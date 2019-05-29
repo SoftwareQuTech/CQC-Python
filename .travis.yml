@@ -1,11 +1,33 @@
-dist: xenial
 language: python
-python:
-    - "3.6"
-    - "3.7"
+only:
+- master
+- Develop
+matrix:
+  include:
+  - name: Python 3.5 on Linux
+    python: 3.5
+  - name: Python 3.6 on Linux
+    python: 3.6
+    env:
+    - BUILD=True
+  - name: Python 3.7 on Xenial Linux
+    python: 3.7
+    dist: xenial
+  - name: Python 3.7 on macOS
+    os: osx
+    osx_image: xcode10.2
+    language: shell
 before_install:
-    - make build
+- make build
 install:
-    - pip3 install dist/*.whl
+- pip3 install dist/*.whl
 script:
-    - make lint
+- make lint
+deploy:
+  provider: pypi
+  user: adahlberg
+  password:
+    secure: cQUlOGHX5ksULLBM2kOE9s2hdaJn4WK8rhD4LUuWndUG7rLeqtVfEMVrqWuMmzWcHXKOti143vgthSgp+akixfnQD7jWupVVSRiz5SFgq+1DRezGlkvYcZz2833on28lNFRiTjuPHkY3WoK0sS1iESxwTBvvi4y+q+AGtFzKE8hr+Pej+HnqFMMeXfqE7d/ZhoOrcBiRRcOrV/2JjpET5CMqimCYR4rz25yzpvVWlakC24vCqGs0Py+JL+VlZszjQz25NAQuuVwOAKnH/bapCV/JFmpvrFF5gKqAly9d1/+ZVgQVT9swMPjwmQs3zQ9E7IlL+4BPhdDly1H/GchyTRvf3uFt6Lok8ySvDyIkZUM2HlIoJIJCAESRCoEK7K7t1ySovBKjXI1Jc8O3QhAvdVMFWPpVxq5ZKwvUAEKtt7vRzN2KVmSi1nJxEzL89iuZkUtihws6DD8Y/6VgcemCFEZlP8ubxxRqR6gSaAhxSHppTdlNK2xUKq5AOwuS8A/3ur7SsMGasmMXTgQ/ElkrlHSZDvub4A89EMxfCMKrutIDPXSdpgYkmAvMFBsop+il/HJwWLc14xiNRsod4XVV5143M3pGg1wNKCifl2tTjbgoho9kFyso6RFkK28Qy3oSqZ+Sdw346M6jD6r2JVm7xsQZI7a5iR2Uq3PESkjkTP0=
+  on:
+    tags: true
+    condition: $BUILD = True
