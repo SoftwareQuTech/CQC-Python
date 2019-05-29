@@ -97,7 +97,7 @@ try:
     from simulaqron.settings import simulaqron_settings
     _simulaqron_version = simulaqron.__version__
     _simulaqron_major = int(_simulaqron_version.split('.')[0])
-except ModuleNotFoundError:
+except ImportError:
     _simulaqron_major = -1
 
 
