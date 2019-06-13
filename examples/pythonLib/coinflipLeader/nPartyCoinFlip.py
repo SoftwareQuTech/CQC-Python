@@ -6,11 +6,12 @@ def main():
     leaderChooser = CoinflipConsensus(arr)  # Elects a leader from array that you declared
     return leaderChooser.leader()
 
+
 # For 12-13-14-15 lines: After seeing "Add person" sentence, you can add person that how many person you want to add.
-#  After adding one person you should press "enter" and then you can continue to add person with press enter 
-#  If you want to cancel from adding person you should press enter again
+# After adding one person you should press "enter" and then you can continue to add person with press enter 
+# If you want to cancel from adding person you should press enter again
 # After enter the all name that you wanted to add you should press "enter"
-# Note that: you should use name from cqc's names space such as Alice, Bob, David, Eve Charlie.., you cant't use name randomly such as Gozde, Axel ...
+# Note that: you should use names configure in the network
 arr = []  # Here an empty array was defined
 veri = input("Add person")   
 while veri:                     
