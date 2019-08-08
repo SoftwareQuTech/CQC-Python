@@ -68,7 +68,6 @@ from cqc.cqcHeader import (
     CQCXtraQubitHeader,
     CQCRotationHeader,
     CQC_VERSION,
-    CQC_HDR_LENGTH,
     CQCHeader,
     CQC_TP_DONE,
     CQC_ERR_UNSUPP,
@@ -76,7 +75,6 @@ from cqc.cqcHeader import (
     CQC_ERR_GENERAL,
     CQCSequenceHeader,
     CQCFactoryHeader,
-    CQC_CMD_HDR_LENGTH,
     CQC_TP_INF_TIME,
     CQC_ERR_NOQUBIT,
     CQCMeasOutHeader,
@@ -174,6 +172,21 @@ def createXtraHeader(command, values):
     else:
         header = None
     return header
+
+
+
+class CQCVariable:
+    _next_ref_id = 0
+    
+    def __init__(self):
+        self._ref_id = CQCVariable._next_ref_id
+        CQCVariable._next_ref_id += 1
+
+    # make ref_id a read-only variable
+    @property
+    def ref_id(self):
+        return self._ref_id
+
 
 
 class CQCConnection:
@@ -509,7 +522,7 @@ class CQCConnection:
         """
         # Send Header
         hdr = CQCHeader()
-        hdr.setVals(CQC_VERSION, CQC_TP_COMMAND, self._appID, CQC_CMD_HDR_LENGTH)
+        hdr.setVals(CQC_VERSION, CQC_TP_COMMAND, self._appID, CQCCmdHeader.HDR_LENGTH)
         msg = hdr.pack()
         self._s.send(msg)
 
@@ -562,11 +575,11 @@ class CQCConnection:
             xtra_hdr.setVals(step)
 
         if xtra_hdr is None:
-            header_length = CQC_CMD_HDR_LENGTH
+            header_length = CQCCmdHeader.HDR_LENGTH
             xtra_msg = b""
         else:
             xtra_msg = xtra_hdr.pack()
-            header_length = CQC_CMD_HDR_LENGTH + xtra_hdr.HDR_LENGTH
+            header_length = CQCCmdHeader.HDR_LENGTH + xtra_hdr.HDR_LENGTH
 
             # Send Header
         hdr = CQCHeader()
@@ -595,7 +608,7 @@ class CQCConnection:
         """
         # Send Header
         hdr = CQCHeader()
-        hdr.setVals(CQC_VERSION, CQC_TP_GET_TIME, self._appID, CQC_CMD_HDR_LENGTH)
+        hdr.setVals(CQC_VERSION, CQC_TP_GET_TIME, self._appID, CQCCmdHeader.HDR_LENGTH)
         msg = hdr.pack()
         self._s.send(msg)
 
@@ -616,7 +629,7 @@ class CQCConnection:
 
         # CQC header
         hdr = CQCHeader()
-        hdr.setVals(CQC_VERSION, CQC_TP_COMMAND, self._appID, CQC_CMD_HDR_LENGTH)
+        hdr.setVals(CQC_VERSION, CQC_TP_COMMAND, self._appID, CQCCmdHeader.HDR_LENGTH)
         cqc_msg = hdr.pack()
 
         # Command header
@@ -757,10 +770,10 @@ class CQCConnection:
                 xtra_hdr = CQCRotationHeader()
                 xtra_hdr.setVals(step_size)
             xtra_msg = xtra_hdr.pack()
-            hdr_length = CQC_CMD_HDR_LENGTH + CQCFactoryHeader.HDR_LENGTH + xtra_hdr.HDR_LENGTH
+            hdr_length = CQCCmdHeader.HDR_LENGTH + CQCFactoryHeader.HDR_LENGTH + xtra_hdr.HDR_LENGTH
         else:
             xtra_msg = b""
-            hdr_length = CQC_CMD_HDR_LENGTH + CQCFactoryHeader.HDR_LENGTH
+            hdr_length = CQCCmdHeader.HDR_LENGTH + CQCFactoryHeader.HDR_LENGTH
 
             # Send Header
         hdr = CQCHeader()
@@ -835,18 +848,18 @@ class CQCConnection:
 
                     # If we don't have the CQC header yet, try and read it in full.
             if not gotCQCHeader:
-                if len(self.buf) < CQC_HDR_LENGTH:
+                if len(self.buf) < CQCHeader.HDR_LENGTH:
                     # Not enough data for CQC header, return and wait for the rest
                     checkedBuf = True
                     continue
 
                     # Got enough data for the CQC Header so read it in
                 gotCQCHeader = True
-                rawHeader = self.buf[0:CQC_HDR_LENGTH]
+                rawHeader = self.buf[0:CQCHeader.HDR_LENGTH]
                 currHeader = CQCHeader(rawHeader)
 
                 # Remove the header from the buffer
-                self.buf = self.buf[CQC_HDR_LENGTH : len(self.buf)]
+                self.buf = self.buf[CQCHeader.HDR_LENGTH : len(self.buf)]
 
                 # Check for error
                 self.check_error(currHeader)

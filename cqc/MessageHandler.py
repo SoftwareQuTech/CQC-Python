@@ -61,7 +61,6 @@ from cqc.cqcHeader import (
     CQCXtraQubitHeader,
     CQCRotationHeader,
     CQCXtraHeader,
-    CQC_CMD_XTRA_LENGTH,
     CQC_VERSION,
     CQCHeader,
     CQC_TP_DONE,
@@ -70,7 +69,6 @@ from cqc.cqcHeader import (
     CQC_ERR_GENERAL,
     CQCSequenceHeader,
     CQCFactoryHeader,
-    CQC_CMD_HDR_LENGTH,
 )
 from twisted.internet.defer import DeferredLock, inlineCallbacks
 
@@ -211,7 +209,7 @@ class CQCMessageHandler(ABC):
         """
         if cqc_version < 1:
             if has_extra(cmd):
-                cmd_length = CQC_CMD_XTRA_LENGTH
+                cmd_length = CQCXtraHeader.HDR_LENGTH
                 hdr = CQCXtraHeader(cmd_data[:cmd_length])
                 return hdr
             else:
@@ -255,7 +253,7 @@ class CQCMessageHandler(ABC):
         cur_length = 0
         should_notify = None
         while cur_length < length:
-            cmd = CQCCmdHeader(cmd_data[cur_length: cur_length + CQC_CMD_HDR_LENGTH])
+            cmd = CQCCmdHeader(cmd_data[cur_length: cur_length + CQCCmdHeader.HDR_LENGTH])
             logging.debug("CQC %s got command header %s", self.name, cmd.printable())
 
             newl = cur_length + cmd.HDR_LENGTH

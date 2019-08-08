@@ -31,7 +31,7 @@ import logging
 from twisted.internet.defer import inlineCallbacks
 from twisted.internet.protocol import Protocol, connectionDone
 
-from cqc.cqcHeader import CQC_HDR_LENGTH, CQC_VERSION, CQCHeader
+from cqc.cqcHeader import CQC_VERSION, CQCHeader
 
 ###############################################################################
 #
@@ -96,17 +96,17 @@ class CQCProtocol(Protocol):
 
             # If we don't have the CQC header yet, try and read it in full.
         if not self.gotCQCHeader:
-            if len(self.buf) < CQC_HDR_LENGTH:
+            if len(self.buf) < CQCHeader.HDR_LENGTH:
                 # Not enough data for CQC header, return and wait for the rest
                 return
 
                 # Got enough data for the CQC Header so read it in
             self.gotCQCHeader = True
-            raw_header = self.buf[0:CQC_HDR_LENGTH]
+            raw_header = self.buf[0:CQCHeader.HDR_LENGTH]
             self.currHeader = CQCHeader(raw_header)
 
             # Remove the header from the buffer
-            self.buf = self.buf[CQC_HDR_LENGTH: len(self.buf)]
+            self.buf = self.buf[CQCHeader.HDR_LENGTH: len(self.buf)]
 
             logging.debug("CQC %s: Read CQC Header: %s", self.name, self.currHeader.printable())
 
