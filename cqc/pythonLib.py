@@ -27,6 +27,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+# This import allows to use type hints for classes that have not been defined yet. 
+# See https://stackoverflow.com/questions/33533148/how-do-i-specify-that-the-return-type-of-a-method-is-the-same-as-the-class-itsel
+# This import must be the very first import in this file, otherwise an error is raised
+from __future__ import annotations
+
 import math
 import os
 import sys
@@ -34,6 +40,7 @@ import time
 import logging
 import socket
 import warnings
+from typing import Union, Any, List
 
 from cqc.cqcHeader import (
     Header,
@@ -85,7 +92,11 @@ from cqc.cqcHeader import (
     CQC_TP_EPR_OK,
     CQC_TP_NEW_OK,
     CQC_TP_EXPIRE,
-    CQCLogicalOperator 
+    CQCLogicalOperator,
+    CQCIFHeader,
+    CQCTypeHeader,
+    CQCType,
+    CQCAssignHeader
 )
 from cqc.entInfoHeader import EntInfoHeader
 from cqc.hostConfig import cqc_node_id_from_addrinfo
@@ -173,29 +184,6 @@ def createXtraHeader(command, values):
     else:
         header = None
     return header
-
-
-
-class CQCVariable:
-    _next_ref_id = 0
-    
-    def __init__(self):
-        self._ref_id = CQCVariable._next_ref_id
-        CQCVariable._next_ref_id += 1
-
-    # make ref_id a read-only variable
-    @property
-    def ref_id(self):
-        return self._ref_id
-
-    # override the == operator
-    def __eq__(self, other):
-        return ()
-    
-    # override the != operator
-    def __ne__(self, other):
-        pass
-
 
 
 class CQCConnection:
@@ -338,6 +326,11 @@ class CQCConnection:
 
         # Bool that indicates whether we are in a factory and thus should pend commands
         self.pend_messages = pend_messages
+
+        # Bool that indicates wheter we are in a CQCType.PROGRAM
+        self._inside_cqc_program = False
+
+
 
     def _pend_header(self, header: Header) -> None:
         self._pending_headers.append(header)
@@ -1258,11 +1251,11 @@ class CQCConnection:
             self.flush()
         self.pend_messages = pend_messages
 
-    def flush(self, do_sequence=True):
+    def flush(self, do_sequence=False):
         """
         Flush all pending messages to the backend.
         :param do_sequence: boolean to indicate if you want to send the pending messages as a sequence
-        :return: A list of things that are send back from the server. Can be qubits, or outcomes
+        :return: A list of things that are sent back from the server. Can be qubits, or outcomes
         """
         return self.flush_factory(1, do_sequence)
 
@@ -1276,16 +1269,11 @@ class CQCConnection:
         # Initialize should_notify to False
         should_notify = False
 
-        # store the total message length
-        message_length = 0
-
-        # Remember the headers about which the backend will send a message in return
-        expect_return = []
+        # Store how many of the headers we send will get a response message from the backend
+        response_amount = 0
 
         # Loop over the pending_headers to determine the total length and set should_notify
         for header in self._pending_headers:
-
-            message_length += header.HDR_LENGTH
 
             # Check if the current header is a Command header. It can also be a sub header
             if isinstance(header, CQCCmdHeader):
@@ -1294,42 +1282,30 @@ class CQCConnection:
                 
                 # Remember this header if we expect a return messge
                 if shouldReturn(header.instr):
-                    expect_return.append(header)
+                    response_amount += 1
 
-            
 
         # Determine the CQC Header type
         if num_iter == 1:
             cqc_type = CQC_TP_COMMAND
         else:
+            # Build and insert the Factory header
             cqc_type = CQC_TP_FACTORY
             factory_header = CQCFactoryHeader()
             factory_header.setVals(num_iter, should_notify, block_factory)
-            message_length += factory_header.HDR_LENGTH
             # Insert the factory header at the front
             self._pending_headers.insert(0, factory_header)
             
-        # Build the CQC Header
-        cqc_header = CQCHeader()
-        cqc_header.setVals(CQC_VERSION, cqc_type, self._appID, message_length)
-        # Insert CQC Header at the front
-        self._pending_headers.insert(0, cqc_header)
-
-        print('========================================================')
-        # send the headers
-        for header in self._pending_headers:
-            self._s.send(header.pack())
-            print(header.printable())
-            logging.debug("App {} sends CQC: {}".format(self.name, header.printable()))
-            
-        print('========================================================')
-        # Reset _pending_headers to an empty list after all headers are sent
-        self._pending_headers = []
+        # Insert the cqc header
+        self.insert_cqc_header(cqc_type)
+        
+        # Send all pending headers
+        self.send_pending_headers()
 
         # Read out any returned messages from the backend
         res = []
         for _ in range(num_iter):
-            for header in expect_return:
+            for _ in range(response_amount):
                 message = self.readMessage()
                 self.check_error(message[0])
                 res.append(self.parse_CQC_msg(message))
@@ -1341,6 +1317,58 @@ class CQCConnection:
         
         # Return information that the backend returned
         return res
+
+    
+
+    def send_pending_headers(self) -> List[Any]:
+        """
+        Sends all pending headers.
+        After sending, self._pending_headers is emptied.
+        """
+
+        print('========================================================')
+        # Send all pending headers
+        for header in self._pending_headers:
+            #self._s.send(header.pack())
+            print('--------------------------------')
+            print(header.printable())
+            logging.debug("App {} sends CQC: {}".format(self.name, header.printable()))
+
+            
+        print('========================================================')
+
+        # Reset _pending_headers to an empty list after all headers are sent
+        self._pending_headers = []
+
+
+
+    def insert_cqc_header(self, cqc_type: CQCType, version=CQC_VERSION) -> None:
+        """
+        Inserts a CQC Header at index 0 of self._pending_headers.
+        Invoke this method *after* all other headers are pended, so that the correct message length is calculated.
+        """
+
+        # Count the total message length
+        message_length = 0
+        for header in self._pending_headers:
+            message_length += header.HDR_LENGTH
+
+        # Build the CQC Header
+        cqc_header = CQCHeader()
+        cqc_header.setVals(CQC_VERSION, cqc_type, self._appID, message_length)
+
+        # Insert CQC Header at the front
+        self._pending_headers.insert(0, cqc_header)
+
+
+    def _pend_type_header(self, cqc_type: CQCType, length: int) -> None:
+        """
+        Creates a CQCTypeHeader and pends it.
+        """
+        header = CQCTypeHeader()
+        header.setVals(cqc_type, length)
+        self._pend_header(header)
+
 
     def tomography(self, preparation, iterations, progress=True):
         """
@@ -1423,28 +1451,200 @@ class CQCConnection:
         return True
 
 
-    
-    def cqc_if(self):
-        
-        if not self.pend_messages:
-            raise CQCGeneralError('Conditionals can only be used if messages are pended. Run CQCConnection.set_pending(True) before any conditionals.')
 
-        return CQCConditional(self)
+class CQCVariable:
+    _next_ref_id = 0
+    
+    def __init__(self):
+        self._ref_id = CQCVariable._next_ref_id
+        CQCVariable._next_ref_id += 1
+
+    # make ref_id a read-only variable
+    @property
+    def ref_id(self):
+        return self._ref_id
+
+    # override the == operator
+    # other can be a CQCVariable or int
+    def __eq__(self, other: Union['CQCVariable', int]):
+        return LogicalFunction(self, CQCLogicalOperator.EQ, other)
+    
+    # override the != operator
+    def __ne__(self, other: Union['CQCVariable', int]):
+        return LogicalFunction(self, CQCLogicalOperator.NEQ, other)
+        
+
+class LogicalFunction:
+
+    def __init__(self, 
+        operand_one: CQCVariable, 
+        operator: CQCLogicalOperator, 
+        operand_two: Union[CQCVariable, int]
+        ):
+
+        self.operand_one = operand_one
+        self.operator = operator
+        self.operand_two = operand_two
+
+    def get_negation(self) -> LogicalFunction:
+        return LogicalFunction(self.operand_one, CQCLogicalOperator.opposite_of(self.operator), self.operand_two)
+
+    def get_CQCIFHeader(self) -> CQCIFHeader:
+
+        if isinstance(self.operand_two, int):
+            type_of_operand_two = CQCIFHeader.TYPE_VALUE
+            operand_two = self.operand_two
+        else:
+            type_of_operand_two = CQCIFHeader.TYPE_REF_ID
+            operand_two = self.operand_two._ref_id
+
+        header = CQCIFHeader()
+        header.setVals(
+            self.operand_one.ref_id,
+            self.operator,
+            type_of_operand_two,
+            operand_two,
+            length=0
+        )
+        return header
+
+
+
+class CQCProgram:
+    def __init__(self, cqc_connection: CQCConnection):
+        self._conn = cqc_connection
+
+    def __enter__(self):
+        # Set the _inside_cqc_program bool to True on the connection
+        self._conn._inside_cqc_program = True
+
+        self._conn.pend_messages = True
+
+        # Return self so that this instance is bound to the variable after "as", i.e.: "with CQCProgram() as pgrm"
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # Build and insert the CQC Header
+        self._conn.insert_cqc_header(CQCType.PROGRAM)
+
+        # Send this program to the backend
+        self._conn.send_pending_headers()
+
+        # We are no longer in a TP_PROGRAM
+        self._conn._inside_cqc_program = False
+
+        self._conn.pend_messages = False
+
+    def cqc_if(self, logical_function: LogicalFunction):
+        return CQCConditional(self._conn, False, logical_function)
 
     def cqc_else(self):
-        pass
+        # Find out to which if this else belongs
+        return CQCConditional(self._conn, True)
+
+    def repeat(self, repetition_amount: int):
+        return CQCFactory(self._conn, repetition_amount)
+
+class CQCFactory:
+
+    def __init__(self, cqc_connection: CQCConnection, repetition_amount: int):
+        self._conn = cqc_connection
+        self._repetition_amount = repetition_amount
+
+    def __enter__(self):
+
+        # Inside a TP_FACTORY, we don't want CQCType headers before every instruction.
+        # Therefore, we set this bool to False
+        self._conn._inside_cqc_program = False
+
+        # Create the CQC Type header, and store it so that we can modify its length at __exit__
+        self.type_header = CQCTypeHeader()
+        self.type_header.setVals(CQCType.FACTORY, length=0)
+
+        # Build the Factory header
+        factory_header = CQCFactoryHeader()
+        factory_header.setVals(self._repetition_amount)
+
+        # Pend the headers
+        self._conn._pend_header(self.type_header)
+        self._conn._pend_header(factory_header)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+
+        # Outside a TP_FACTORY, we want CQCType headers before every instruction.
+        # Therefore, we set this bool to True
+        self._conn._inside_cqc_program = True
+
+        # Calculate the length of the body of the factory
+        # Loop in reverse through all pending_headers to calculate the length of all headers
+        index = len(self._conn._pending_headers) - 1
+        body_length = 0
+        while self._conn._pending_headers[index] is not self.type_header:
+            body_length += self._conn._pending_headers[index].HDR_LENGTH
+            index -= 1
+        
+        # Set the correct length
+        self.type_header.length = body_length
+
 
 
 class CQCConditional:
 
-    def __init__(self, cqc_connection: CQCConnection):
-        pass
+    # This private class variable holds the last CQCConditional that 
+    # functioned as an IF (as opposed to an ELSE) on which __exit__ is invoked. 
+    # In other words, it is the last closed IF statement. 
+    # This is important so that ELSE statements can find out to which IF statement they belong.
+    # If this variable is None, then there either has not been aan IF statement yet, or the last 
+    # CQCConditional was an ELSE.
+    _last_closed_conditional = None
+
+    def __init__(self, cqc_connection: CQCConnection, is_else: bool, logical_function: LogicalFunction=None):
+        self._conn = cqc_connection
+        self.is_else = is_else
+
+        if is_else:
+            # If _last_closed_conditional is None, then there either has not been aan IF statement yet, or the last 
+            # CQCConditional was an ELSE.
+            if CQCConditional._last_closed_conditional is None:
+                raise CQCGeneralError('Cannot use an ELSE if there is no IF directly before it.')
+            else:
+                # Get the negation of the logical function of the IF, 
+                # which will be the logical function for this ELSE statement
+                logical_function = CQCConditional._last_closed_conditional._logical_function.get_negation()
+            
+        self._logical_function = logical_function
 
     def __enter__(self):
-        pass
+        # Pend CQC Type header
+        self._conn._pend_type_header(CQCType.IF, CQCIFHeader.HDR_LENGTH)
+
+        # Build the IF header, and store it so we can modify its length at __exit__
+        self.header = self._logical_function.get_CQCIFHeader()
+
+        # Pend the IF header
+        self._conn._pend_header(self.header)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
+
+        # Set _last_closed_conditional to the correct value
+        if (self.is_else):
+            CQCConditional._last_closed_conditional = None
+        else:
+            CQCConditional._last_closed_conditional = self
+
+        
+        # Calculate the length of the body of the conditional
+        # Loop in reverse through all pending_headers to calculate the lenght of all headers
+        index = len(self._conn._pending_headers) - 1
+        body_length = 0
+        while self._conn._pending_headers[index] is not self.header:
+            body_length += self._conn._pending_headers[index].HDR_LENGTH
+            index -= 1
+        
+        # Set the correct length
+        self.header.length = body_length
+            
+
 
 
 
@@ -1645,9 +1845,9 @@ class qubit:
         Qubit is not active. Possible causes:
         - Qubit is sent to another node
         - Qubit is measured (with inplace=False)
-        - Qubit is realeased released
+        - Qubit is released
         - Qubit is not not received. 
-        - Qubits is used and created in the same factory.
+        - Qubit is used and created in the same factory.
         """)
 
     def _set_active(self, be_active):
@@ -1673,7 +1873,11 @@ class qubit:
         self.check_active()
 
         if self._cqc.pend_messages:
-            
+
+            # If we are inside a TP_PROGRAM, then insert the CQC Type header before the command header
+            if self._cqc._inside_cqc_program:
+                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH)
+
             # Build the header
             header = CQCCmdHeader()
             header.setVals(qubit_id=self._qID, instr=command, notify=notify, block=block)
@@ -1880,6 +2084,10 @@ class qubit:
 
         if self._cqc.pend_messages:
 
+            # If we are inside a TP_PROGRAM, then insert the CQC Type header before the command header
+            if self._cqc._inside_cqc_program:
+                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH + CQCXtraQubitHeader.HDR_LENGTH)
+
             # Build command header and extra qubit sub header
             command_header = CQCCmdHeader()
             command_header.setVals(self._qID, command, notify, block)
@@ -1961,15 +2169,30 @@ class qubit:
 
         if self._cqc.pend_messages:
 
+            # If we are inside a TP_PROGRAM, then insert the CQC Type header before the command header
+            if self._cqc._inside_cqc_program:
+                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH + CQCAssignHeader.HDR_LENGTH)
+
+            # Create a CQC Variable that holds the reference id for the measurement outcome
+            cqc_variable = CQCVariable()
+
             # Build header
             header = CQCCmdHeader()
             header.setVals(self._qID, command, block=block)
 
-            # Pend header
+            # Bild Assign sub header
+            assign_sub_header = CQCAssignHeader()
+            assign_sub_header.setVals(cqc_variable.ref_id)
+
+            # Pend headers
             self._cqc._pend_header(header)
+            self._cqc._pend_header(assign_sub_header)
+
 
             # print info
             logging.debug("App {} pends message: 'Measure qubit with ID {}'".format(self._cqc.name, self._qID))
+
+            return cqc_variable
 
         else:
             # print info

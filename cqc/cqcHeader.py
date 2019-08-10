@@ -143,6 +143,14 @@ class CQCLogicalOperator(IntEnum):
     EQ = 0 # Equal
     NEQ = 1 # Not equal
 
+    @staticmethod
+    def opposite_of(operator: 'CQCLogicalOperator'): # String literal type hint because it is a forward reference
+       opposites = {
+           CQCLogicalOperator.EQ: CQCLogicalOperator.NEQ,
+           CQCLogicalOperator.NEQ: CQCLogicalOperator.EQ
+       }
+       return opposites[operator]
+
 class Header(metaclass=abc.ABCMeta):
     """
     Abstact class for headers.
@@ -427,7 +435,9 @@ class CQCIFHeader(Header):
         return ("CQC IF header. RefID=" + str(self.first_operand)
         + " | Operator=" + str(self.operator)
         + " | " + operand_type + "=" + str(self.second_operand)
-        + " | Second_operand_type=" + operand_type)
+        + " | Second_operand_type=" + operand_type
+        + " | Body_length=" + str(self.length)
+        )
 
 
 class CQCCmdHeader(Header):
