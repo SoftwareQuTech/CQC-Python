@@ -41,6 +41,7 @@ import logging
 import socket
 import warnings
 from typing import Union, Any, List
+from anytree import NodeMixin, RenderTree
 
 from cqc.cqcHeader import (
     Header,
@@ -330,6 +331,8 @@ class CQCConnection:
         # Bool that indicates wheter we are in a CQCType.PROGRAM
         self._inside_cqc_program = False
 
+        #!!!
+        self.current_scope = None
 
 
     def _pend_header(self, header: Header) -> None:
@@ -716,7 +719,7 @@ class CQCConnection:
             self.check_error(msg[0])
             if msg[0].tp != CQC_TP_DONE:
                 raise CQCUnsuppError(
-                    "Unexpected message send back from the server. Message: {}".format(msg[0].printable())
+                    "Unexpected message sent back from the server. Message: {}".format(msg[0].printable())
                 )
             self.print_CQC_msg(msg)
 
@@ -1329,9 +1332,9 @@ class CQCConnection:
         print('========================================================')
         # Send all pending headers
         for header in self._pending_headers:
-            #self._s.send(header.pack())
+            self._s.send(header.pack())
             print('--------------------------------')
-            print(header.printable())
+            print("SENT: " + header.printable())
             logging.debug("App {} sends CQC: {}".format(self.name, header.printable()))
 
             
@@ -1510,9 +1513,12 @@ class LogicalFunction:
 
 
 
-class CQCProgram:
+class CQCProgram(NodeMixin):
     def __init__(self, cqc_connection: CQCConnection):
         self._conn = cqc_connection
+
+        #!!!
+        self._conn.current_scope = self
 
     def __enter__(self):
         # Set the _inside_cqc_program bool to True on the connection
@@ -1524,16 +1530,26 @@ class CQCProgram:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        # Build and insert the CQC Header
-        self._conn.insert_cqc_header(CQCType.PROGRAM)
+        
+        # Only do these things if there was no exception.
+        if exc_type is None:
+            # Build and insert the CQC Header
+            self._conn.insert_cqc_header(CQCType.PROGRAM)
 
-        # Send this program to the backend
-        self._conn.send_pending_headers()
+            # Send this program to the backend
+            self._conn.send_pending_headers()
 
-        # We are no longer in a TP_PROGRAM
-        self._conn._inside_cqc_program = False
+            # We are no longer in a TP_PROGRAM
+            self._conn._inside_cqc_program = False
 
-        self._conn.pend_messages = False
+            self._conn.pend_messages = False
+
+
+            #!!!
+            self._conn.current_scope = None
+
+        print(RenderTree(self))
+
 
     def cqc_if(self, logical_function: LogicalFunction):
         return CQCConditional(self._conn, False, logical_function)
@@ -1542,10 +1558,10 @@ class CQCProgram:
         # Find out to which if this else belongs
         return CQCConditional(self._conn, True)
 
-    def repeat(self, repetition_amount: int):
-        return CQCFactory(self._conn, repetition_amount)
+    def loop(self, times: int):
+        return CQCFactory(self._conn, times)
 
-class CQCFactory:
+class CQCFactory():
 
     def __init__(self, cqc_connection: CQCConnection, repetition_amount: int):
         self._conn = cqc_connection
@@ -1588,7 +1604,7 @@ class CQCFactory:
 
 
 
-class CQCConditional:
+class CQCConditional(NodeMixin):
 
     # This private class variable holds the last CQCConditional that 
     # functioned as an IF (as opposed to an ELSE) on which __exit__ is invoked. 
@@ -1624,6 +1640,11 @@ class CQCConditional:
         # Pend the IF header
         self._conn._pend_header(self.header)
 
+
+        #!!!
+        self.parent = self._conn.current_scope
+        self._conn.current_scope = self
+
     def __exit__(self, exc_type, exc_val, exc_tb):
 
         # Set _last_closed_conditional to the correct value
@@ -1644,6 +1665,8 @@ class CQCConditional:
         # Set the correct length
         self.header.length = body_length
             
+        #!!!
+        self._conn.current_scope = self.parent
 
 
 
@@ -1739,8 +1762,12 @@ class qubit:
                 "For more information, see https://softwarequtech.github.io/SimulaQron/html/PythonLib.html"
             )
 
-            # Whether the qubit is active. Will be set in the first run
+        # Whether the qubit is active. Will be set in the first run
         self._active = None
+
+        # !!!
+        self.scope_of_deactivation = None
+
 
         if createNew:
             if cqc.pend_messages:
@@ -1841,19 +1868,35 @@ class qubit:
         Checks if the qubit is active
         """
         if not self._active:
-            raise QubitNotActiveError("""
+
+            #!!!
+            if (
+                not self._cqc._inside_cqc_program
+                or self.scope_of_deactivation == self._cqc.current_scope
+                or self.scope_of_deactivation in self._cqc.current_scope.ancestors
+                or self.scope_of_deactivation in self._cqc.current_scope.descendants
+            ):
+
+                raise QubitNotActiveError("""
         Qubit is not active. Possible causes:
         - Qubit is sent to another node
         - Qubit is measured (with inplace=False)
         - Qubit is released
-        - Qubit is not not received. 
-        - Qubit is used and created in the same factory.
+        - Qubit is not received
+        - Qubit is used and created in the same factory
+        - Qubit is measured (with inplace=False) inside a cqc_if block earlier in the code
         """)
 
     def _set_active(self, be_active):
+
+        #!!!
+        if not be_active and self._cqc._inside_cqc_program:
+            self.scope_of_deactivation = self._cqc.current_scope
+
         # Check if not already new state
         if self._active == be_active:
-            return
+           return
+
         if be_active:
             self._cqc.active_qubits.append(self)
         else:

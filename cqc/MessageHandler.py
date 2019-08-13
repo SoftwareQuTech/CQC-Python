@@ -69,6 +69,8 @@ from cqc.cqcHeader import (
     CQC_ERR_GENERAL,
     CQCSequenceHeader,
     CQCFactoryHeader,
+    CQCType,
+    CQCTypeHeader
 )
 from twisted.internet.defer import DeferredLock, inlineCallbacks
 
@@ -116,10 +118,12 @@ class CQCMessageHandler(ABC):
     def __init__(self, factory):
         # Functions to invoke when receiving a CQC Header of a certain type
         self.messageHandlers = {
-            CQC_TP_HELLO: self.handle_hello,
-            CQC_TP_COMMAND: self.handle_command,
-            CQC_TP_FACTORY: self.handle_factory,
-            CQC_TP_GET_TIME: self.handle_time,
+            CQCType.HELLO: self.handle_hello,
+            CQCType.COMMAND: self.handle_command,
+            CQCType.FACTORY: self.handle_factory,
+            CQCType.GET_TIME: self.handle_time,
+            CQCType.PROGRAM: self.handle_program,
+            CQCType.IF: self.handle_conditional
         }
 
         # Functions to invoke when receiving a certain command
@@ -272,6 +276,7 @@ class CQCMessageHandler(ABC):
                 logging.debug("CQC %s: Read XTRA Header: %s", self.name, xtra.printable())
 
             # Run this command
+            print(cmd.printable())
             logging.debug("CQC %s: Executing command: %s", self.name, cmd.printable())
             if cmd.instr not in self.commandHandlers:
                 logging.debug("CQC {}: Unknown command {}".format(self.name, cmd.instr))
@@ -370,6 +375,41 @@ class CQCMessageHandler(ABC):
             self._sequence_lock.release()
 
         return succ and should_notify
+
+
+    @inlineCallbacks
+    def handle_program(self, header: CQCHeader, data: bytes):
+        """
+        Handler for messages of TP_PROGRAM. Notice that header is the CQC Header, and data is the complete bocy, excluding the CQC Header.
+        """
+        # Strategy for handling TP_PROGRAM:
+        # The first bit of data will be a CQC Type header. We extract this header.
+        # We extract from this first CQC Type header the type of the following instructions, and we invoke the 
+        # corresponding handler from self.messageHandlers. This handler expects as parameter header a CQC Header. 
+        # Therefore, we construct the CQC Header that corresponds to the TP_HEADER, and input that constructed 
+        # CQC Header as header parameter.
+        # After this handler returns, we repeat until the end of the program.
+
+        current_position = 0
+
+        while current_position < header.length:
+
+            # Extract CQCTypeHeader
+            type_header = CQCTypeHeader(data[current_position : current_position + CQCTypeHeader.HDR_LENGTH])
+
+            current_position += CQCTypeHeader.HDR_LENGTH
+
+            # Create equivalent CQCHeader
+            equiv_cqc_header = type_header.make_equivalent_CQCHeader(header.version, header.app_id)
+
+            yield self.messageHandlers[type_header.type](equiv_cqc_header, data[current_position:])
+            current_position += type_header.length
+        
+
+
+    def handle_conditional(self, header: CQCHeader, data: bytes):
+        pass
+
 
     @abstractmethod
     def handle_hello(self, header, data):

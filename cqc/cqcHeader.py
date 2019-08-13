@@ -359,6 +359,15 @@ class CQCTypeHeader(Header):
         Produce a printable string for information purposes.
         """
         return "CQC Type header. Type=" + str(self.type) + " | Length=" + str(self.length)
+
+
+    def make_equivalent_CQCHeader(self, version: int, app_id: int) -> CQCHeader:
+        """
+        Produce a CQC Header that is equivalent to this CQCTypeHeader. This method does not make any modifications to self.
+        """
+        cqc_header = CQCHeader()
+        cqc_header.setVals(version, self.type, app_id, self.length)
+        return cqc_header
         
 
 
