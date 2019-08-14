@@ -103,6 +103,32 @@ def has_extra(cmd):
 
     return False
 
+def is_error_message(message: bytes):
+
+    # Only CQCHeaders can be error messages, so if the length does not correspond it is not an error message
+    try:
+        header = CQCHeader(message)
+    # A ValueError is raised by Header.__init__ if the message cannot be read as a CQCHeader.
+    # Since only CQCHeaders can contain errors, this means the message is not an error
+    except ValueError:
+        return False
+
+    error_types = {
+        CQCType.ERR_GENERAL,
+        CQCType.ERR_INUSE,
+        CQCType.ERR_NOQUBIT,
+        CQCType.ERR_TIMEOUT,
+        CQCType.ERR_UNKNOWN,
+        CQCType.ERR_UNSUPP
+    }
+
+    if header.tp in error_types:
+        return True
+    else:
+        return False
+
+    
+
 
 def print_error(error):
     logging.error("Uncaught twisted error found: {}".format(error))
@@ -380,14 +406,14 @@ class CQCMessageHandler(ABC):
     @inlineCallbacks
     def handle_program(self, header: CQCHeader, data: bytes):
         """
-        Handler for messages of TP_PROGRAM. Notice that header is the CQC Header, and data is the complete bocy, excluding the CQC Header.
+        Handler for messages of TP_PROGRAM. Notice that header is the CQC Header, and data is the complete body, excluding the CQC Header.
         """
         # Strategy for handling TP_PROGRAM:
-        # The first bit of data will be a CQC Type header. We extract this header.
-        # We extract from this first CQC Type header the type of the following instructions, and we invoke the 
-        # corresponding handler from self.messageHandlers. This handler expects as parameter header a CQC Header. 
-        # Therefore, we construct the CQC Header that corresponds to the TP_HEADER, and input that constructed 
-        # CQC Header as header parameter.
+        # The first bit of data will be a CQCType header. We extract this header.
+        # We extract from this first CQCType header the type of the following instructions, and we invoke the 
+        # corresponding handler from self.messageHandlers. This handler expects as parameter "header" a CQCHeader. 
+        # Therefore, we construct the CQCHeader that corresponds to the CQCType header (remember that the CQCType header is just a reduced CQCHeader),
+        # and input that constructed CQCHeader as "header" parameter.
         # After this handler returns, we repeat until the end of the program.
 
         current_position = 0
@@ -406,6 +432,15 @@ class CQCMessageHandler(ABC):
             current_position += type_header.length
         
 
+        # A TP_PROGRAM should return the first error if there is an error message present, and otherwise return one TP_DONE
+        # We use the next function to retrieve the first error message from the list.
+        # Notice the [:] syntax. This ensures the underlying list is updated, and not just the variable.
+        # See https://stackoverflow.com/questions/2361426/get-the-first-item-from-an-iterable-that-matches-a-condition
+        # and https://stackoverflow.com/questions/1207406/how-to-remove-items-from-a-list-while-iterating
+        self.return_messages[:] = [next(
+            (message for message in self.return_messages if is_error_message(message)),
+            self.create_return_message(header.app_id, CQCType.DONE, cqc_version=header.version)
+        )]
 
     def handle_conditional(self, header: CQCHeader, data: bytes):
         pass

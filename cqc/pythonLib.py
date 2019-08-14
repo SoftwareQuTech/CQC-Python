@@ -1539,16 +1539,22 @@ class CQCProgram(NodeMixin):
             # Send this program to the backend
             self._conn.send_pending_headers()
 
+            # We expect one message back, which can be an error or TP_DONE
+            # This also blocks the program until we have received a message from the backend, 
+            # which is important because it avoids that we send more messages before the backend is finished.
+            message = self._conn.readMessage()
+
+            # Check if it is an error and assume it is a TP_DONE if it is not an error
+            self._conn.check_error(message[0])
+
             # We are no longer in a TP_PROGRAM
             self._conn._inside_cqc_program = False
 
             self._conn.pend_messages = False
 
-
             #!!!
             self._conn.current_scope = None
 
-        print(RenderTree(self))
 
 
     def cqc_if(self, logical_function: LogicalFunction):
