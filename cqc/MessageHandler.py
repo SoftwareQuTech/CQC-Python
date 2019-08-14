@@ -70,7 +70,10 @@ from cqc.cqcHeader import (
     CQCSequenceHeader,
     CQCFactoryHeader,
     CQCType,
-    CQCTypeHeader
+    CQCTypeHeader,
+    CQCAssignHeader,
+    CQCIFHeader,
+    CQCLogicalOperator
 )
 from twisted.internet.defer import DeferredLock, inlineCallbacks
 
@@ -180,7 +183,13 @@ class CQCMessageHandler(ABC):
 
         # Convenience
         self.name = factory.name
-        self.return_messages = []  # List of all cqc messages to return
+
+        # List of all cqc messages to return
+        self.return_messages = []  
+
+        # Dictionary that stores all reference ids and their values.
+        self.references = {}
+
 
     @inlineCallbacks
     def handle_cqc_message(self, header, message, transport=None):
@@ -191,6 +200,7 @@ class CQCMessageHandler(ABC):
         if header.tp in self.messageHandlers:
             try:
                 should_notify = yield self.messageHandlers[header.tp](header, message)
+                
                 if should_notify:
                     # Send a notification that we are done if successful
                     logging.debug("CQC %s: Command successful, sent done.", self.name)
@@ -255,6 +265,9 @@ class CQCMessageHandler(ABC):
         elif instruction == CQC_CMD_ROT_X or instruction == CQC_CMD_ROT_Y or instruction == CQC_CMD_ROT_Z:
             cmd_length = CQCRotationHeader.HDR_LENGTH
             hdr = CQCRotationHeader(cmd_data[:cmd_length])
+        elif instruction == CQC_CMD_MEASURE or instruction == CQC_CMD_MEASURE_INPLACE:
+            cmd_length = CQCAssignHeader.HDR_LENGTH
+            hdr = CQCAssignHeader(cmd_data[:cmd_length])
         else:
             return None
         return hdr
@@ -325,40 +338,9 @@ class CQCMessageHandler(ABC):
                 msg = self.create_return_message(cqc_header.app_id, CQC_ERR_GENERAL, cqc_version=cqc_header.version)
                 self.return_messages.append(msg)
                 return False, 0
+            
             if succ is False:  # only if it explicitly is false, if succ is None then we assume it went fine
                 return False, 0
-
-            # Check if there are additional commands to execute afterwards
-            if cmd.action:
-                # lock the sequence
-                if not is_locked:
-                    self._sequence_lock.acquire()
-                sequence_header = CQCSequenceHeader(data[newl: newl + CQCSequenceHeader.HDR_LENGTH])
-                newl += sequence_header.HDR_LENGTH
-                logging.debug("CQC %s: Reading extra action commands", self.name)
-                try:
-                    (succ, retNotify) = yield self._process_command(
-                        cqc_header,
-                        sequence_header.cmd_length,
-                        data[newl: newl + sequence_header.cmd_length],
-                        is_locked=True,
-                    )
-                except Exception as err:
-                    logging.error(
-                        "CQC {}: Got the following unexpected error when process commands: {}".format(self.name, err)
-                    )
-                    msg = self.create_return_message(cqc_header.app_id, CQC_ERR_GENERAL, cqc_version=cqc_header.version)
-                    self.return_messages.append(msg)
-                    return False, 0
-
-                should_notify = should_notify or retNotify
-                if not succ:
-                    return False, 0
-                newl = newl + sequence_header.cmd_length
-                if not is_locked:
-                    logging.debug("CQC %s: Releasing lock", self.name)
-                    # unlock
-                    self._sequence_lock.release()
 
             cur_length = newl
         return True, should_notify
@@ -428,9 +410,13 @@ class CQCMessageHandler(ABC):
             # Create equivalent CQCHeader
             equiv_cqc_header = type_header.make_equivalent_CQCHeader(header.version, header.app_id)
 
-            yield self.messageHandlers[type_header.type](equiv_cqc_header, data[current_position:])
+            result = yield self.messageHandlers[type_header.type](equiv_cqc_header, data[current_position:])
+            
             current_position += type_header.length
-        
+
+            if type_header.type == CQCType.IF:
+                current_position += result
+
 
         # A TP_PROGRAM should return the first error if there is an error message present, and otherwise return one TP_DONE
         # We use the next function to retrieve the first error message from the list.
@@ -442,8 +428,40 @@ class CQCMessageHandler(ABC):
             self.create_return_message(header.app_id, CQCType.DONE, cqc_version=header.version)
         )]
 
+        # The other handlers from self.message_handlers return a bool that indicates whether 
+        # self.handle_cqc_message should append a TP_DONE message. This handle_program method does that itself 
+        # if necessary so we just return nothing (None).
+
     def handle_conditional(self, header: CQCHeader, data: bytes):
-        pass
+        """
+        Handler for messages of TP_IF. 
+        """
+        # Strategy for handling TP_IF:
+        # We extract the CQCIFHeader from the data. We then extract all necessary variables from the header.
+        # We then evaluate the conditional. If the conditional evaluates to FALSE, then we return the bodylength of
+        # the IF. The program handler will than skip this bodylength. If the conditional evaluates to True, then we return 0.
+
+        if_header = CQCIFHeader(data[:CQCIFHeader.HDR_LENGTH])
+
+        try:
+            first_operand_value = self.references[if_header.first_operand]
+        except KeyError:
+            self.return_messages.append(
+                    self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version))
+        
+        if if_header.type_of_second_operand is CQCIFHeader.TYPE_VALUE:
+            second_operand_value = if_header.second_operand
+        else:
+            try:
+                second_operand_value = self.references[if_header.second_operand]
+            except KeyError:
+                self.return_messages.append(
+                    self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version))
+
+        if CQCLogicalOperator.is_true(first_operand_value, if_header.operator, second_operand_value):
+            return 0
+        else:
+            return if_header.length
 
 
     @abstractmethod

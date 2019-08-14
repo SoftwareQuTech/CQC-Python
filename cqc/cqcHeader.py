@@ -27,6 +27,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+# This import allows to use type hints for classes that have not been defined yet. 
+# See https://stackoverflow.com/questions/33533148/how-do-i-specify-that-the-return-type-of-a-method-is-the-same-as-the-class-itsel
+# This import must be the very first import in this file, otherwise an error is raised
+from __future__ import annotations
+
 import warnings
 
 import struct
@@ -150,6 +156,14 @@ class CQCLogicalOperator(IntEnum):
            CQCLogicalOperator.NEQ: CQCLogicalOperator.EQ
        }
        return opposites[operator]
+
+    @staticmethod
+    def is_true(first_operand: int, operator: CQCLogicalOperator, second_operand: int):
+        comparison_method = {
+            CQCLogicalOperator.EQ: first_operand.__eq__,
+            CQCLogicalOperator.NEQ: first_operand.__ne__
+        }
+        return comparison_method[operator](second_operand)
 
 class Header(metaclass=abc.ABCMeta):
     """
