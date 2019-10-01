@@ -1334,16 +1334,10 @@ class CQCConnection:
         After sending, self._pending_headers is emptied.
         """
 
-        print('========================================================')
         # Send all pending headers
         for header in self._pending_headers:
             self._s.send(header.pack())
-            print('--------------------------------')
-            print("SENT: " + header.printable())
             logging.debug("App {} sends CQC: {}".format(self.name, header.printable()))
-
-            
-        print('========================================================')
 
         # Reset _pending_headers to an empty list after all headers are sent
         self._pending_headers = []
@@ -1461,15 +1455,26 @@ class CQCConnection:
 
 
 class CQCVariable:
+    """
+    Instances of this class are returned by measure command, if executed inside a CQCMix context.
+    A CQCVariable holds a reference ID with which one can refer to the outcome of the measurement.
+    """
     _next_ref_id = 0
     
     def __init__(self):
+        """
+        Increments the reference ID, and assigns the new unique reference ID to this CQCVariable.
+        This system ensures no two CQCVariable instances have the same reference ID.
+        """
         self._ref_id = CQCVariable._next_ref_id
         CQCVariable._next_ref_id += 1
 
     # make ref_id a read-only variable
     @property
     def ref_id(self):
+        """
+        Get the refernce ID of this CQCVariable. This is a read-only property.
+        """
         return self._ref_id
 
     # override the == operator
@@ -1483,12 +1488,27 @@ class CQCVariable:
         
 
 class LogicalFunction:
+    """
+    Private helper class. This class should never be used outside this pythonLib.
+    """
 
     def __init__(self, 
         operand_one: CQCVariable, 
         operator: CQCLogicalOperator, 
         operand_two: Union[CQCVariable, int]
         ):
+        """
+        Stores all information necessary to create a logical comparison
+
+        - **Arguments**
+
+            :operand_one:   The CQCVariable that stores the measurement outcome that must be compared
+            :operator:      One of the CQCLogicalOperator types that CQC supports. 
+                            At present, equality and inequality are supported.
+            :operand_two:   Either a CQCVariable or an integer. 
+                            If a CQCVariable, then the value behind this variable will be compared to operand_one. 
+                            If an integer, then the value behind operand_one will be compared to this integer.
+        """
 
         self.operand_one = operand_one
         self.operator = operator
@@ -1498,6 +1518,9 @@ class LogicalFunction:
         return LogicalFunction(self.operand_one, CQCLogicalOperator.opposite_of(self.operator), self.operand_two)
 
     def get_CQCIFHeader(self) -> CQCIFHeader:
+        """
+        Builds the If header corresponding to this logical function.
+        """
 
         if isinstance(self.operand_two, int):
             type_of_operand_two = CQCIFHeader.TYPE_VALUE
@@ -1519,7 +1542,20 @@ class LogicalFunction:
 
 
 class CQCMix(NodeMixin):
+    """
+    This Python Context Manager Type can be used to create CQC programs that consist of more than a single type.
+    Hence the name CQC Mix. Programs of this type can consist of any number and mix of the other CQC types. 
+    """
+
     def __init__(self, cqc_connection: CQCConnection):
+        """
+        Initializes the Mix context.
+
+        - **Arguments**
+
+            :cqc_connection:    The CQCConnection to which this CQC Program must be sent.
+        """
+
         self._conn = cqc_connection
 
         # Set the current scope to self
@@ -1564,16 +1600,45 @@ class CQCMix(NodeMixin):
 
 
     def cqc_if(self, logical_function: LogicalFunction):
+        """
+        Open a Python Context Manager Type to start an if-statement block.
+
+        - **Arguments**
+
+            :logical_function:      A LogicalFunction instance. Never instantiate this explicitely; instead
+                                    use the following: CQCVariable == 1 OR CQCVariable == CQCVariable. 
+                                    CQCVariable can be any instance that you want to test to a value, or to another  
+                                    CQCVariable. The operator can be == or !=. 
+                                    The value can be any integer (though only 1 and 0 make sense).
+                                
+        """
         return CQCConditional(self._conn, False, logical_function)
 
     def cqc_else(self):
+        """
+        Open a Python Context Manager Type to start an else-statement block.
+        This will be  an else-block of the last closed cqc_if-block.                    
+        """
         # Find out to which if this else belongs
         return CQCConditional(self._conn, True)
 
     def loop(self, times: int):
+        """
+        Open a Python Context Manager Type to start a factory (i.e. repeated sequence of commands).
+
+        - **Arguments**
+
+            :times:     The number of times the commands inside body of this context should be repeated.
+                                
+        """
         return CQCFactory(self._conn, times)
 
-class CQCFactory():
+class CQCFactory:
+    """
+    Private class to create factories inside CQCMix contexts. Never explicitely instantiate this class outside 
+    the source code of this library.
+    Instead, use CQCMix.loop(x), where x is the amount of times to repeat.
+    """
 
     def __init__(self, cqc_connection: CQCConnection, repetition_amount: int):
         self._conn = cqc_connection
@@ -1617,6 +1682,11 @@ class CQCFactory():
 
 
 class CQCConditional(NodeMixin):
+    """
+    Private helper class. Never explicitely instantiate this class outside the source code of this library.
+    This Context Manager class is instantiated by CQCMix.cqc_if() and CQCMix.cqc_else(). Its 
+    function is to build and pend CQC If headers.
+    """
 
     # This private class variable holds the last CQCConditional that 
     # functioned as an IF (as opposed to an ELSE) on which __exit__ is invoked. 
@@ -2062,6 +2132,10 @@ class qubit:
 
         if self._cqc.pend_messages:
 
+            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
+            if self._cqc._inside_cqc_mix:
+                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH + CQCRotationHeader.HDR_LENGTH)
+
             # Build command header and rotation sub header
             command_header = CQCCmdHeader()
             command_header.setVals(self._qID, command, notify, block)
@@ -2290,6 +2364,10 @@ class qubit:
         self.check_active()
 
         if self._cqc.pend_messages:
+
+            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
+            if self._cqc._inside_cqc_mix:
+                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH)
 
             # Build header
             header = CQCCmdHeader()
