@@ -331,7 +331,8 @@ class CQCConnection:
         # Bool that indicates wheter we are in a CQCType.PROGRAM
         self._inside_cqc_program = False
 
-        #!!!
+        # Variable of type NodeMixin. This variable is used in CQCMix types to create a
+        # scoping mechanism.
         self.current_scope = None
 
 
@@ -554,6 +555,7 @@ class CQCConnection:
         remote_appID=0,
         remote_node=0,
         remote_port=0,
+        ref_id=0
     ):
         """
         Sends a simple message, command message and xtra message to the cqc server.
@@ -583,6 +585,9 @@ class CQCConnection:
         elif command == CQC_CMD_ROT_X or command == CQC_CMD_ROT_Y or command == CQC_CMD_ROT_Z:
             xtra_hdr = CQCRotationHeader()
             xtra_hdr.setVals(step)
+        elif command == CQC_CMD_MEASURE:
+            xtra_hdr = CQCAssignHeader()
+            xtra_hdr.setVals(ref_id)
 
         if xtra_hdr is None:
             header_length = CQCCmdHeader.HDR_LENGTH
@@ -1517,7 +1522,7 @@ class CQCProgram(NodeMixin):
     def __init__(self, cqc_connection: CQCConnection):
         self._conn = cqc_connection
 
-        #!!!
+        # Set the current scope to self
         self._conn.current_scope = self
 
     def __enter__(self):
@@ -1552,7 +1557,8 @@ class CQCProgram(NodeMixin):
 
             self._conn.pend_messages = False
 
-            #!!!
+            # Set the current scope to None, since we exit the CQCMix context 
+            # current_scope is only used inside CQCMix contexts
             self._conn.current_scope = None
 
 
@@ -1647,7 +1653,7 @@ class CQCConditional(NodeMixin):
         self._conn._pend_header(self.header)
 
 
-        #!!!
+        # Register the parent scope, and set the current scope to self
         self.parent = self._conn.current_scope
         self._conn.current_scope = self
 
@@ -1671,7 +1677,7 @@ class CQCConditional(NodeMixin):
         # Set the correct length
         self.header.length = body_length
             
-        #!!!
+        # Set the scope to the parent scope
         self._conn.current_scope = self.parent
 
 
@@ -1771,7 +1777,8 @@ class qubit:
         # Whether the qubit is active. Will be set in the first run
         self._active = None
 
-        # !!!
+        # This stores the scope (type NodeMixin) in which this qubit was deactivated
+        # If the qubit has not yet been deactivated, this is set to None
         self.scope_of_deactivation = None
 
 
@@ -1875,7 +1882,17 @@ class qubit:
         """
         if not self._active:
 
-            #!!!
+            # This conditional checks whether it is certain that the qubit is inactive at this 
+            # point in the code. If such is the case, an error is raised. 
+            # At this point, it is certain that self_active is False. However, this does not necessarily
+            # mean that the qubit is inactive due to the possibility to write cqc_if blocks.
+            # There are four options:
+            # 1) Control is currently not inside a CQCMix. In that case, the qubit is inactive.
+            # 2) The qubit was deactivated in the current scope. The qubit therefore is inactive.
+            # 3) The qubit was deactivated in an ancestor scope. The qubit therefore is inactive.
+            # 4) The qubit was deactivated in a descendent scope.  The qubit is therefore inactive. 
+            # The only possible way self_active can be False but the qubit is in fact active, is
+            # if the qubit was deactivated in a sibling scope, such as the sibling if-block of an else-block.
             if (
                 not self._cqc._inside_cqc_program
                 or self.scope_of_deactivation == self._cqc.current_scope
@@ -1895,7 +1912,7 @@ class qubit:
 
     def _set_active(self, be_active):
 
-        #!!!
+        # Set the scope of deactivation to the current scope, if inside a CQCMix.
         if not be_active and self._cqc._inside_cqc_program:
             self.scope_of_deactivation = self._cqc.current_scope
 
@@ -2247,7 +2264,8 @@ class qubit:
             # print info
             logging.debug("App {} tells CQC: 'Measure qubit with ID {}'".format(self._cqc.name, self._qID))
 
-            self._cqc.sendCommand(self._qID, command, notify=0, block=int(block))
+            # Ref id is unimportant in this case because we are not inside a CQCMix
+            self._cqc.sendCmdXtra(self._qID, command, notify=0, block=int(block), ref_id=0)
 
             # Return measurement outcome
             message = self._cqc.readMessage()
