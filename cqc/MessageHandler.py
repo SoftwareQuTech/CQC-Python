@@ -187,7 +187,8 @@ class CQCMessageHandler(ABC):
         # List of all cqc messages to return
         self.return_messages = []  
 
-        # Dictionary that stores all reference ids and their values.
+        # Dictionary that stores all reference ids and their values privately for each app_id.
+        # Query/assign like this: self.references[app_id][ref_id]
         self.references = {}
 
 
@@ -197,6 +198,11 @@ class CQCMessageHandler(ABC):
         This calls the correct method to handle the cqcmessage, based on the type specified in the header
         """
         self.return_messages = []
+
+        # References are app_id private. If this app doesn't yet have a references dictionary, create one.
+        if header.app_id not in self.references:
+            self.references[header.app_id] = {}
+
         if header.tp in self.messageHandlers:
             try:
                 should_notify = yield self.messageHandlers[header.tp](header, message)
@@ -444,7 +450,7 @@ class CQCMessageHandler(ABC):
         if_header = CQCIFHeader(data[:CQCIFHeader.HDR_LENGTH])
 
         try:
-            first_operand_value = self.references[if_header.first_operand]
+            first_operand_value = self.references[header.app_id][if_header.first_operand]
         except KeyError:
             self.return_messages.append(
                     self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version))
@@ -453,7 +459,7 @@ class CQCMessageHandler(ABC):
             second_operand_value = if_header.second_operand
         else:
             try:
-                second_operand_value = self.references[if_header.second_operand]
+                second_operand_value = self.references[header.app_id][if_header.second_operand]
             except KeyError:
                 self.return_messages.append(
                     self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version))
