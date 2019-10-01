@@ -151,7 +151,7 @@ class CQCMessageHandler(ABC):
             CQCType.COMMAND: self.handle_command,
             CQCType.FACTORY: self.handle_factory,
             CQCType.GET_TIME: self.handle_time,
-            CQCType.PROGRAM: self.handle_program,
+            CQCType.MIX: self.handle_mix,
             CQCType.IF: self.handle_conditional
         }
 
@@ -392,11 +392,11 @@ class CQCMessageHandler(ABC):
 
 
     @inlineCallbacks
-    def handle_program(self, header: CQCHeader, data: bytes):
+    def handle_mix(self, header: CQCHeader, data: bytes):
         """
-        Handler for messages of TP_PROGRAM. Notice that header is the CQC Header, and data is the complete body, excluding the CQC Header.
+        Handler for messages of TP_MIX. Notice that header is the CQC Header, and data is the complete body, excluding the CQC Header.
         """
-        # Strategy for handling TP_PROGRAM:
+        # Strategy for handling TP_MIX:
         # The first bit of data will be a CQCType header. We extract this header.
         # We extract from this first CQCType header the type of the following instructions, and we invoke the 
         # corresponding handler from self.messageHandlers. This handler expects as parameter "header" a CQCHeader. 
@@ -424,7 +424,7 @@ class CQCMessageHandler(ABC):
                 current_position += result
 
 
-        # A TP_PROGRAM should return the first error if there is an error message present, and otherwise return one TP_DONE
+        # A TP_MIX should return the first error if there is an error message present, and otherwise return one TP_DONE
         # We use the next function to retrieve the first error message from the list.
         # Notice the [:] syntax. This ensures the underlying list is updated, and not just the variable.
         # See https://stackoverflow.com/questions/2361426/get-the-first-item-from-an-iterable-that-matches-a-condition
@@ -435,7 +435,7 @@ class CQCMessageHandler(ABC):
         )]
 
         # The other handlers from self.message_handlers return a bool that indicates whether 
-        # self.handle_cqc_message should append a TP_DONE message. This handle_program method does that itself 
+        # self.handle_cqc_message should append a TP_DONE message. This handle_mix method does that itself 
         # if necessary so we just return nothing (None).
 
     def handle_conditional(self, header: CQCHeader, data: bytes):
@@ -445,7 +445,7 @@ class CQCMessageHandler(ABC):
         # Strategy for handling TP_IF:
         # We extract the CQCIFHeader from the data. We then extract all necessary variables from the header.
         # We then evaluate the conditional. If the conditional evaluates to FALSE, then we return the bodylength of
-        # the IF. The program handler will than skip this bodylength. If the conditional evaluates to True, then we return 0.
+        # the IF. The mix handler will then skip this bodylength. If the conditional evaluates to True, then we return 0.
 
         if_header = CQCIFHeader(data[:CQCIFHeader.HDR_LENGTH])
 

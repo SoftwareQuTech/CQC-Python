@@ -328,8 +328,8 @@ class CQCConnection:
         # Bool that indicates whether we are in a factory and thus should pend commands
         self.pend_messages = pend_messages
 
-        # Bool that indicates wheter we are in a CQCType.PROGRAM
-        self._inside_cqc_program = False
+        # Bool that indicates wheter we are in a CQCType.MIX
+        self._inside_cqc_mix = False
 
         # Variable of type NodeMixin. This variable is used in CQCMix types to create a
         # scoping mechanism.
@@ -1518,7 +1518,7 @@ class LogicalFunction:
 
 
 
-class CQCProgram(NodeMixin):
+class CQCMix(NodeMixin):
     def __init__(self, cqc_connection: CQCConnection):
         self._conn = cqc_connection
 
@@ -1526,12 +1526,12 @@ class CQCProgram(NodeMixin):
         self._conn.current_scope = self
 
     def __enter__(self):
-        # Set the _inside_cqc_program bool to True on the connection
-        self._conn._inside_cqc_program = True
+        # Set the _inside_cqc_mix bool to True on the connection
+        self._conn._inside_cqc_mix = True
 
         self._conn.pend_messages = True
 
-        # Return self so that this instance is bound to the variable after "as", i.e.: "with CQCProgram() as pgrm"
+        # Return self so that this instance is bound to the variable after "as", i.e.: "with CQCMix() as pgrm"
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -1539,7 +1539,7 @@ class CQCProgram(NodeMixin):
         # Only do these things if there was no exception.
         if exc_type is None:
             # Build and insert the CQC Header
-            self._conn.insert_cqc_header(CQCType.PROGRAM)
+            self._conn.insert_cqc_header(CQCType.MIX)
 
             # Send this program to the backend
             self._conn.send_pending_headers()
@@ -1552,8 +1552,8 @@ class CQCProgram(NodeMixin):
             # Check if it is an error and assume it is a TP_DONE if it is not an error
             self._conn.check_error(message[0])
 
-            # We are no longer in a TP_PROGRAM
-            self._conn._inside_cqc_program = False
+            # We are no longer in a TP_MIX
+            self._conn._inside_cqc_mix = False
 
             self._conn.pend_messages = False
 
@@ -1583,7 +1583,7 @@ class CQCFactory():
 
         # Inside a TP_FACTORY, we don't want CQCType headers before every instruction.
         # Therefore, we set this bool to False
-        self._conn._inside_cqc_program = False
+        self._conn._inside_cqc_mix = False
 
         # Create the CQC Type header, and store it so that we can modify its length at __exit__
         self.type_header = CQCTypeHeader()
@@ -1601,7 +1601,7 @@ class CQCFactory():
 
         # Outside a TP_FACTORY, we want CQCType headers before every instruction.
         # Therefore, we set this bool to True
-        self._conn._inside_cqc_program = True
+        self._conn._inside_cqc_mix = True
 
         # Calculate the length of the body of the factory
         # Loop in reverse through all pending_headers to calculate the length of all headers
@@ -1894,7 +1894,7 @@ class qubit:
             # The only possible way self_active can be False but the qubit is in fact active, is
             # if the qubit was deactivated in a sibling scope, such as the sibling if-block of an else-block.
             if (
-                not self._cqc._inside_cqc_program
+                not self._cqc._inside_cqc_mix
                 or self.scope_of_deactivation == self._cqc.current_scope
                 or self.scope_of_deactivation in self._cqc.current_scope.ancestors
                 or self.scope_of_deactivation in self._cqc.current_scope.descendants
@@ -1913,7 +1913,7 @@ class qubit:
     def _set_active(self, be_active):
 
         # Set the scope of deactivation to the current scope, if inside a CQCMix.
-        if not be_active and self._cqc._inside_cqc_program:
+        if not be_active and self._cqc._inside_cqc_mix:
             self.scope_of_deactivation = self._cqc.current_scope
 
         # Check if not already new state
@@ -1940,8 +1940,8 @@ class qubit:
 
         if self._cqc.pend_messages:
 
-            # If we are inside a TP_PROGRAM, then insert the CQC Type header before the command header
-            if self._cqc._inside_cqc_program:
+            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
+            if self._cqc._inside_cqc_mix:
                 self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH)
 
             # Build the header
@@ -2150,8 +2150,8 @@ class qubit:
 
         if self._cqc.pend_messages:
 
-            # If we are inside a TP_PROGRAM, then insert the CQC Type header before the command header
-            if self._cqc._inside_cqc_program:
+            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
+            if self._cqc._inside_cqc_mix:
                 self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH + CQCXtraQubitHeader.HDR_LENGTH)
 
             # Build command header and extra qubit sub header
@@ -2235,8 +2235,8 @@ class qubit:
 
         if self._cqc.pend_messages:
 
-            # If we are inside a TP_PROGRAM, then insert the CQC Type header before the command header
-            if self._cqc._inside_cqc_program:
+            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
+            if self._cqc._inside_cqc_mix:
                 self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH + CQCAssignHeader.HDR_LENGTH)
 
             # Create a CQC Variable that holds the reference id for the measurement outcome

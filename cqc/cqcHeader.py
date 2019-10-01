@@ -134,7 +134,7 @@ class CQCType(IntEnum):
     GET_TIME = 8  # Get creation time of qubit
     INF_TIME = 9  # Return timinig information
     NEW_OK = 10  # Created a new qubit
-    PROGRAM = 11 # Indicate that the program will contain multiple header types
+    MIX = 11 # Indicate that the CQC program will contain multiple header types
     IF = 12 # Announce a CQC IF header
 
     ERR_GENERAL = 20  # General purpose error (no details
