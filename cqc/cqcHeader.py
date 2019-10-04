@@ -29,7 +29,7 @@
 
 
 # This import allows to use type hints for classes that have not been defined yet. 
-# See https://stackoverflow.com/questions/33533148/how-do-i-specify-that-the-return-type-of-a-method-is-the-same-as-the-class-itsel
+# See https://stackoverflow.com/questions/33533148/
 # This import must be the very first import in this file, otherwise an error is raised
 from __future__ import annotations
 
@@ -134,8 +134,8 @@ class CQCType(IntEnum):
     GET_TIME = 8  # Get creation time of qubit
     INF_TIME = 9  # Return timinig information
     NEW_OK = 10  # Created a new qubit
-    MIX = 11 # Indicate that the CQC program will contain multiple header types
-    IF = 12 # Announce a CQC IF header
+    MIX = 11  # Indicate that the CQC program will contain multiple header types
+    IF = 12  # Announce a CQC IF header
 
     ERR_GENERAL = 20  # General purpose error (no details
     ERR_NOQUBIT = 21  # No more qubits available
@@ -146,16 +146,16 @@ class CQCType(IntEnum):
 
 
 class CQCLogicalOperator(IntEnum):
-    EQ = 0 # Equal
-    NEQ = 1 # Not equal
+    EQ = 0  # Equal
+    NEQ = 1  # Not equal
 
     @staticmethod
-    def opposite_of(operator: 'CQCLogicalOperator'): # String literal type hint because it is a forward reference
-       opposites = {
-           CQCLogicalOperator.EQ: CQCLogicalOperator.NEQ,
-           CQCLogicalOperator.NEQ: CQCLogicalOperator.EQ
-       }
-       return opposites[operator]
+    def opposite_of(operator: CQCLogicalOperator):
+        opposites = {
+            CQCLogicalOperator.EQ: CQCLogicalOperator.NEQ,
+            CQCLogicalOperator.NEQ: CQCLogicalOperator.EQ
+        }
+        return opposites[operator]
 
     @staticmethod
     def is_true(first_operand: int, operator: CQCLogicalOperator, second_operand: int):
@@ -164,6 +164,7 @@ class CQCLogicalOperator(IntEnum):
             CQCLogicalOperator.NEQ: first_operand.__ne__
         }
         return comparison_method[operator](second_operand)
+
 
 class Header(metaclass=abc.ABCMeta):
     """
@@ -342,14 +343,12 @@ class CQCTypeHeader(Header):
     PACKAGING_FORMAT = "!BI"
     HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
     
-
-    def _setVals(self, tp: CQCType=0, length: int=0) -> None:
+    def _setVals(self, tp: CQCType = 0, length: int = 0) -> None:
         """
         Set using given values.
         """
         self.type = tp
         self.length = length
-
 
     def _pack(self) -> bytes:
         """
@@ -357,7 +356,6 @@ class CQCTypeHeader(Header):
         """
         return struct.pack(self.PACKAGING_FORMAT, self.type, self.length)
         
-
     def _unpack(self, headerBytes) -> None:
         """
         Unpack packet data.
@@ -366,24 +364,21 @@ class CQCTypeHeader(Header):
         self.type = unpacked[0]
         self.length = unpacked[1]
 
-
-
     def _printable(self) -> str:
         """
         Produce a printable string for information purposes.
         """
         return "CQC Type header. Type=" + str(self.type) + " | Length=" + str(self.length)
 
-
     def make_equivalent_CQCHeader(self, version: int, app_id: int) -> CQCHeader:
         """
-        Produce a CQC Header that is equivalent to this CQCTypeHeader. This method does not make any modifications to self.
+        Produce a CQC Header that is equivalent to this CQCTypeHeader. 
+        This method does not make any modifications to self.
         """
         cqc_header = CQCHeader()
         cqc_header.setVals(version, self.type, app_id, self.length)
         return cqc_header
-        
-
+    
 
 class CQCIFHeader(Header):
     """
@@ -396,12 +391,14 @@ class CQCIFHeader(Header):
     TYPE_VALUE = 0
     TYPE_REF_ID = 1
 
-    def _setVals(self, 
-        first_operand: int=0, 
-        operator: CQCLogicalOperator=0,
-        type_of_second_operand: int=0, 
-        second_operand: int=0,
-        length: int=0) -> None:
+    def _setVals(
+        self, 
+        first_operand: int = 0, 
+        operator: CQCLogicalOperator = 0,
+        type_of_second_operand: int = 0, 
+        second_operand: int = 0,
+        length: int = 0
+    ) -> None:
         """
         Set the fields of this header. 
         first_operand must be a reference id.
@@ -415,7 +412,6 @@ class CQCIFHeader(Header):
         self.second_operand = second_operand
         self.length = length
 
-
     def _pack(self) -> bytes:
         """
         Pack data into packet format. For defnitions see cLib/cgc.h
@@ -428,8 +424,7 @@ class CQCIFHeader(Header):
             self.type_of_second_operand, 
             self.second_operand, 
             self.length
-        )
-        
+        )     
 
     def _unpack(self, headerBytes) -> None:
         """
@@ -443,7 +438,6 @@ class CQCIFHeader(Header):
         self.second_operand = unpacked[3]
         self.length = unpacked[4]
 
-
     def _printable(self) -> str:
         """
         Produce a printable string for information purposes.
@@ -455,11 +449,12 @@ class CQCIFHeader(Header):
             operand_type = "Value"
 
         # parenthesis to concatenate the string over multiple lines
-        return ("CQC IF header. RefID=" + str(self.first_operand)
-        + " | Operator=" + str(self.operator)
-        + " | " + operand_type + "=" + str(self.second_operand)
-        + " | Second_operand_type=" + operand_type
-        + " | Body_length=" + str(self.length)
+        return (
+            "CQC IF header. RefID=" + str(self.first_operand)
+            + " | Operator=" + str(self.operator)
+            + " | " + operand_type + "=" + str(self.second_operand)
+            + " | Second_operand_type=" + operand_type
+            + " | Body_length=" + str(self.length)
         )
 
 
@@ -471,7 +466,6 @@ class CQCCmdHeader(Header):
     PACKAGING_FORMAT = "!HBB"
     HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
     
-
     def _setVals(self, qubit_id=0, instr=0, notify=False, block=False, action=False):
         """
         Set using given values.
@@ -540,14 +534,12 @@ class CQCAssignHeader(Header):
 
     PACKAGING_FORMAT = "!I"
     HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
-    
 
-    def _setVals(self, ref_id: int=0) -> None:
+    def _setVals(self, ref_id: int = 0) -> None:
         """
         Set using given values.
         """
         self.ref_id = ref_id
-
 
     def _pack(self) -> bytes:
         """
@@ -555,7 +547,6 @@ class CQCAssignHeader(Header):
         """
 
         return struct.pack(self.PACKAGING_FORMAT, self.ref_id)
-
 
     def _unpack(self, headerBytes) -> None:
         """
@@ -565,16 +556,12 @@ class CQCAssignHeader(Header):
 
         self.ref_id = unpacked[0]
 
-
     def _printable(self) -> str:
         """
         Produce a printable string for information purposes.
         """
 
         return "CQC Assign sub header. RefID=" + str(self.ref_id)
-
-
-
 
 
 class CQCXtraHeader(Header):
@@ -782,7 +769,7 @@ class CQCCommunicationHeader(Header):
 
     PACKAGING_FORMAT = "!HHL"
     PACKAGING_FORMAT_V1 = "!HLH"
-    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT) # Both versions have the same size
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)  # Both versions have the same size
 
     def __init__(self, headerBytes=None, cqc_version=CQC_VERSION):
         """

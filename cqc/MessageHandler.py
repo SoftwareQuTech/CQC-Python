@@ -38,10 +38,6 @@ from cqc.cqcHeader import (
     CQC_CMD_ROT_X,
     CQC_CMD_ROT_Y,
     CQC_CMD_ROT_Z,
-    CQC_TP_HELLO,
-    CQC_TP_COMMAND,
-    CQC_TP_FACTORY,
-    CQC_TP_GET_TIME,
     CQC_CMD_I,
     CQC_CMD_X,
     CQC_CMD_Y,
@@ -67,7 +63,6 @@ from cqc.cqcHeader import (
     CQC_ERR_UNSUPP,
     CQC_ERR_UNKNOWN,
     CQC_ERR_GENERAL,
-    CQCSequenceHeader,
     CQCFactoryHeader,
     CQCType,
     CQCTypeHeader,
@@ -106,6 +101,7 @@ def has_extra(cmd):
 
     return False
 
+
 def is_error_message(message: bytes):
 
     # Only CQCHeaders can be error messages, so if the length does not correspond it is not an error message
@@ -129,8 +125,6 @@ def is_error_message(message: bytes):
         return True
     else:
         return False
-
-    
 
 
 def print_error(error):
@@ -190,7 +184,6 @@ class CQCMessageHandler(ABC):
         # Dictionary that stores all reference ids and their values privately for each app_id.
         # Query/assign like this: self.references[app_id][ref_id]
         self.references = {}
-
 
     @inlineCallbacks
     def handle_cqc_message(self, header, message, transport=None):
@@ -390,17 +383,18 @@ class CQCMessageHandler(ABC):
 
         return succ and should_notify
 
-
     @inlineCallbacks
     def handle_mix(self, header: CQCHeader, data: bytes):
         """
-        Handler for messages of TP_MIX. Notice that header is the CQC Header, and data is the complete body, excluding the CQC Header.
+        Handler for messages of TP_MIX. Notice that header is the CQC Header, 
+        and data is the complete body, excluding the CQC Header.
         """
         # Strategy for handling TP_MIX:
         # The first bit of data will be a CQCType header. We extract this header.
         # We extract from this first CQCType header the type of the following instructions, and we invoke the 
         # corresponding handler from self.messageHandlers. This handler expects as parameter "header" a CQCHeader. 
-        # Therefore, we construct the CQCHeader that corresponds to the CQCType header (remember that the CQCType header is just a reduced CQCHeader),
+        # Therefore, we construct the CQCHeader that corresponds to the CQCType header 
+        # (remember that the CQCType header is just a reduced CQCHeader),
         # and input that constructed CQCHeader as "header" parameter.
         # After this handler returns, we repeat until the end of the program.
 
@@ -423,7 +417,6 @@ class CQCMessageHandler(ABC):
             if type_header.type == CQCType.IF:
                 current_position += result
 
-
         # A TP_MIX should return the first error if there is an error message present, and otherwise return one TP_DONE
         # We use the next function to retrieve the first error message from the list.
         # Notice the [:] syntax. This ensures the underlying list is updated, and not just the variable.
@@ -445,7 +438,8 @@ class CQCMessageHandler(ABC):
         # Strategy for handling TP_IF:
         # We extract the CQCIFHeader from the data. We then extract all necessary variables from the header.
         # We then evaluate the conditional. If the conditional evaluates to FALSE, then we return the bodylength of
-        # the IF. The mix handler will then skip this bodylength. If the conditional evaluates to True, then we return 0.
+        # the IF. The mix handler will then skip this bodylength. 
+        # If the conditional evaluates to True, then we return 0.
 
         if_header = CQCIFHeader(data[:CQCIFHeader.HDR_LENGTH])
 
@@ -453,7 +447,8 @@ class CQCMessageHandler(ABC):
             first_operand_value = self.references[header.app_id][if_header.first_operand]
         except KeyError:
             self.return_messages.append(
-                    self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version))
+                self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version)
+            )
         
         if if_header.type_of_second_operand is CQCIFHeader.TYPE_VALUE:
             second_operand_value = if_header.second_operand
@@ -468,7 +463,6 @@ class CQCMessageHandler(ABC):
             return 0
         else:
             return if_header.length
-
 
     @abstractmethod
     def handle_hello(self, header, data):

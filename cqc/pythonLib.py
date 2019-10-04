@@ -29,7 +29,7 @@
 
 
 # This import allows to use type hints for classes that have not been defined yet. 
-# See https://stackoverflow.com/questions/33533148/how-do-i-specify-that-the-return-type-of-a-method-is-the-same-as-the-class-itsel
+# See https://stackoverflow.com/questions/33533148/
 # This import must be the very first import in this file, otherwise an error is raised
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ import logging
 import socket
 import warnings
 from typing import Union, Any, List
-from anytree import NodeMixin, RenderTree
+from anytree import NodeMixin
 
 from cqc.cqcHeader import (
     Header,
@@ -167,6 +167,7 @@ def get_remote_from_directory_or_address(cqcNet, name, remote_socket):
         remote_ip = cqc_node_id_from_addrinfo(addr)
         remote_port = addr[4][1]
     return remote_ip, remote_port
+
 
 # !! Deprecated. Do not use this method
 def createXtraHeader(command, values):
@@ -323,7 +324,7 @@ class CQCConnection:
         self.active_qubits = []
 
         # List of pended header objects waiting to be sent to the backend
-        self._pending_headers = [] # ONLY cqc.cqcHeader.Header objects should be in this list
+        self._pending_headers = []  # ONLY cqc.cqcHeader.Header objects should be in this list
 
         # Bool that indicates whether we are in a factory and thus should pend commands
         self.pend_messages = pend_messages
@@ -334,7 +335,6 @@ class CQCConnection:
         # Variable of type NodeMixin. This variable is used in CQCMix types to create a
         # scoping mechanism.
         self.current_scope = None
-
 
     def _pend_header(self, header: Header) -> None:
         self._pending_headers.append(header)
@@ -734,7 +734,6 @@ class CQCConnection:
         """
         return self.release_qubits(self.active_qubits[:])
 
-
     # sendFactory is depecrated. Do not use it. #
     def sendFactory(
         self,
@@ -1047,7 +1046,6 @@ class CQCConnection:
             self._pend_header(command_header)
             self._pend_header(comm_sub_header)
 
-
             # print info
             logging.debug(
                 "App {} pends message: 'Send qubit with ID {} to {} and appID {}'".format(
@@ -1292,7 +1290,6 @@ class CQCConnection:
                 if shouldReturn(header.instr):
                     response_amount += 1
 
-
         # Determine the CQC Header type
         if num_iter == 1:
             cqc_type = CQC_TP_COMMAND
@@ -1326,8 +1323,6 @@ class CQCConnection:
         # Return information that the backend returned
         return res
 
-    
-
     def send_pending_headers(self) -> List[Any]:
         """
         Sends all pending headers.
@@ -1341,8 +1336,6 @@ class CQCConnection:
 
         # Reset _pending_headers to an empty list after all headers are sent
         self._pending_headers = []
-
-
 
     def insert_cqc_header(self, cqc_type: CQCType, version=CQC_VERSION) -> None:
         """
@@ -1362,7 +1355,6 @@ class CQCConnection:
         # Insert CQC Header at the front
         self._pending_headers.insert(0, cqc_header)
 
-
     def _pend_type_header(self, cqc_type: CQCType, length: int) -> None:
         """
         Creates a CQCTypeHeader and pends it.
@@ -1370,7 +1362,6 @@ class CQCConnection:
         header = CQCTypeHeader()
         header.setVals(cqc_type, length)
         self._pend_header(header)
-
 
     def tomography(self, preparation, iterations, progress=True):
         """
@@ -1453,7 +1444,6 @@ class CQCConnection:
         return True
 
 
-
 class CQCVariable:
     """
     Instances of this class are returned by measure command, if executed inside a CQCMix context.
@@ -1492,11 +1482,12 @@ class LogicalFunction:
     Private helper class. This class should never be used outside this pythonLib.
     """
 
-    def __init__(self, 
+    def __init__(
+        self, 
         operand_one: CQCVariable, 
         operator: CQCLogicalOperator, 
         operand_two: Union[CQCVariable, int]
-        ):
+    ):
         """
         Stores all information necessary to create a logical comparison
 
@@ -1538,7 +1529,6 @@ class LogicalFunction:
             length=0
         )
         return header
-
 
 
 class CQCMix(NodeMixin):
@@ -1597,8 +1587,6 @@ class CQCMix(NodeMixin):
             # current_scope is only used inside CQCMix contexts
             self._conn.current_scope = None
 
-
-
     def cqc_if(self, logical_function: LogicalFunction):
         """
         Open a Python Context Manager Type to start an if-statement block.
@@ -1632,6 +1620,7 @@ class CQCMix(NodeMixin):
                                 
         """
         return CQCFactory(self._conn, times)
+
 
 class CQCFactory:
     """
@@ -1680,7 +1669,6 @@ class CQCFactory:
         self.type_header.length = body_length
 
 
-
 class CQCConditional(NodeMixin):
     """
     Private helper class. Never explicitely instantiate this class outside the source code of this library.
@@ -1696,7 +1684,7 @@ class CQCConditional(NodeMixin):
     # CQCConditional was an ELSE.
     _last_closed_conditional = None
 
-    def __init__(self, cqc_connection: CQCConnection, is_else: bool, logical_function: LogicalFunction=None):
+    def __init__(self, cqc_connection: CQCConnection, is_else: bool, logical_function: LogicalFunction = None):
         self._conn = cqc_connection
         self.is_else = is_else
 
@@ -1722,7 +1710,6 @@ class CQCConditional(NodeMixin):
         # Pend the IF header
         self._conn._pend_header(self.header)
 
-
         # Register the parent scope, and set the current scope to self
         self.parent = self._conn.current_scope
         self._conn.current_scope = self
@@ -1735,7 +1722,6 @@ class CQCConditional(NodeMixin):
         else:
             CQCConditional._last_closed_conditional = self
 
-        
         # Calculate the length of the body of the conditional
         # Loop in reverse through all pending_headers to calculate the lenght of all headers
         index = len(self._conn._pending_headers) - 1
@@ -1749,8 +1735,6 @@ class CQCConditional(NodeMixin):
             
         # Set the scope to the parent scope
         self._conn.current_scope = self.parent
-
-
 
 
 class ProgressBar:
@@ -1850,7 +1834,6 @@ class qubit:
         # This stores the scope (type NodeMixin) in which this qubit was deactivated
         # If the qubit has not yet been deactivated, this is set to None
         self.scope_of_deactivation = None
-
 
         if createNew:
             if cqc.pend_messages:
@@ -1988,7 +1971,7 @@ class qubit:
 
         # Check if not already new state
         if self._active == be_active:
-           return
+            return
 
         if be_active:
             self._cqc.active_qubits.append(self)
@@ -2304,7 +2287,8 @@ class qubit:
             command = CQC_CMD_MEASURE_INPLACE
         else:
             command = CQC_CMD_MEASURE
-            # Set qubit to non active so the user can receive helpful errors during compile time if this qubit is used after this measurement
+            # Set qubit to non active so the user can receive helpful errors during compile time 
+            # if this qubit is used after this measurement
             self._set_active(False)
 
         if self._cqc.pend_messages:
@@ -2327,7 +2311,6 @@ class qubit:
             # Pend headers
             self._cqc._pend_header(header)
             self._cqc._pend_header(assign_sub_header)
-
 
             # print info
             logging.debug("App {} pends message: 'Measure qubit with ID {}'".format(self._cqc.name, self._qID))
