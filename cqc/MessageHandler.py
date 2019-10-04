@@ -67,7 +67,7 @@ from cqc.cqcHeader import (
     CQCType,
     CQCTypeHeader,
     CQCAssignHeader,
-    CQCIFHeader,
+    CQCIfHeader,
     CQCLogicalOperator
 )
 from twisted.internet.defer import DeferredLock, inlineCallbacks
@@ -314,7 +314,6 @@ class CQCMessageHandler(ABC):
                 logging.debug("CQC %s: Read XTRA Header: %s", self.name, xtra.printable())
 
             # Run this command
-            print(cmd.printable())
             logging.debug("CQC %s: Executing command: %s", self.name, cmd.printable())
             if cmd.instr not in self.commandHandlers:
                 logging.debug("CQC {}: Unknown command {}".format(self.name, cmd.instr))
@@ -436,12 +435,12 @@ class CQCMessageHandler(ABC):
         Handler for messages of TP_IF. 
         """
         # Strategy for handling TP_IF:
-        # We extract the CQCIFHeader from the data. We then extract all necessary variables from the header.
+        # We extract the CQCIfHeader from the data. We then extract all necessary variables from the header.
         # We then evaluate the conditional. If the conditional evaluates to FALSE, then we return the bodylength of
         # the IF. The mix handler will then skip this bodylength. 
         # If the conditional evaluates to True, then we return 0.
 
-        if_header = CQCIFHeader(data[:CQCIFHeader.HDR_LENGTH])
+        if_header = CQCIfHeader(data[:CQCIfHeader.HDR_LENGTH])
 
         try:
             first_operand_value = self.references[header.app_id][if_header.first_operand]
@@ -450,7 +449,7 @@ class CQCMessageHandler(ABC):
                 self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version)
             )
         
-        if if_header.type_of_second_operand is CQCIFHeader.TYPE_VALUE:
+        if if_header.type_of_second_operand is CQCIfHeader.TYPE_VALUE:
             second_operand_value = if_header.second_operand
         else:
             try:

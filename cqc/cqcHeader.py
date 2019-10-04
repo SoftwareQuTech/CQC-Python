@@ -27,12 +27,6 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-# This import allows to use type hints for classes that have not been defined yet. 
-# See https://stackoverflow.com/questions/33533148/
-# This import must be the very first import in this file, otherwise an error is raised
-from __future__ import annotations
-
 import warnings
 
 import struct
@@ -150,7 +144,7 @@ class CQCLogicalOperator(IntEnum):
     NEQ = 1  # Not equal
 
     @staticmethod
-    def opposite_of(operator: CQCLogicalOperator):
+    def opposite_of(operator: 'CQCLogicalOperator'):
         opposites = {
             CQCLogicalOperator.EQ: CQCLogicalOperator.NEQ,
             CQCLogicalOperator.NEQ: CQCLogicalOperator.EQ
@@ -158,7 +152,7 @@ class CQCLogicalOperator(IntEnum):
         return opposites[operator]
 
     @staticmethod
-    def is_true(first_operand: int, operator: CQCLogicalOperator, second_operand: int):
+    def is_true(first_operand: int, operator: 'CQCLogicalOperator', second_operand: int):
         comparison_method = {
             CQCLogicalOperator.EQ: first_operand.__eq__,
             CQCLogicalOperator.NEQ: first_operand.__ne__
@@ -380,7 +374,7 @@ class CQCTypeHeader(Header):
         return cqc_header
     
 
-class CQCIFHeader(Header):
+class CQCIfHeader(Header):
     """
         Definition of the CQC IF header.
     """
