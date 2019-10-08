@@ -1,3 +1,5 @@
+# CQC (3.0.3)
+
 The classical-quantum combiner (CQC) interface is an interface between higher layers and hardware in a Quantum Internet. It comes with a Python, C and Rust library for constructing CQC messages. The Python library is definitely the best place to get started.
 
 Documentation of CQC can be found at https://softwarequtech.github.io/SimulaQron/html/CQCInterface.html

@@ -1,6 +1,7 @@
 PYTHON        = python3
 PIP           = pip3
-CQC_DIR		  = cqc
+CQC_DIR	      = cqc
+EXAMPLES      = examples
 
 clean: _clear_pyc _clear_build
 
@@ -8,7 +9,7 @@ _clear_pyc:
 	@find . -name '*.pyc' -delete
 
 lint:
-	@${PYTHON} -m flake8 ${CQC_DIR}
+	@${PYTHON} -m flake8 ${CQC_DIR} ${EXAMPLES}
 
 python-deps:
 	@cat requirements.txt | xargs -n 1 -L 1 $(PIP) install
