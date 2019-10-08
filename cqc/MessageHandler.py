@@ -26,8 +26,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from abc import ABC, abstractmethod
 import logging
+from collections import defaultdict
+from abc import ABC, abstractmethod
 
 from cqc.cqcHeader import (
     CQCCmdHeader,
@@ -152,43 +153,44 @@ class CQCMessageHandler(ABC):
 
         # Convenience
         self.name = factory.name
-        self.return_messages = []  # List of all cqc messages to return
+        self.return_messages = defaultdict(list)  # Dictionary of all cqc messages to return per app_id
 
     @inlineCallbacks
     def handle_cqc_message(self, header, message, transport=None):
         """
         This calls the correct method to handle the cqcmessage, based on the type specified in the header
         """
-        self.return_messages = []
+        self.return_messages[header.app_id] = []
         if header.tp in self.messageHandlers:
             try:
                 should_notify = yield self.messageHandlers[header.tp](header, message)
                 if should_notify:
                     # Send a notification that we are done if successful
                     logging.debug("CQC %s: Command successful, sent done.", self.name)
-                    self.return_messages.append(
+                    self.return_messages[header.app_id].append(
                         self.create_return_message(header.app_id, CQC_TP_DONE, cqc_version=header.version))
             except UnknownQubitError:
                 logging.error("CQC {}: Couldn't find qubit with given ID".format(self.name))
-                self.return_messages.append(
+                self.return_messages[header.app_id].append(
                     self.create_return_message(header.app_id, CQC_ERR_UNKNOWN, cqc_version=header.version))
             except NotImplementedError:
                 logging.error("CQC {}: Command not implemented yet".format(self.name))
-                self.return_messages.append(
+                self.return_messages[header.app_id].append(
                     self.create_return_message(header.app_id, CQC_ERR_UNSUPP, cqc_version=header.version))
             except Exception as err:
                 logging.error(
                     "CQC {}: Got the following unexpected error when handling CQC message: {}".format(self.name, err)
                 )
-                self.return_messages.append(
+                self.return_messages[header.app_id].append(
                     self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version))
         else:
             logging.error("CQC %s: Could not find cqc type %d in handlers.", self.name, header.yp)
-            self.return_messages.append(
+            self.return_messages[header.app_id].append(
                 self.create_return_message(header.app_id, CQC_ERR_UNSUPP, cqc_version=header.version))
 
-    def retrieve_return_messages(self):
-        return self.return_messages
+    def retrieve_return_messages(self, app_id):
+        """Retrieve the return messages of a given app_id"""
+        return self.return_messages[app_id]
 
     @staticmethod
     def create_return_message(app_id, msg_type, length=0, cqc_version=CQC_VERSION):
@@ -278,13 +280,13 @@ class CQCMessageHandler(ABC):
             if cmd.instr not in self.commandHandlers:
                 logging.debug("CQC {}: Unknown command {}".format(self.name, cmd.instr))
                 msg = self.create_return_message(cqc_header.app_id, CQC_ERR_UNSUPP, cqc_version=cqc_header.version)
-                self.return_messages.append(msg)
+                self.return_messages[cqc_header.app_id].append(msg)
                 return False, 0
             try:
                 succ = yield self.commandHandlers[cmd.instr](cqc_header, cmd, xtra)
             except NotImplementedError:
                 logging.error("CQC {}: Command not implemented yet".format(self.name))
-                self.return_messages.append(
+                self.return_messages[cqc_header.app_id].append(
                     self.create_return_message(cqc_header.app_id, CQC_ERR_UNSUPP, cqc_version=cqc_header.verstion))
                 return False, 0
             except Exception as err:
@@ -294,7 +296,7 @@ class CQCMessageHandler(ABC):
                     )
                 )
                 msg = self.create_return_message(cqc_header.app_id, CQC_ERR_GENERAL, cqc_version=cqc_header.version)
-                self.return_messages.append(msg)
+                self.return_messages[cqc_header.app_id].append(msg)
                 return False, 0
             if succ is False:  # only if it explicitly is false, if succ is None then we assume it went fine
                 return False, 0
@@ -319,7 +321,7 @@ class CQCMessageHandler(ABC):
                         "CQC {}: Got the following unexpected error when process commands: {}".format(self.name, err)
                     )
                     msg = self.create_return_message(cqc_header.app_id, CQC_ERR_GENERAL, cqc_version=cqc_header.version)
-                    self.return_messages.append(msg)
+                    self.return_messages[cqc_header.app_id].append(msg)
                     return False, 0
 
                 should_notify = should_notify or retNotify
@@ -340,7 +342,7 @@ class CQCMessageHandler(ABC):
         # Get factory header
         if len(data) < header.length:
             logging.debug("CQC %s: Missing header(s) in factory", self.name)
-            self.return_messages.append(
+            self.return_messages[header.app_id].append(
                 self.create_return_message(header.app_id, CQC_ERR_UNSUPP, cqc_version=header.version))
             return False
         fact_header = CQCFactoryHeader(data[:fact_l])
@@ -363,7 +365,7 @@ class CQCMessageHandler(ABC):
                 logging.error(
                     "CQC {}: Got the following unexpected error when processing factory: {}".format(self.name, err)
                 )
-                self.return_messages.append(
+                self.return_messages[header.app_id].append(
                     self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version))
                 return False
 

@@ -846,7 +846,7 @@ class CQCConnection:
                 currHeader = CQCHeader(rawHeader)
 
                 # Remove the header from the buffer
-                self.buf = self.buf[CQC_HDR_LENGTH : len(self.buf)]
+                self.buf = self.buf[CQC_HDR_LENGTH:len(self.buf)]
 
                 # Check for error
                 self.check_error(currHeader)
