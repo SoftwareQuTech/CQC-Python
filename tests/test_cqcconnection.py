@@ -42,10 +42,8 @@ def get_expected_headers_simple_h():
     )
 
     expected_headers = [
-        hdr_tp_cmd,
-        hdr_cmd_new,
-        hdr_tp_cmd,
-        hdr_cmd_h,
+        hdr_tp_cmd + hdr_cmd_new,
+        hdr_tp_cmd + hdr_cmd_h,
         hdr_tp_cmd + hdr_cmd_release,
     ]
 

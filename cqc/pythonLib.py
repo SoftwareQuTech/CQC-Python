@@ -36,6 +36,7 @@ import socket
 import warnings
 from typing import Union, Any, List
 from anytree import NodeMixin
+from abc import ABC, abstractmethod
 
 from cqc.cqcHeader import (
     Header,
@@ -183,8 +184,255 @@ def createXtraHeader(command, values):
         header = None
     return header
 
+class CQCHandler(ABC):
+    """This class defines the things any CQCHandler must do.
 
-class CQCConnection:
+    It is to be subclassed by the various actual classes that handle CQC, such
+    as CQCConnection and CQCToFile.
+    
+    Essential things that a CQCHandler must do:
+    - sendCommand/sendCmdXtra
+    - construct commands
+    - decide if to pend or send immediatly
+    - return qubit IDs
+    - return messages if those are expected back
+    - pass entanglement information
+    - active qubits
+    - release qubits
+    - get time?
+
+    More general(?):
+    - construct commands
+    - send commands
+    - pend or not
+    - return qubit IDs
+    - pass back messages if those are expected
+    """
+
+    def __init__(self, pend_messages=False, notify=True):
+
+        # Decides if to send each command as it is received, or only 
+        # when flushed
+        self.pend_messages = pend_messages
+        self._pending_headers = []
+
+        # Set an app ID
+        self._appID = 0
+
+        self.name = "CQCHandler"
+
+        self.active_qubits = []
+
+        # This is a sort of global notify
+        self.notify = notify
+
+        # Bool that indicates wheter we are in a CQCType.MIX
+        self._inside_cqc_mix = False
+
+        # Variable of type NodeMixin. This variable is used in CQCMix types to create a
+        # scoping mechanism.
+        self.current_scope = None
+
+    def _pend_header(self, header: Header) -> None:
+        self._pending_headers.append(header)
+
+    def __enter__(self):
+        # This flag is used to check if CQCHandler is opened using a 
+        # 'with' statement.
+        # Otherwise an deprecation warning is printed when instantiating
+        # qubits.
+        self._opened_with_with = True
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        # All qubits should now be released
+        self.close(release_qubits=True)
+
+    def commit_command(self, qID, command, notify=1, block=1, action=0, 
+                    xtra_qID=0, step=0, remote_appID=0, remote_node=0, 
+                    remote_port=0, ref_id=0):
+        """Construct and commit command."""
+
+        msg = self.construct_command(
+            qID, command, notify=notify, block=block, action=action, 
+            xtra_qID=xtra_qID, step=step, remote_appID=remote_appID, 
+            remote_node=remote_node, remote_port=remote_port, ref_id=ref_id)
+        self.commit(msg)
+    
+    def construct_command(self, qID, command, notify=1, block=1, action=0, 
+                          xtra_qID=0, step=0, remote_appID=0, remote_node=0, 
+                          remote_port=0, ref_id=0):
+        """Construct a commmand.
+
+        Extra arguments are only used if the command if of a type that 
+        needs them.
+
+        - **Arguments**
+
+            :qID:               qubit ID
+            :command:           Command to be executed, eg CQC_CMD_H
+            :nofify:            Do we wish to be notified when done.
+            :block:             Do we want the qubit to be blocked
+            :action:            Are there more commands to be executed
+            :xtra_qID:          Extra qubit ID for for example CNOT
+            :step:              Defines the angle of rotation.
+            :remote_appID:      Application ID of remote host
+            :remote_node:       ip of remote host in cqc network
+            :remote_port:       port of remote host in cqc network
+        """
+
+        # Construct extra header if needed.
+        xtra_hdr = None
+        if command == CQC_CMD_SEND or command == CQC_CMD_EPR:
+            xtra_hdr = CQCCommunicationHeader()
+            xtra_hdr.setVals(remote_appID, remote_node, remote_port)
+        elif command == CQC_CMD_CNOT or command == CQC_CMD_CPHASE:
+            xtra_hdr = CQCXtraQubitHeader()
+            xtra_hdr.setVals(xtra_qID)
+        elif (command == CQC_CMD_ROT_X or command == CQC_CMD_ROT_Y or 
+              command == CQC_CMD_ROT_Z):
+            xtra_hdr = CQCRotationHeader()
+            xtra_hdr.setVals(step)
+        elif command == CQC_CMD_MEASURE or command == CQC_CMD_MEASURE_INPLACE:
+            xtra_hdr = CQCAssignHeader()
+            xtra_hdr.setVals(ref_id)
+
+        # If xtra_hdr is None, we don't need an extra message.
+        if xtra_hdr is None:
+            header_length = CQCCmdHeader.HDR_LENGTH
+            xtra_msg = b""
+        else:
+            xtra_msg = xtra_hdr.pack()
+            header_length = CQCCmdHeader.HDR_LENGTH + xtra_hdr.HDR_LENGTH
+
+        # Construct Header
+        hdr = CQCHeader()
+        hdr.setVals(CQC_VERSION, CQC_TP_COMMAND, self._appID, header_length)
+        msg = hdr.pack()
+
+        # Construct Command
+        cmd_hdr = CQCCmdHeader()
+        cmd_hdr.setVals(qID, command, notify, block, action)
+        cmd_msg = cmd_hdr.pack()
+
+        return msg + cmd_msg + xtra_msg
+
+    def construct_release(self, qubits, notify=True, block=False, 
+                          action=False):
+        """Construct command to release qubits
+
+        - **Arguments**
+
+            :qubits:    a list of qubits to be released
+            :notify:    Do we wish to be notified when done.
+            :block:     Do we want the qubit to be blocked
+            :action:    Execute the releases recursively or sequencely
+        """
+
+        if isinstance(qubits, qubit):
+            qubits = [qubits]
+        assert isinstance(qubits, list)
+        n = len(qubits)
+
+        if n == 0:  # then we don't need to do anything
+            return
+
+        logging.debug("App {} tells CQC: Release {} qubits".format(self.name, n))
+        if action:
+            hdr_length = CQCCmdHeader.HDR_LENGTH + CQCSequenceHeader.HDR_LENGTH
+        else:
+            hdr_length = CQCCmdHeader.HDR_LENGTH
+
+        hdr = CQCHeader()
+        hdr.setVals(CQC_VERSION, CQC_TP_COMMAND, self._appID, hdr_length * n)
+        cqc_msg = hdr.pack()
+
+        release_messages = b""
+
+        for i in range(n):
+            q = qubits[i]
+            try:
+                q.check_active()
+            except QubitNotActiveError as e:
+                raise QubitNotActiveError(
+                    str(e) + ". Qubit {} is not active. None of the qubits are released".format(q._qID)
+                )
+            q._set_active(False)
+            cmd_hdr = CQCCmdHeader()
+            cmd_hdr.setVals(q._qID, CQC_CMD_RELEASE, int(notify), int(block), 
+                            int(action))
+            release_messages += cmd_hdr.pack()
+            if action:
+                seq_hdr = CQCSequenceHeader()
+                # After this one we are sending n-i-1 more releases
+                seq_hdr.setVals(hdr_length * (n - i - 1))
+                release_messages += seq_hdr.pack()
+
+        return cqc_msg + release_messages
+
+    def construct_simple(self, tp):
+        """Construct simple message.
+        
+        For example a HELLO message if tp=CQC_TP_HELLO.
+        """
+        hdr = CQCHeader()
+        hdr.setVals(CQC_VERSION, tp, self._appID, 0)
+        msg = hdr.pack()
+        return msg
+
+    def sendSimple(self, tp):
+        """Construct and commit simple message."""
+        
+        msg = self.construct_simple(tp)
+        self.commit(msg)
+
+    @abstractmethod
+    def new_qubitID(self):
+        """Provide new qubit ID."""
+        pass
+
+    @abstractmethod
+    def close(self, release_qubits=True):
+        """Handle exiting of context."""
+        pass
+
+    @abstractmethod
+    def createEPR(self):
+        """Create EPR pair."""
+        pass
+
+    @abstractmethod
+    def recvEPR(self):
+        """Receive EPR pair."""
+        pass
+
+    @abstractmethod
+    def sendQubit(self):
+        """Send qubit."""
+        pass
+
+    @abstractmethod
+    def recvQubit(self):
+        """Receive qubit."""
+        pass
+
+    @abstractmethod
+    def return_meas_outcome(self):
+        """Return measurement outcome."""
+        pass
+
+    @abstractmethod
+    def commit(self):
+        """Commit a message. 
+
+        This can mean sending it to the backend or just writing to file.
+        """
+        pass
+
+
+class CQCConnection(CQCHandler):
+    """Handler to be used when sending commands over a socket."""
+
     _appIDs = {}
 
     def __init__(self, name, socket_address=None, appID=None, pend_messages=False,
@@ -218,6 +466,9 @@ class CQCConnection:
             :param network_name: None or str
                 Used if simulaqron is used to load socket addresses for the backend
         """
+
+        super().__init__(pend_messages = pend_messages)
+
         self._setup_logging(log_level)
 
         # This flag is used to check if CQCConnection is opened using a 'with' statement.
@@ -233,7 +484,7 @@ class CQCConnection:
         if name not in self._appIDs:
             self._appIDs[name] = []
 
-            # Which appID
+        # Which appID
         if appID is None:
             if len(self._appIDs[name]) == 0:
                 self._appID = 0
@@ -317,35 +568,6 @@ class CQCConnection:
                 self._s.close()
                 raise err
 
-        # All qubits active for this connection
-        self.active_qubits = []
-
-        # List of pended header objects waiting to be sent to the backend
-        self._pending_headers = []  # ONLY cqc.cqcHeader.Header objects should be in this list
-
-        # Bool that indicates whether we are in a factory and thus should pend commands
-        self.pend_messages = pend_messages
-
-        # Bool that indicates wheter we are in a CQCType.MIX
-        self._inside_cqc_mix = False
-
-        # Variable of type NodeMixin. This variable is used in CQCMix types to create a
-        # scoping mechanism.
-        self.current_scope = None
-
-    def _pend_header(self, header: Header) -> None:
-        self._pending_headers.append(header)
-
-    def __enter__(self):
-        # This flag is used to check if CQCConnection is opened using a 'with' statement.
-        # Otherwise an deprecation warning is printed when instantiating qubits.
-        self._opened_with_with = True
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # All qubits should now be released
-        self.close(release_qubits=True)
-
     def __str__(self):
         return "Socket to cqc server '{}'".format(self.name)
 
@@ -363,17 +585,34 @@ class CQCConnection:
             logging.basicConfig(format="%(asctime)s:%(levelname)s:%(message)s", level=level)
 
     def get_appID(self):
-        """
-        Returns the application ID.
-        """
+        """Returns the application ID."""
+
         return self._appID
 
-    def close(self, release_qubits=True):
-        """
-        Closes the connection. Releases all qubits and remove the app ID from the used app IDs.
+    def commit(self, msg):
+        """Send message through the socket."""
+
+        self._s.send(msg)
+
+    def close(self, release_qubits=True, notify=True):
+        """Closes the connection. 
+        
+        Releases all qubits if that option is set.
         """
         if release_qubits:
-            self.release_all_qubits()
+            if len(self.active_qubits[:]) != 0:
+                msg = self.construct_release(self.active_qubits[:], block=True)
+                self.commit(msg)
+
+                if notify:
+                    msg = self.readMessage()
+                    self.check_error(msg[0])
+                    if msg[0].tp != CQC_TP_DONE:
+                        raise CQCUnsuppError(
+                            "Unexpected message sent back from the server. Message: {}".format(msg[0].printable())
+                        )
+                    self.print_CQC_msg(msg)
+
         self._s.close()
         self._pop_app_id()
 
@@ -391,9 +630,17 @@ class CQCConnection:
         except ValueError:
             pass  # Already removed
 
+    def new_qubitID(self):
+        """Provide new qubit ID."""
+
+        msg = self.readMessage()
+        otherHdr = msg[1]
+
+        return otherHdr.qubit_id
+
     def startClassicalServer(self):
-        """
-        Sets up a server for the application communication, if not already set up.
+        """Sets up a server for the application communication, 
+        if not already set up.
         """
         if self._appNet is None:
             raise ValueError(
@@ -417,6 +664,8 @@ class CQCConnection:
             self._classicalServer = conn
 
     def closeClassicalServer(self):
+        """Closes classical server."""
+
         if self._classicalServer:
             logging.debug("App {}: Closing classical server".format(self.name))
             self._classicalServer.close()
@@ -424,6 +673,8 @@ class CQCConnection:
             self._classicalServer = None
 
     def recvClassical(self, timout=1, msg_size=1024, close_after=True):
+        """Receive classical message."""
+
         if not self._classicalServer:
             self.startClassicalServer()
         for _ in range(10 * timout):
@@ -513,108 +764,8 @@ class CQCConnection:
         if close_after:
             self.closeClassicalChannel(name)
 
-    def sendSimple(self, tp):
-        """
-        Sends a simple message to the cqc server, for example a HELLO message if tp=CQC_TP_HELLO.
-        """
-        hdr = CQCHeader()
-        hdr.setVals(CQC_VERSION, tp, self._appID, 0)
-        msg = hdr.pack()
-        self._s.send(msg)
-
-    def sendCommand(self, qID, command, notify=1, block=1, action=0):
-        """
-        Sends a simple message and command message to the cqc server.
-
-        - **Arguments**
-
-            :qID:        qubit ID
-            :command:    Command to be executed, eg CQC_CMD_H
-            :nofify:    Do we wish to be notified when done.
-            :block:        Do we want the qubit to be blocked
-            :action:    Are there more commands to be executed
-        """
-        # Send Header
-        hdr = CQCHeader()
-        hdr.setVals(CQC_VERSION, CQC_TP_COMMAND, self._appID, CQCCmdHeader.HDR_LENGTH)
-        msg = hdr.pack()
-        self._s.send(msg)
-
-        # Send Command
-        cmd_hdr = CQCCmdHeader()
-        cmd_hdr.setVals(qID, command, notify, block, action)
-        cmd_msg = cmd_hdr.pack()
-        self._s.send(cmd_msg)
-
-    def sendCmdXtra(
-        self,
-        qID,
-        command,
-        notify=1,
-        block=1,
-        action=0,
-        xtra_qID=0,
-        step=0,
-        remote_appID=0,
-        remote_node=0,
-        remote_port=0,
-        ref_id=0
-    ):
-        """
-        Sends a simple message, command message and xtra message to the cqc server.
-
-        - **Arguments**
-
-            :qID:         qubit ID
-            :command:     Command to be executed, eg CQC_CMD_H
-            :nofify:     Do we wish to be notified when done.
-            :block:         Do we want the qubit to be blocked
-            :action:     Are there more commands to be executed
-            :xtra_qID:     Extra qubit ID for for example CNOT
-            :step:         Defines the angle of rotation.
-            :remote_appID:     Application ID of remote host
-            :remote_node:     ip of remote host in cqc network
-            :remote_port:     port of remote host in cqc network
-        """
-
-        # Check what extra header we require
-        xtra_hdr = None
-        if command == CQC_CMD_SEND or command == CQC_CMD_EPR:
-            xtra_hdr = CQCCommunicationHeader()
-            xtra_hdr.setVals(remote_appID, remote_node, remote_port)
-        elif command == CQC_CMD_CNOT or command == CQC_CMD_CPHASE:
-            xtra_hdr = CQCXtraQubitHeader()
-            xtra_hdr.setVals(xtra_qID)
-        elif command == CQC_CMD_ROT_X or command == CQC_CMD_ROT_Y or command == CQC_CMD_ROT_Z:
-            xtra_hdr = CQCRotationHeader()
-            xtra_hdr.setVals(step)
-        elif command == CQC_CMD_MEASURE or CQC_CMD_MEASURE_INPLACE:
-            xtra_hdr = CQCAssignHeader()
-            xtra_hdr.setVals(ref_id)
-
-        if xtra_hdr is None:
-            header_length = CQCCmdHeader.HDR_LENGTH
-            xtra_msg = b""
-        else:
-            xtra_msg = xtra_hdr.pack()
-            header_length = CQCCmdHeader.HDR_LENGTH + xtra_hdr.HDR_LENGTH
-
-            # Send Header
-        hdr = CQCHeader()
-        hdr.setVals(CQC_VERSION, CQC_TP_COMMAND, self._appID, header_length)
-        msg = hdr.pack()
-
-        # Send Command
-        cmd_hdr = CQCCmdHeader()
-        cmd_hdr.setVals(qID, command, notify, block, action)
-        cmd_msg = cmd_hdr.pack()
-
-        # Send headers
-        self._s.send(msg + cmd_msg + xtra_msg)
-
     def sendGetTime(self, qID, notify=1, block=1, action=0):
-        """
-        Sends get-time message
+        """Sends get-time message
 
         - **Arguments**
 
@@ -628,17 +779,17 @@ class CQCConnection:
         hdr = CQCHeader()
         hdr.setVals(CQC_VERSION, CQC_TP_GET_TIME, self._appID, CQCCmdHeader.HDR_LENGTH)
         msg = hdr.pack()
-        self._s.send(msg)
+        self.commit(msg)
 
         # Send Command
         cmd_hdr = CQCCmdHeader()
         cmd_hdr.setVals(qID, 0, notify, block, action)
         cmd_msg = cmd_hdr.pack()
-        self._s.send(cmd_msg)
+        self.commit(cmd_msg)
 
     def allocate_qubits(self, num_qubits, notify=True, block=True):
-        """
-        Requests the backend to reserve some qubits
+        """Requests the backend to reserve some qubits
+
         :param num_qubits: The amount of qubits to reserve
         :return: A list of qubits
         :param notify:     Do we wish to be notified when done.
@@ -655,7 +806,7 @@ class CQCConnection:
         cmd_hdr.setVals(num_qubits, CQC_CMD_ALLOCATE, int(notify), int(block), 0)
         cmd_msg = cmd_hdr.pack()
 
-        self._s.send(cqc_msg + cmd_msg)
+        self.commit(cqc_msg + cmd_msg)
         qubits = []
         for _ in range(num_qubits):
             msg = self.readMessage()
@@ -674,86 +825,11 @@ class CQCConnection:
 
         return qubits
 
-    def release_qubits(self, qubits, notify=True, block=True, action=False):
-        """
-        Release qubits so backend can free them up for other uses
-        :param qubits: a list of qubits to be released
-        :param notify:     Do we wish to be notified when done.
-        :param block:         Do we want the qubit to be blocked
-        :param action:     Execute the releases recursively or sequencely
-        """
-
-        if isinstance(qubits, qubit):
-            qubits = [qubits]
-        assert isinstance(qubits, list)
-        n = len(qubits)
-
-        if n == 0:  # then we don't need to do anything
-            return
-
-        logging.debug("App {} tells CQC: Release {} qubits".format(self.name, n))
-        if action:
-            hdr_length = CQCCmdHeader.HDR_LENGTH + CQCSequenceHeader.HDR_LENGTH
-        else:
-            hdr_length = CQCCmdHeader.HDR_LENGTH
-        hdr = CQCHeader()
-        hdr.setVals(CQC_VERSION, CQC_TP_COMMAND, self._appID, hdr_length * n)
-        cqc_msg = hdr.pack()
-
-        release_messages = b""
-
-        for i in range(n):
-            q = qubits[i]
-            try:
-                q.check_active()
-            except QubitNotActiveError as e:
-                raise QubitNotActiveError(
-                    str(e) + ". Qubit {} is not active. None of the qubits are released".format(q._qID)
-                )
-            q._set_active(False)
-            cmd_hdr = CQCCmdHeader()
-            cmd_hdr.setVals(q._qID, CQC_CMD_RELEASE, int(notify), int(block), int(action))
-            release_messages += cmd_hdr.pack()
-            if action:
-                seq_hdr = CQCSequenceHeader()
-                # After this one we are sending n-i-1 more releases
-                seq_hdr.setVals(hdr_length * (n - i - 1))
-                release_messages += seq_hdr.pack()
-
-        self._s.send(cqc_msg + release_messages)
-
-        if notify:
-            msg = self.readMessage()
-            self.check_error(msg[0])
-            if msg[0].tp != CQC_TP_DONE:
-                raise CQCUnsuppError(
-                    "Unexpected message sent back from the server. Message: {}".format(msg[0].printable())
-                )
-            self.print_CQC_msg(msg)
-
-    def release_all_qubits(self):
-        """
-        Releases all qubits off this connection
-        """
-        return self.release_qubits(self.active_qubits[:])
-
-    # sendFactory is depecrated. Use flush_factory() instead. #
-    def sendFactory(
-        self,
-        qID,
-        command,
-        num_iter,
-        notify=1,
-        block=1,
-        action=0,
-        xtra_qID=-1,
-        remote_appID=0,
-        remote_node=0,
-        remote_port=0,
-        step_size=0,
-    ):
-        """
-        Sends a factory message
+    # sendFactory is deprecated use flush_factory() instead.
+    def sendFactory(self, qID, command, num_iter, notify=1, block=1, action=0,
+                    xtra_qID=-1, remote_appID=0, remote_node=0, remote_port=0, 
+                    step_size=0):
+        """Sends a factory message
 
         - **Arguments**
 
@@ -814,7 +890,7 @@ class CQCConnection:
         logging.debug("App {} sends CQC message {}".format(self.name, cmd_hdr.printable()))
         if xtra_hdr:
             logging.debug("App {} sends CQC message {}".format(self.name, xtra_hdr.printable()))
-        self._s.send(msg + factory_msg + cmd_msg + xtra_msg)
+        self.commit(msg + factory_msg + cmd_msg + xtra_msg)
 
         # Get RECV messages
         # Some commands expect to get a list of messages back, check those
@@ -839,14 +915,16 @@ class CQCConnection:
         return res
 
     def readMessage(self, maxsize=192):  # WHAT IS GOOD SIZE?
-        """
-        Receive the whole message from cqc server.
-        Returns (CQCHeader,None,None), (CQCHeader,CQCNotifyHeader,None) or (CQCHeader,CQCNotifyHeader,EntInfoHeader)
-        depending on the type of message.
+        """Receive the whole message from cqc server.
+
+        Returns (CQCHeader,None,None), (CQCHeader,CQCNotifyHeader,None) 
+        or (CQCHeader,CQCNotifyHeader,EntInfoHeader) depending on the 
+        type of message.
+
         Maxsize is the max size of message.
         """
 
-        # Initilize checks
+        # Initialize checks
         gotCQCHeader = False
         if self.buf:
             checkedBuf = False
@@ -1001,15 +1079,13 @@ class CQCConnection:
             return otherHdr.datetime
 
     def check_error(self, hdr):
-        """
-        Checks if there is an error returned.
-        """
+        """Checks if there is an error returned."""
+
         self._errorHandler(hdr.tp)
 
     def _errorHandler(self, cqc_err):
-        """
-        Raises an error if there is an error-message
-        """
+        """Raises an error if there is an error-message."""
+
         if cqc_err == CQC_ERR_GENERAL:
             raise CQCGeneralError("General error")
         if cqc_err == CQC_ERR_NOQUBIT:
@@ -1022,8 +1098,9 @@ class CQCConnection:
             raise CQCUnknownError("Unknown qubit ID")
 
     def sendQubit(self, q, name, remote_appID=0, remote_socket=None, notify=True, block=True):
-        """
-        Sends qubit to another node in the cqc network. If this node is not in the network an error is raised.
+        """Sends qubit to another node in the cqc network. 
+        
+        If this node is not in the network an error is raised.
 
         - **Arguments**
 
@@ -1065,15 +1142,10 @@ class CQCConnection:
                     self.name, q._qID, name, remote_appID
                 )
             )
-            self.sendCmdXtra(
-                q._qID,
-                CQC_CMD_SEND,
-                notify=int(notify),
-                block=int(block),
-                remote_appID=remote_appID,
-                remote_node=remote_ip,
-                remote_port=remote_port,
-            )
+            self.commit_command(q._qID, CQC_CMD_SEND, notify=int(notify), 
+                             block=int(block), remote_appID=remote_appID, 
+                             remote_node=remote_ip, remote_port=remote_port)
+
             if notify:
                 message = self.readMessage()
                 self.print_CQC_msg(message)
@@ -1082,8 +1154,7 @@ class CQCConnection:
             q._set_active(False)
 
     def recvQubit(self, notify=True, block=True):
-        """
-        Receives a qubit.
+        """Receives a qubit.
 
         - **Arguments**
 
@@ -1108,7 +1179,7 @@ class CQCConnection:
         else:
             # print info
             logging.debug("App {} tells CQC: 'Receive qubit'".format(self.name))
-            self.sendCommand(0, CQC_CMD_RECV, notify=int(notify), block=int(block))
+            self.commit_command(0, CQC_CMD_RECV, notify=int(notify), block=int(block))
 
             # Get RECV message
             message = self.readMessage()
@@ -1130,8 +1201,7 @@ class CQCConnection:
             return q
 
     def createEPR(self, name, remote_appID=0, remote_socket=None, notify=True, block=True):
-        """
-        Creates epr with other host in cqc network.
+        """Creates epr with other host in cqc network.
 
         - **Arguments**
 
@@ -1168,7 +1238,7 @@ class CQCConnection:
                 "App {} tells CQC: 'Create EPR-pair with {} and appID {}'".format(self.name, name, remote_appID)
             )
 
-            self.sendCmdXtra(
+            self.commit_command(
                 0,
                 CQC_CMD_EPR,
                 notify=int(notify),
@@ -1199,8 +1269,7 @@ class CQCConnection:
             return q
 
     def recvEPR(self, notify=True, block=True):
-        """
-        Receives a qubit from an EPR-pair generated with another node.
+        """Receives a qubit from an EPR-pair generated with another node.
 
         - **Arguments**
 
@@ -1223,7 +1292,7 @@ class CQCConnection:
         else:
             # print info
             logging.debug("App {} tells CQC: 'Receive half of EPR'".format(self.name))
-            self.sendCommand(0, CQC_CMD_EPR_RECV, notify=int(notify), block=int(block))
+            self.commit_command(0, CQC_CMD_EPR_RECV, notify=int(notify), block=int(block))
 
             # Get RECV message
             message = self.readMessage()
@@ -1248,8 +1317,8 @@ class CQCConnection:
             return q
 
     def set_pending(self, pend_messages):
-        """
-        Set the pend_messages flag.
+        """Set the pend_messages flag.
+
         If true, flush() has to be called to send all self._pending_headers in sequence to the backend
         If false, all commands are directly send to the back_end
         :param pend_messages: Boolean to indicate if messages should pend or not
@@ -1276,8 +1345,8 @@ class CQCConnection:
         return self.flush_factory(nb_of_qubits)
 
     def flush(self, do_sequence=False):
-        """
-        Flush all pending messages to the backend.
+        """Flush all pending messages to the backend.
+        
         :param do_sequence: boolean to indicate if you want to send the pending messages as a sequence
         :return: A list of things that are sent back from the server. Can be qubits, or outcomes
         """
@@ -1349,7 +1418,7 @@ class CQCConnection:
 
         # Send all pending headers
         for header in self._pending_headers:
-            self._s.send(header.pack())
+            self.commit(header.pack())
             logging.debug("App {} sends CQC: {}".format(self.name, header.printable()))
 
         # Reset _pending_headers to an empty list after all headers are sent
@@ -1439,8 +1508,7 @@ class CQCConnection:
         return list(freqs)
 
     def test_preparation(self, preparation, exp_values, conf=2, iterations=100, progress=True):
-        """
-        Test the preparation of a qubit.
+        """Test the preparation of a qubit.
         Returns True if the expected values are inside the confidence interval produced from the data received from
         the tomography function
 
@@ -1460,6 +1528,17 @@ class CQCConnection:
                 print(freqs, exp_values, epsilon)
                 return False
         return True
+
+    def return_meas_outcome(self):
+        """Return measurement outcome."""
+
+        msg = self.readMessage()
+
+        try:
+            otherHdr = message[1]
+            return otherHdr.outcome
+        except AttributeError:
+            return None
 
 
 class CQCVariable:
@@ -1837,6 +1916,8 @@ class qubit:
         # Cqc connection
         self._cqc = cqc
 
+        self.notify = cqc.notify
+
         # Check if the cqc connection was openened using a 'with' statement
         # If not, raise a deprecation warning
         if not self._cqc._opened_with_with:
@@ -1858,21 +1939,20 @@ class qubit:
             logging.debug("App {} tells CQC: 'Create qubit'".format(self._cqc.name))
 
             # Create new qubit at the cqc server
-            self._cqc.sendCommand(0, CQC_CMD_NEW, notify=int(notify), block=int(block))
-
+            self._cqc.commit_command(0, CQC_CMD_NEW, notify=int(notify), block=int(block))
+            
             # Get qubit id
-            message = self._cqc.readMessage()
             try:
-                otherHdr = message[1]
-                self._qID = otherHdr.qubit_id
+                self._qID = self._cqc.new_qubitID()
             except AttributeError:
                 raise CQCGeneralError("Didn't receive the qubit id")
-                # Activate qubit
+            
+            # Activate qubit
             self._set_active(True)
-
-            if notify:
+            if notify and self.notify:
                 message = self._cqc.readMessage()
                 self._cqc.print_CQC_msg(message)
+        
         else:
             self._qID = q_id
             self._set_active(False)  # Why?
@@ -1981,7 +2061,6 @@ class qubit:
         else:
             if self in self._cqc.active_qubits:
                 self._cqc.active_qubits.remove(self)
-
         self._active = be_active
 
     def _single_qubit_gate(self, command, notify, block):
@@ -2011,8 +2090,8 @@ class qubit:
                 "App {} tells CQC: 'Send command {} for qubit with ID {}'".format(self._cqc.name, command, self._qID)
             )
 
-            self._cqc.sendCommand(self._qID, command, notify=int(notify), block=int(block))
-            if notify:
+            self._cqc.commit_command(self._qID, command, notify=int(notify), block=int(block))
+            if notify and self.notify:
                 message = self._cqc.readMessage()
                 self._cqc.print_CQC_msg(message)
 
@@ -2148,8 +2227,8 @@ class qubit:
                     self._cqc.name, command, step, self._qID
                 )
             )
-            self._cqc.sendCmdXtra(self._qID, command, step=step, notify=int(notify), block=int(block))
-            if notify:
+            self._cqc.commit_command(self._qID, command, step=step, notify=int(notify), block=int(block))
+            if notify and self.notify:
                 message = self._cqc.readMessage()
                 self._cqc.print_CQC_msg(message)
 
@@ -2227,8 +2306,8 @@ class qubit:
                     self._cqc.name, self._qID, target._qID
                 )
             )
-            self._cqc.sendCmdXtra(self._qID, command, notify=int(notify), block=int(block), xtra_qID=target._qID)
-            if notify:
+            self._cqc.commit_command(self._qID, command, notify=int(notify), block=int(block), xtra_qID=target._qID)
+            if notify and self.notify:
                 message = self._cqc.readMessage()
                 self._cqc.print_CQC_msg(message)
 
@@ -2300,16 +2379,14 @@ class qubit:
             logging.debug("App {} tells CQC: 'Measure qubit with ID {}'".format(self._cqc.name, self._qID))
 
             # Ref id is unimportant in this case because we are not inside a CQCMix
-            self._cqc.sendCmdXtra(self._qID, command, notify=0, block=int(block), ref_id=0)
+            self._cqc.commit_command(self._qID, command, notify=0, block=int(block), ref_id=0)
+
+            if not inplace:
+                self._set_active(False)
 
             # Return measurement outcome
-            message = self._cqc.readMessage()
 
-            try:
-                otherHdr = message[1]
-                return otherHdr.outcome
-            except AttributeError:
-                return None
+            return self._cqc.return_meas_outcome()
 
     def reset(self, notify=True, block=True):
         """
@@ -2334,8 +2411,8 @@ class qubit:
             # print info
             logging.debug("App {} tells CQC: 'Reset qubit with ID {}'".format(self._cqc.name, self._qID))
 
-            self._cqc.sendCommand(self._qID, CQC_CMD_RESET, notify=int(notify), block=int(block))
-            if notify:
+            self._cqc.commit_command(self._qID, CQC_CMD_RESET, notify=int(notify), block=int(block))
+            if notify and self.notify:
                 message = self._cqc.readMessage()
                 self._cqc.print_CQC_msg(message)
 
@@ -2372,3 +2449,317 @@ class qubit:
             return otherHdr.datetime
         except AttributeError:
             return None
+
+
+class CQCToFile(CQCHandler):
+    """Handler to be used when writing the CQC commands to a file."""
+
+    def __init__(self, filename='CQC_File', pend_messages=False,
+                 overwrite=False):
+
+        # Call init of CQCHandler
+        super().__init__(pend_messages = pend_messages)
+
+        self.name = "CQCToFile"
+
+        self.next_qubitID = 0
+
+        # Set path of file to write to
+        script_dir = sys.path[0]
+        self.filename = os.path.join(script_dir, filename)
+        self.filenameb = self.filename+"binary"
+
+        # Check if file exists
+        if overwrite:
+            # Remove file if we can overwrite
+            try:
+                os.remove(self.filename)
+            except FileNotFoundError:
+                pass
+            
+            try:
+                os.remove(self.filenameb)
+            except FileNotFoundError:
+                pass
+        else:
+            if not (os.path.isfile(self.filename) 
+                    or os.path.isfile(self.filename + "binary")):
+                pass
+            else:
+                # Append number to filename if can't overwrite
+                num = 0
+                while True:
+                    if (os.path.isfile(self.filename + str(num)) 
+                        or os.path.isfile(self.filename +str(num) + "binary")):
+                        num += 1
+                    else:
+                        self.filename = self.filename + str(num)
+                        self.filenameb = self.filename + "binary"
+                        break 
+
+        # Don't want notify when writing to file
+        self.notify = False
+
+    def commit(self, msg):
+        """Write a message to file.
+
+        Message is written as the bytes turned into a string.
+        """
+
+        with open(self.filename, 'a') as f:
+            f.write(str(msg) + '\n')
+
+    def new_qubitID(self):
+        """Provice new qubit ID."""
+
+        qubitID = self.next_qubitID
+
+        self.next_qubitID += 1
+
+        return qubitID
+
+    def close(self, release_qubits=True):
+        """Handle exiting context."""
+
+        if release_qubits:
+
+            msg = self.construct_release(self.active_qubits[:], notify=True, 
+                                         block=True, action=False)
+            self.commit(msg)
+
+    def createEPR(self, name, remote_appID=0, notify=True, block=True):
+        """Create EPR pair."""
+
+
+        remote_ip, remote_port = 0,0 #TODO: some function that assigns based on name?
+
+        # Initialize the qubit
+        q = qubit(self, createNew=False)
+
+        if self.pend_messages:
+            # print info
+            logging.debug(
+                "App {} pends message: 'Create EPR-pair with {} and appID {}'".format(self.name, name, remote_appID)
+            )
+
+            self._pending_headers.append([q, CQC_CMD_EPR, int(notify), 
+                                          int(block), [remote_appID, remote_ip,
+                                                       remote_port]])
+            return q
+        else:
+            # print info
+            logging.debug(
+                "App {} tells CQC: 'Create EPR-pair with {} and appID {}'".format(self.name, name, remote_appID)
+            )
+
+            self.commit_command(0, CQC_CMD_EPR, notify=int(notify), 
+                             block=int(block), remote_appID=remote_appID, 
+                             remote_node=remote_ip, remote_port=remote_port)
+
+            entInfoHdr = None #TODO: create function that returns some fake entanglement info
+            q_id = self.new_qubitID()
+
+            q.set_entInfo(entInfoHdr)
+            q._qID = q_id
+
+            # Activate and return qubit
+            q._set_active(True)
+
+            return q
+
+    def recvEPR(self, notify=True, block=True):
+        """Receive EPR pair."""
+
+        # initialize the qubit
+        q = qubit(self, createNew=False)
+        if self.pend_messages:
+            # print info
+            logging.debug("App {} pends message: 'Receive half of EPR'".format(self.name))
+            self._pending_headers.append([q, CQC_CMD_EPR_RECV, int(notify), 
+                                          int(block)])
+            return q
+        else:
+            # print info
+            logging.debug("App {} tells CQC: 'Receive half of EPR'".format(self.name))
+            self.commit_command(0, CQC_CMD_EPR_RECV, notify=int(notify), 
+                             block=int(block))
+
+            
+            entInfoHdr = None #TODO: create function that returns some fake entanglement info?
+            q_id = self.new_qubitID()
+
+
+            # initialize the qubit
+            q.set_entInfo(entInfoHdr)
+            q._qID = q_id
+
+            # Activate and return qubit
+            q._set_active(True)
+            return q
+
+    def sendQubit(self, q, name, remote_appID=0, remote_socket=None, 
+                  notify=True, block=True):
+        """Send qubit."""
+
+        remote_ip, remote_port = 0,0 #TODO: some function that assigns based on name?
+
+        if self.pend_messages:
+            # print info
+            logging.debug(
+                "App {} pends message: 'Send qubit with ID {} to {} and appID {}'"
+                .format(self.name, q._qID, name, remote_appID))
+
+            self._pending_headers.append([q, CQC_CMD_SEND, 
+                                        int(notify), int(block), 
+                                        [remote_appID, remote_ip, remote_port]])
+        else:
+            # print info
+            logging.debug(
+                "App {} tells CQC: 'Send qubit with ID {} to {} and appID {}'"
+                .format(self.name, q._qID, name, remote_appID))
+            self.commit_command(q._qID, CQC_CMD_SEND, notify=int(notify), 
+                             block=int(block), remote_appID=remote_appID, 
+                             remote_node=remote_ip, remote_port=remote_port)
+
+            # Deactivate qubit
+            q._set_active(False)
+
+    def recvQubit(self, notify=True, block=True):
+        """Receive qubit."""
+
+        # initialize the qubit
+        q = qubit(self, createNew=False)
+
+        if self.pend_messages:
+            # print info
+            logging.debug("App {} pends message: 'Receive qubit'"
+                          .format(self.name))
+            self._pending_headers.append([q, CQC_CMD_RECV, int(notify), 
+                                          int(block)])
+            return q
+        else:
+            # print info
+            logging.debug("App {} tells CQC: 'Receive qubit'"
+                          .format(self.name))
+            self.commit_command(0, CQC_CMD_RECV, notify=int(notify), 
+                             block=int(block))
+
+            q_id = self.new_qubitID()
+
+            # initialize the qubit
+            q._qID = q_id
+
+            # Activate and return qubit
+            q._set_active(True)
+            return q
+
+    def return_meas_outcome(self):
+        """Return measurement outcome."""
+
+        return 0
+
+    def flush(self, do_sequence=True):
+        """Flush all pending messages to the backend.
+
+        Returns a list of qubits and/or measurement outcomes.
+
+        - **Arguments**
+            :do_sequence:   boolean to indicate if you want to send the 
+                            pending messages as a sequence
+        """
+        return self.flush_factory(1, do_sequence)
+
+    def flush_factory(self, num_iter, do_sequence=True, block_factory=False):
+        """Flushes the current pending sequence in a factory. It is performed multiple times
+        
+        :param num_iter: The amount of times the current pending sequence is performed
+        :return: A list of outcomes/qubits that are produced by the commands
+        """
+
+        res = []
+
+        # Initialize should_notify to False
+        should_notify = False
+
+        # Store how many of the headers we send will get a response message from the backend
+        response_amount = 0
+
+        # Loop over the pending_headers to determine the total length and set should_notify
+        for header in self._pending_headers:
+
+            # Check if the current header is a Command header. It can also be a sub header
+            if isinstance(header, CQCCmdHeader):
+                # set should_notify to True if at least one of all command headers has notify to True
+                should_notify = should_notify or header.notify
+                
+                # Remember this header if we expect a return messge
+                if shouldReturn(header.instr):
+                    response_amount += 1
+
+                    # 
+                    if header.instr in (2, 3):
+                        res.append(self.return_meas_outcome())
+                    else:
+                        q == None
+                        if num_iter != 1:
+                            q._set_active(False)
+                            q = qubit(self, createNew=False)
+                        if q == None:
+                            q = qubit(self, createNew=False)
+                        q._qID = self.new_qubitID()
+                        q.set_entInfo(None)
+                        q._set_active(True)
+                        res.append(q)
+
+
+        # Determine the CQC Header type
+        if num_iter == 1:
+            cqc_type = CQC_TP_COMMAND
+        else:
+            # Build and insert the Factory header
+            cqc_type = CQC_TP_FACTORY
+            factory_header = CQCFactoryHeader()
+            factory_header.setVals(num_iter, should_notify, block_factory)
+            # Insert the factory header at the front
+            self._pending_headers.insert(0, factory_header)
+            
+        # Insert the cqc header
+        self.insert_cqc_header(cqc_type)
+        
+        # Send all pending headers
+        self.send_pending_headers()
+        
+        # Return information that the backend returned
+        return res
+
+    def send_pending_headers(self) -> List[Any]:
+        """
+        Sends all pending headers.
+        After sending, self._pending_headers is emptied.
+        """
+
+        # Send all pending headers
+        for header in self._pending_headers:
+            self.commit(header.pack())
+            logging.debug("App {} sends CQC: {}".format(self.name, header.printable()))
+
+        # Reset _pending_headers to an empty list after all headers are sent
+        self._pending_headers = []
+
+    def insert_cqc_header(self, cqc_type: CQCType, version=CQC_VERSION) -> None:
+        """
+        Inserts a CQC Header at index 0 of self._pending_headers.
+        Invoke this method *after* all other headers are pended, so that the correct message length is calculated.
+        """
+
+        # Count the total message length
+        message_length = 0
+        for header in self._pending_headers:
+            message_length += header.HDR_LENGTH
+
+        # Build the CQC Header
+        cqc_header = CQCHeader()
+        cqc_header.setVals(CQC_VERSION, cqc_type, self._appID, message_length)
+
+        # Insert CQC Header at the front
+        self._pending_headers.insert(0, cqc_header)
