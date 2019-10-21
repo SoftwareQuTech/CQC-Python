@@ -251,7 +251,7 @@ class CQCConnection:
             self._appID = appID
             self._appIDs[name].append(self._appID)
 
-            # Buffer received data
+        # Buffer received data
         self.buf = None
 
         # ClassicalServer
@@ -310,6 +310,7 @@ class CQCConnection:
                 time.sleep(self._conn_retry_time)
                 self._s.close()
                 if not retry_connection:
+                    self.close(release_qubits=False)
                     raise err
             except Exception as err:
                 logging.warning("App {} : Critical error when connection to CQC server: {}".format(self.name, err))
@@ -369,20 +370,26 @@ class CQCConnection:
 
     def close(self, release_qubits=True):
         """
-        Closes the connection. Releases all qubits
+        Closes the connection. Releases all qubits and remove the app ID from the used app IDs.
         """
         if release_qubits:
             self.release_all_qubits()
         self._s.close()
-        try:
-            self._appIDs[self.name].remove(self._appID)
-        except ValueError:
-            pass  # Already closed
+        self._pop_app_id()
 
         self.closeClassicalServer()
 
         for name in list(self._classicalConn):
             self.closeClassicalChannel(name)
+
+    def _pop_app_id(self):
+        """
+        Removes the used appID from the list.
+        """
+        try:
+            self._appIDs[self.name].remove(self._appID)
+        except ValueError:
+            pass  # Already removed
 
     def startClassicalServer(self):
         """

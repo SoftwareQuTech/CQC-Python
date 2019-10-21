@@ -153,7 +153,7 @@ class CQCProtocol(Protocol):
     def _parseData(self, header, data):
         try:
             yield self.messageHandler.handle_cqc_message(header, data)
-            messages = self.messageHandler.retrieve_return_messages()
+            messages = self.messageHandler.retrieve_return_messages(header.app_id)
         except Exception as e:
             raise e
 
