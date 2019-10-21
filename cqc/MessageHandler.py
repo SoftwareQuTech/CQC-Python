@@ -180,9 +180,6 @@ class CQCMessageHandler(ABC):
         self.name = factory.name
         self.return_messages = defaultdict(list)  # Dictionary of all cqc messages to return per app_id
 
-        # List of all cqc messages to return
-        self.return_messages = []  
-
         # Dictionary that stores all reference ids and their values privately for each app_id.
         # Query/assign like this: self.references[app_id][ref_id]
         self.references = defaultdict(dict)
@@ -418,7 +415,7 @@ class CQCMessageHandler(ABC):
         # Notice the [:] syntax. This ensures the underlying list is updated, and not just the variable.
 
         return_message = None
-        for message in self.return_messages:
+        for message in self.return_messages[header.app_id]:
             if is_error_message(message):
                 return_message = message
                 break
@@ -426,7 +423,7 @@ class CQCMessageHandler(ABC):
         if return_message is None:
             return_message = self.create_return_message(header.app_id, CQCType.DONE, cqc_version=header.version)
 
-        self.return_messages[:] = [return_message]
+        self.return_messages[header.app_id][:] = [return_message]
 
         # The other handlers from self.message_handlers return a bool that indicates whether 
         # self.handle_cqc_message should append a TP_DONE message. This handle_mix method does that itself 
@@ -454,7 +451,7 @@ class CQCMessageHandler(ABC):
         # If one of the above lookups in self.references fails because the queried reference IDs haven't 
         # been assigned earlier, a KeyError will be raised
         except KeyError:
-            self.return_messages.append(
+            self.return_messages[header.app_id].append(
                 self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version)
             )
             # Since the referenced IDs don't exist, we consider this IF-statement to evaluate to False.
