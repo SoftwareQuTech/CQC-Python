@@ -397,7 +397,7 @@ class CQCIfHeader(Header):
         Set the fields of this header. 
         first_operand must be a reference id.
         second_operand will be interpreted as eiter a reference id or a value, dependent on type_of_second_operand.
-        type_of_second_operand must either be CQCIFHEADER.TYPE_VALUE or CQCIFHEADER.TYPE_REF_ID
+        type_of_second_operand must either be CQCIfHeader.TYPE_VALUE or CQCIfHeader.TYPE_REF_ID
         """
 
         self.first_operand = first_operand

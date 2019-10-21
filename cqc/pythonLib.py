@@ -730,7 +730,7 @@ class CQCConnection:
         """
         return self.release_qubits(self.active_qubits[:])
 
-    # sendFactory is depecrated. Do not use it. #
+    # sendFactory is depecrated. Use flush_factory() instead. #
     def sendFactory(
         self,
         qID,
@@ -1481,14 +1481,14 @@ class CQCVariable:
     # override the == operator
     # other can be a CQCVariable or int
     def __eq__(self, other: Union['CQCVariable', int]):
-        return LogicalFunction(self, CQCLogicalOperator.EQ, other)
+        return _LogicalFunction(self, CQCLogicalOperator.EQ, other)
     
     # override the != operator
     def __ne__(self, other: Union['CQCVariable', int]):
-        return LogicalFunction(self, CQCLogicalOperator.NEQ, other)
+        return _LogicalFunction(self, CQCLogicalOperator.NEQ, other)
         
 
-class LogicalFunction:
+class _LogicalFunction:
     """
     Private helper class. This class should never be used outside this pythonLib.
     """
@@ -1516,8 +1516,8 @@ class LogicalFunction:
         self.operator = operator
         self.operand_two = operand_two
 
-    def get_negation(self) -> 'LogicalFunction':
-        return LogicalFunction(self.operand_one, CQCLogicalOperator.opposite_of(self.operator), self.operand_two)
+    def get_negation(self) -> '_LogicalFunction':
+        return _LogicalFunction(self.operand_one, CQCLogicalOperator.opposite_of(self.operator), self.operand_two)
 
     def get_CQCIfHeader(self) -> CQCIfHeader:
         """
@@ -1598,20 +1598,20 @@ class CQCMix(NodeMixin):
             # current_scope is only used inside CQCMix contexts
             self._conn.current_scope = None
 
-    def cqc_if(self, logical_function: LogicalFunction):
+    def cqc_if(self, logical_function: _LogicalFunction):
         """
         Open a Python Context Manager Type to start an if-statement block.
 
         - **Arguments**
 
-            :logical_function:      A LogicalFunction instance. Never instantiate this explicitely; instead
+            :logical_function:      A _LogicalFunction instance. Never instantiate this explicitely; instead
                                     use the following: CQCVariable == 1 OR CQCVariable == CQCVariable. 
                                     CQCVariable can be any instance that you want to test to a value, or to another  
                                     CQCVariable. The operator can be == or !=. 
                                     The value can be any integer (though only 1 and 0 make sense).
                                 
         """
-        return CQCConditional(self._conn, False, logical_function)
+        return _CQCConditional(self._conn, False, logical_function)
 
     def cqc_else(self):
         """
@@ -1619,7 +1619,7 @@ class CQCMix(NodeMixin):
         This will be  an else-block of the last closed cqc_if-block.                    
         """
         # Find out to which if this else belongs
-        return CQCConditional(self._conn, True)
+        return _CQCConditional(self._conn, True)
 
     def loop(self, times: int):
         """
@@ -1630,10 +1630,10 @@ class CQCMix(NodeMixin):
             :times:     The number of times the commands inside body of this context should be repeated.
                                 
         """
-        return CQCFactory(self._conn, times)
+        return _CQCFactory(self._conn, times)
 
 
-class CQCFactory:
+class _CQCFactory:
     """
     Private class to create factories inside CQCMix contexts. Never explicitely instantiate this class outside 
     the source code of this library.
@@ -1680,34 +1680,34 @@ class CQCFactory:
         self.type_header.length = body_length
 
 
-class CQCConditional(NodeMixin):
+class _CQCConditional(NodeMixin):
     """
     Private helper class. Never explicitely instantiate this class outside the source code of this library.
     This Context Manager class is instantiated by CQCMix.cqc_if() and CQCMix.cqc_else(). Its 
     function is to build and pend CQC If headers.
     """
 
-    # This private class variable holds the last CQCConditional that 
+    # This private class variable holds the last _CQCConditional that 
     # functioned as an IF (as opposed to an ELSE) on which __exit__ is invoked. 
     # In other words, it is the last closed IF statement. 
     # This is important so that ELSE statements can find out to which IF statement they belong.
     # If this variable is None, then there either has not been aan IF statement yet, or the last 
-    # CQCConditional was an ELSE.
+    # _CQCConditional was an ELSE.
     _last_closed_conditional = None
 
-    def __init__(self, cqc_connection: CQCConnection, is_else: bool, logical_function: LogicalFunction = None):
+    def __init__(self, cqc_connection: CQCConnection, is_else: bool, logical_function: _LogicalFunction = None):
         self._conn = cqc_connection
         self.is_else = is_else
 
         if is_else:
             # If _last_closed_conditional is None, then there either has not been aan IF statement yet, or the last 
-            # CQCConditional was an ELSE.
-            if CQCConditional._last_closed_conditional is None:
+            # _CQCConditional was an ELSE.
+            if _CQCConditional._last_closed_conditional is None:
                 raise CQCGeneralError('Cannot use an ELSE if there is no IF directly before it.')
             else:
                 # Get the negation of the logical function of the IF, 
                 # which will be the logical function for this ELSE statement
-                logical_function = CQCConditional._last_closed_conditional._logical_function.get_negation()
+                logical_function = _CQCConditional._last_closed_conditional._logical_function.get_negation()
             
         self._logical_function = logical_function
 
@@ -1729,9 +1729,9 @@ class CQCConditional(NodeMixin):
 
         # Set _last_closed_conditional to the correct value
         if (self.is_else):
-            CQCConditional._last_closed_conditional = None
+            _CQCConditional._last_closed_conditional = None
         else:
-            CQCConditional._last_closed_conditional = self
+            _CQCConditional._last_closed_conditional = self
 
         # Calculate the length of the body of the conditional
         # Loop in reverse through all pending_headers to calculate the lenght of all headers
@@ -1949,15 +1949,15 @@ class qubit:
                 or self.scope_of_deactivation in self._cqc.current_scope.descendants
             ):
 
-                raise QubitNotActiveError("""
-        Qubit is not active. Possible causes:
-        - Qubit is sent to another node
-        - Qubit is measured (with inplace=False)
-        - Qubit is released
-        - Qubit is not received
-        - Qubit is used and created in the same factory
-        - Qubit is measured (with inplace=False) inside a cqc_if block earlier in the code
-        """)
+                raise QubitNotActiveError(
+                    "Qubit is not active. Possible causes:\n"
+                    "- Qubit is sent to another node\n"
+                    "- Qubit is measured (with inplace=False)\n"
+                    "- Qubit is released\n"
+                    "- Qubit is not received\n"
+                    "- Qubit is used and created in the same factory\n"
+                    "- Qubit is measured (with inplace=False) inside a cqc_if block earlier in the code\n"
+                )
 
     def _set_active(self, be_active):
 

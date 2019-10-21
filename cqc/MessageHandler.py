@@ -27,6 +27,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from abc import ABC, abstractmethod
+from collections import defaultdict
 import logging
 
 from cqc.cqcHeader import (
@@ -183,7 +184,7 @@ class CQCMessageHandler(ABC):
 
         # Dictionary that stores all reference ids and their values privately for each app_id.
         # Query/assign like this: self.references[app_id][ref_id]
-        self.references = {}
+        self.references = defaultdict(dict)
 
     @inlineCallbacks
     def handle_cqc_message(self, header, message, transport=None):
@@ -191,10 +192,6 @@ class CQCMessageHandler(ABC):
         This calls the correct method to handle the cqcmessage, based on the type specified in the header
         """
         self.return_messages = []
-
-        # References are app_id private. If this app doesn't yet have a references dictionary, create one.
-        if header.app_id not in self.references:
-            self.references[header.app_id] = {}
 
         if header.tp in self.messageHandlers:
             try:
@@ -417,14 +414,18 @@ class CQCMessageHandler(ABC):
                 current_position += result
 
         # A TP_MIX should return the first error if there is an error message present, and otherwise return one TP_DONE
-        # We use the next function to retrieve the first error message from the list.
         # Notice the [:] syntax. This ensures the underlying list is updated, and not just the variable.
-        # See https://stackoverflow.com/questions/2361426/get-the-first-item-from-an-iterable-that-matches-a-condition
-        # and https://stackoverflow.com/questions/1207406/how-to-remove-items-from-a-list-while-iterating
-        self.return_messages[:] = [next(
-            (message for message in self.return_messages if is_error_message(message)),
-            self.create_return_message(header.app_id, CQCType.DONE, cqc_version=header.version)
-        )]
+
+        return_message = None
+        for message in self.return_messages:
+            if is_error_message(message):
+                return_message = message
+                break
+        
+        if return_message is None:
+            return_message = self.create_return_message(header.app_id, CQCType.DONE, cqc_version=header.version)
+
+        self.return_messages[:] = [return_message]
 
         # The other handlers from self.message_handlers return a bool that indicates whether 
         # self.handle_cqc_message should append a TP_DONE message. This handle_mix method does that itself 
@@ -444,19 +445,19 @@ class CQCMessageHandler(ABC):
 
         try:
             first_operand_value = self.references[header.app_id][if_header.first_operand]
+
+            if if_header.type_of_second_operand is CQCIfHeader.TYPE_VALUE:
+                second_operand_value = if_header.second_operand
+            else:
+                second_operand_value = self.references[header.app_id][if_header.second_operand]
+        # If one of the above lookups in self.references fails because the queried reference IDs haven't 
+        # been assigned earlier, a KeyError will be raised
         except KeyError:
             self.return_messages.append(
                 self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version)
             )
-        
-        if if_header.type_of_second_operand is CQCIfHeader.TYPE_VALUE:
-            second_operand_value = if_header.second_operand
-        else:
-            try:
-                second_operand_value = self.references[header.app_id][if_header.second_operand]
-            except KeyError:
-                self.return_messages.append(
-                    self.create_return_message(header.app_id, CQC_ERR_GENERAL, cqc_version=header.version))
+            # Since the referenced IDs don't exist, we consider this IF-statement to evaluate to False.
+            return if_header.length
 
         if CQCLogicalOperator.is_true(first_operand_value, if_header.operator, second_operand_value):
             return 0
