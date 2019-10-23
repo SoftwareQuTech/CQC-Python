@@ -2100,7 +2100,7 @@ class qubit:
         """
         self._single_qubit_gate(CQC_CMD_K, notify, block)
 
-    def _build_and_pend_command(self, command, notify=False, block=False, subheader: Header=None, *subheader_values):
+    def _build_and_pend_command(self, command, notify=False, block=False, subheader: Header = None, *subheader_values):
 
         # If we are inside a TP_MIX, then insert the CQC Type header before the command header
         if self._cqc._inside_cqc_mix:
@@ -2118,8 +2118,7 @@ class qubit:
         if subheader is not None:
             subheader.setVals(*subheader_values)
             self._cqc._pend_header(subheader)
-                
-
+            
     def _single_gate_rotation(self, command, step, notify, block):
         """
         Perform a rotation on a qubit
