@@ -1996,18 +1996,14 @@ class qubit:
 
         if self._cqc.pend_messages:
 
-            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
-            if self._cqc._inside_cqc_mix:
-                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH)
-
-            # Build the header
-            header = CQCCmdHeader()
-            header.setVals(qubit_id=self._qID, instr=command, notify=notify, block=block)
-            # Pend the header
-            self._cqc._pend_header(header)
+            self._build_and_pend_command(command, notify, block)
 
             # print info
-            logging.debug("App {} pends header: {}".format(self._cqc.name, header.printable()))
+            logging.debug(
+                "App {} pends message: 'Perform command {} to qubit with ID {}'".format(
+                    self._cqc.name, command, self._qID
+                )
+            )
 
         else:
             # print info
@@ -2104,6 +2100,26 @@ class qubit:
         """
         self._single_qubit_gate(CQC_CMD_K, notify, block)
 
+    def _build_and_pend_command(self, command, notify=False, block=False, subheader: Header=None, *subheader_values):
+
+        # If we are inside a TP_MIX, then insert the CQC Type header before the command header
+        if self._cqc._inside_cqc_mix:
+            self._cqc._pend_type_header(
+                CQCType.COMMAND, 
+                CQCCmdHeader.HDR_LENGTH + (subheader.HDR_LENGTH if subheader is not None else 0)
+            )
+
+        # Build and pend the command header
+        command_header = CQCCmdHeader()
+        command_header.setVals(self._qID, command, notify, block)
+        self._cqc._pend_header(command_header)
+
+        # Build and pend the subheader, if there is one
+        if subheader is not None:
+            subheader.setVals(*subheader_values)
+            self._cqc._pend_header(subheader)
+                
+
     def _single_gate_rotation(self, command, step, notify, block):
         """
         Perform a rotation on a qubit
@@ -2118,21 +2134,8 @@ class qubit:
 
         if self._cqc.pend_messages:
 
-            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
-            if self._cqc._inside_cqc_mix:
-                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH + CQCRotationHeader.HDR_LENGTH)
-
-            # Build command header and rotation sub header
-            command_header = CQCCmdHeader()
-            command_header.setVals(self._qID, command, notify, block)
-
-            rot_sub_header = CQCRotationHeader()
-            rot_sub_header.setVals(step)
-
-            # Pend headers
-            self._cqc._pend_header(command_header)
-            self._cqc._pend_header(rot_sub_header)
-
+            self._build_and_pend_command(command, notify, block, CQCRotationHeader(), step)
+            
             # print info
             logging.debug(
                 "App {} pends message: 'Perform rotation command {} (angle {}*2pi/256) to qubit with ID {}'".format(
@@ -2210,20 +2213,7 @@ class qubit:
 
         if self._cqc.pend_messages:
 
-            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
-            if self._cqc._inside_cqc_mix:
-                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH + CQCXtraQubitHeader.HDR_LENGTH)
-
-            # Build command header and extra qubit sub header
-            command_header = CQCCmdHeader()
-            command_header.setVals(self._qID, command, notify, block)
-
-            extra_qubit_sub_header = CQCXtraQubitHeader()
-            extra_qubit_sub_header.setVals(target._qID)
-            
-            # Pend headers
-            self._cqc._pend_header(command_header)
-            self._cqc._pend_header(extra_qubit_sub_header)
+            self._build_and_pend_command(command, notify, block, CQCXtraQubitHeader(), target._qID)
 
             # print info
             logging.debug(
@@ -2296,24 +2286,10 @@ class qubit:
 
         if self._cqc.pend_messages:
 
-            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
-            if self._cqc._inside_cqc_mix:
-                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH + CQCAssignHeader.HDR_LENGTH)
-
             # Create a CQC Variable that holds the reference id for the measurement outcome
             cqc_variable = CQCVariable()
 
-            # Build header
-            header = CQCCmdHeader()
-            header.setVals(self._qID, command, block=block)
-
-            # Bild Assign sub header
-            assign_sub_header = CQCAssignHeader()
-            assign_sub_header.setVals(cqc_variable.ref_id)
-
-            # Pend headers
-            self._cqc._pend_header(header)
-            self._cqc._pend_header(assign_sub_header)
+            self._build_and_pend_command(command, False, block, CQCAssignHeader(), cqc_variable.ref_id)
 
             # print info
             logging.debug("App {} pends message: 'Measure qubit with ID {}'".format(self._cqc.name, self._qID))
@@ -2351,16 +2327,7 @@ class qubit:
 
         if self._cqc.pend_messages:
 
-            # If we are inside a TP_MIX, then insert the CQC Type header before the command header
-            if self._cqc._inside_cqc_mix:
-                self._cqc._pend_type_header(CQCType.COMMAND, CQCCmdHeader.HDR_LENGTH)
-
-            # Build header
-            header = CQCCmdHeader()
-            header.setVals(self._qID, CQC_CMD_RESET, notify, block)
-
-            # Pend header
-            self._cqc._pend_header(header)
+            self._build_and_pend_command(CQC_CMD_RESET, notify, block)
 
             # print info
             logging.debug("App {} pends message: 'Reset qubit with ID {}'".format(self._cqc.name, self._qID))
