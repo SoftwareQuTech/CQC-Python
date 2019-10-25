@@ -33,8 +33,15 @@ import struct
 import bitstring
 import abc
 
+from enum import IntEnum
+
 # Constant defining CQC version
 CQC_VERSION = 2
+
+# !!!!!!!!! 
+# Please do not use these header length constants. 
+# Use the class static constants instead. For instance, use CQCCmdHeader.HDR_LENGTH instead of CQC_CMD_HDR_LENGTH
+# !!!!!!!!!
 
 # Lengths of the headers in bytes
 CQC_HDR_LENGTH = 8  # Length of the CQC Header
@@ -49,6 +56,12 @@ CQC_NOTIFY_LENGTH = 20  # Length of a notification send from the CQC upwards
 CQC_MEAS_OUT_HDR_LENGTH = 1  # Length of the measurement outcome header
 CQC_TIMEINFO_HDR_LENGTH = 8  # Length of the time info header
 CQC_EPR_REQ_LENGTH = 16  # Length of EPR request header
+
+
+# !!!!!!!!! 
+# Please do not use these type constants. 
+# Use the CQCType enum instead. For instance, use CQCType.HELLO instead of CQC_TP_HELLO
+# !!!!!!!!!
 
 # Constants defining the messages types
 CQC_TP_HELLO = 0  # Alive check
@@ -103,14 +116,58 @@ CQC_OPT_ACTION = 0x02  # On if there are actions to execute when done
 CQC_OPT_BLOCK = 0x04  # Block until command is done
 
 
+class CQCType(IntEnum):
+    HELLO = 0  # Alive check
+    COMMAND = 1  # Execute a command list
+    FACTORY = 2  # Start executing command list repeatedly
+    EXPIRE = 3  # Qubit has expired
+    DONE = 4  # Done with command
+    RECV = 5  # Received qubit
+    EPR_OK = 6  # Created EPR pair
+    MEASOUT = 7  # Measurement outcome
+    GET_TIME = 8  # Get creation time of qubit
+    INF_TIME = 9  # Return timinig information
+    NEW_OK = 10  # Created a new qubit
+    MIX = 11  # Indicate that the CQC program will contain multiple header types
+    IF = 12  # Announce a CQC IF header
+
+    ERR_GENERAL = 20  # General purpose error (no details
+    ERR_NOQUBIT = 21  # No more qubits available
+    ERR_UNSUPP = 22  # No sequence not supported
+    ERR_TIMEOUT = 23  # Timeout
+    ERR_INUSE = 24  # Qubit already in use
+    ERR_UNKNOWN = 25  # Unknown qubit ID
+
+
+class CQCLogicalOperator(IntEnum):
+    EQ = 0  # Equal
+    NEQ = 1  # Not equal
+
+    @staticmethod
+    def opposite_of(operator: 'CQCLogicalOperator'):
+        opposites = {
+            CQCLogicalOperator.EQ: CQCLogicalOperator.NEQ,
+            CQCLogicalOperator.NEQ: CQCLogicalOperator.EQ
+        }
+        return opposites[operator]
+
+    @staticmethod
+    def is_true(first_operand: int, operator: 'CQCLogicalOperator', second_operand: int):
+        comparison_method = {
+            CQCLogicalOperator.EQ: first_operand.__eq__,
+            CQCLogicalOperator.NEQ: first_operand.__ne__
+        }
+        return comparison_method[operator](second_operand)
+
+
 class Header(metaclass=abc.ABCMeta):
     """
     Abstact class for headers.
     Should be subclassed
     """
-
-    HDR_LENGTH = 0
-    packaging_format = "!"
+    
+    PACKAGING_FORMAT = "!"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     def __init__(self, headerBytes=None):
         """
@@ -231,8 +288,8 @@ class CQCHeader(Header):
         Definition of the general CQC header.
     """
 
-    HDR_LENGTH = CQC_HDR_LENGTH
-    packaging_format = "!BBHL"
+    PACKAGING_FORMAT = "!BBHL"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     def _setVals(self, version=0, tp=0, app_id=0, length=0):
         """
@@ -248,14 +305,14 @@ class CQCHeader(Header):
         """
             Pack data into packet format. For defnitions see cLib/cgc.h
         """
-        cqcH = struct.pack(self.packaging_format, self.version, self.tp, self.app_id, self.length)
+        cqcH = struct.pack(self.PACKAGING_FORMAT, self.version, self.tp, self.app_id, self.length)
         return cqcH
 
     def _unpack(self, headerBytes):
         """
             Unpack packet data. For definitions see cLib/cqc.h
         """
-        cqcH = struct.unpack(self.packaging_format, headerBytes)
+        cqcH = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
         self.version = cqcH[0]
         self.tp = cqcH[1]
         self.app_id = cqcH[2]
@@ -272,14 +329,137 @@ class CQCHeader(Header):
         return toPrint
 
 
+class CQCTypeHeader(Header):
+    """
+        Definition of the CQC Type header. This header announces the type of the headers that will follow.
+    """
+
+    PACKAGING_FORMAT = "!BI"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
+    
+    def _setVals(self, tp: CQCType = 0, length: int = 0) -> None:
+        """
+        Set using given values.
+        """
+        self.type = tp
+        self.length = length
+
+    def _pack(self) -> bytes:
+        """
+        Pack data into packet format. For defnitions see cLib/cgc.h
+        """
+        return struct.pack(self.PACKAGING_FORMAT, self.type, self.length)
+        
+    def _unpack(self, headerBytes) -> None:
+        """
+        Unpack packet data.
+        """
+        unpacked = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
+        self.type = unpacked[0]
+        self.length = unpacked[1]
+
+    def _printable(self) -> str:
+        """
+        Produce a printable string for information purposes.
+        """
+        return "CQC Type header. Type=" + str(self.type) + " | Length=" + str(self.length)
+
+    def make_equivalent_CQCHeader(self, version: int, app_id: int) -> CQCHeader:
+        """
+        Produce a CQC Header that is equivalent to this CQCTypeHeader. 
+        This method does not make any modifications to self.
+        """
+        cqc_header = CQCHeader()
+        cqc_header.setVals(version, self.type, app_id, self.length)
+        return cqc_header
+    
+
+class CQCIfHeader(Header):
+    """
+        Definition of the CQC IF header.
+    """
+
+    PACKAGING_FORMAT = "!IBBII"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
+
+    TYPE_VALUE = 0
+    TYPE_REF_ID = 1
+
+    def _setVals(
+        self, 
+        first_operand: int = 0, 
+        operator: CQCLogicalOperator = 0,
+        type_of_second_operand: int = 0, 
+        second_operand: int = 0,
+        length: int = 0
+    ) -> None:
+        """
+        Set the fields of this header. 
+        first_operand must be a reference id.
+        second_operand will be interpreted as eiter a reference id or a value, dependent on type_of_second_operand.
+        type_of_second_operand must either be CQCIfHeader.TYPE_VALUE or CQCIfHeader.TYPE_REF_ID
+        """
+
+        self.first_operand = first_operand
+        self.operator = operator
+        self.type_of_second_operand = type_of_second_operand
+        self.second_operand = second_operand
+        self.length = length
+
+    def _pack(self) -> bytes:
+        """
+        Pack data into packet format. For defnitions see cLib/cgc.h
+        """
+
+        return struct.pack(
+            self.PACKAGING_FORMAT, 
+            self.first_operand, 
+            self.operator, 
+            self.type_of_second_operand, 
+            self.second_operand, 
+            self.length
+        )     
+
+    def _unpack(self, headerBytes) -> None:
+        """
+        Unpack packet data. For definitions see cLib/cqc.h
+        """
+        unpacked = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
+
+        self.first_operand = unpacked[0]
+        self.operator = unpacked[1]
+        self.type_of_second_operand = unpacked[2]
+        self.second_operand = unpacked[3]
+        self.length = unpacked[4]
+
+    def _printable(self) -> str:
+        """
+        Produce a printable string for information purposes.
+        """
+    
+        if self.type_of_second_operand == self.TYPE_REF_ID:
+            operand_type = "RefID"
+        else:
+            operand_type = "Value"
+
+        # parenthesis to concatenate the string over multiple lines
+        return (
+            "CQC IF header. RefID=" + str(self.first_operand)
+            + " | Operator=" + str(self.operator)
+            + " | " + operand_type + "=" + str(self.second_operand)
+            + " | Second_operand_type=" + operand_type
+            + " | Body_length=" + str(self.length)
+        )
+
+
 class CQCCmdHeader(Header):
     """
         Header for a command instruction packet.
     """
 
-    HDR_LENGTH = CQC_CMD_HDR_LENGTH
-    packaging_format = "!HBB"
-
+    PACKAGING_FORMAT = "!HBB"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
+    
     def _setVals(self, qubit_id=0, instr=0, notify=False, block=False, action=False):
         """
         Set using given values.
@@ -303,14 +483,14 @@ class CQCCmdHeader(Header):
         if self.action:
             opt = opt | CQC_OPT_ACTION
 
-        cmdH = struct.pack(self.packaging_format, self.qubit_id, self.instr, opt)
+        cmdH = struct.pack(self.PACKAGING_FORMAT, self.qubit_id, self.instr, opt)
         return cmdH
 
     def _unpack(self, headerBytes):
         """
         Unpack packet data. For definitions see cLib/cqc.h
         """
-        cmdH = struct.unpack(self.packaging_format, headerBytes)
+        cmdH = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
 
         self.qubit_id = cmdH[0]
         self.instr = cmdH[1]
@@ -340,13 +520,51 @@ class CQCCmdHeader(Header):
         return toPrint
 
 
+class CQCAssignHeader(Header):
+    """
+        Sub header that follows a CMD Measure header. It contains the reference id which can be used 
+        to refer to the measurement outcome
+    """
+
+    PACKAGING_FORMAT = "!I"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
+
+    def _setVals(self, ref_id: int = 0) -> None:
+        """
+        Set using given values.
+        """
+        self.ref_id = ref_id
+
+    def _pack(self) -> bytes:
+        """
+        Pack data into packet format. For defnitions see cLib/cgc.h
+        """
+
+        return struct.pack(self.PACKAGING_FORMAT, self.ref_id)
+
+    def _unpack(self, headerBytes) -> None:
+        """
+        Unpack packet data. For definitions see cLib/cqc.h
+        """
+        unpacked = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
+
+        self.ref_id = unpacked[0]
+
+    def _printable(self) -> str:
+        """
+        Produce a printable string for information purposes.
+        """
+
+        return "CQC Assign sub header. RefID=" + str(self.ref_id)
+
+
 class CQCXtraHeader(Header):
     """
     Optional addtional cmd header information. Only relevant for certain commands.
     """
 
-    HDR_LENGTH = CQC_CMD_XTRA_LENGTH
-    packaging_format = "!HHLLHBB"
+    PACKAGING_FORMAT = "!HHLLHBB"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     # Deprecated, split into multiple headers
     def __init__(self, headerBytes=None):
@@ -372,7 +590,7 @@ class CQCXtraHeader(Header):
             Pack data into packet form. For definitions see cLib/cqc.h
         """
         xtraH = struct.pack(
-            self.packaging_format,
+            self.PACKAGING_FORMAT,
             self.qubit_id,
             self.remote_app_id,
             self.remote_node,
@@ -387,7 +605,7 @@ class CQCXtraHeader(Header):
         """
             Unpack packet data. For defnitions see cLib/cqc.h
         """
-        xtraH = struct.unpack(self.packaging_format, headerBytes)
+        xtraH = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
 
         self.qubit_id = xtraH[0]
         self.remote_app_id = xtraH[1]
@@ -418,8 +636,8 @@ class CQCSequenceHeader(Header):
         Seperate classes used clearity and for possible future adaptability. (Increase length for example)
     """
 
-    packaging_format = "!B"
-    HDR_LENGTH = CQC_SEQ_HDR_LENGTH
+    PACKAGING_FORMAT = "!B"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     def _setVals(self, cmd_length=0):
         """
@@ -433,7 +651,7 @@ class CQCSequenceHeader(Header):
         Pack data into packet form. For definitions see cLib/cqc.h
         :returns the packed header
         """
-        header = struct.pack(self.packaging_format, self.cmd_length)
+        header = struct.pack(self.PACKAGING_FORMAT, self.cmd_length)
         return header
 
     def _unpack(self, headerBytes):
@@ -441,7 +659,7 @@ class CQCSequenceHeader(Header):
         Unpack packet data. For defnitions see cLib/cqc.h
         :param headerBytes: The unpacked headers.
         """
-        header = struct.unpack(self.packaging_format, headerBytes)
+        header = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
         self.cmd_length = header[0]
 
     def _printable(self):
@@ -459,8 +677,8 @@ class CQCRotationHeader(Header):
         Header used to define the rotation angle of a gate
     """
 
-    packaging_format = "!B"
-    HDR_LENGTH = CQC_ROT_HDR_LENGTH
+    PACKAGING_FORMAT = "!B"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     def _setVals(self, step=0):
         """
@@ -474,7 +692,7 @@ class CQCRotationHeader(Header):
         Pack data into packet form. For definitions see cLib/cqc.h
         :returns the packed header
         """
-        header = struct.pack(self.packaging_format, self.step)
+        header = struct.pack(self.PACKAGING_FORMAT, self.step)
         return header
 
     def _unpack(self, headerBytes):
@@ -482,7 +700,7 @@ class CQCRotationHeader(Header):
         Unpack packet data. For defnitions see cLib/cqc.h
         :param headerBytes: The unpacked headers.
         """
-        header = struct.unpack(self.packaging_format, headerBytes)
+        header = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
         self.step = header[0]
 
     def _printable(self):
@@ -500,8 +718,8 @@ class CQCXtraQubitHeader(Header):
         Header used to send qubit of a secondary qubit for two qubit gates
     """
 
-    packaging_format = "!H"
-    HDR_LENGTH = CQC_XTRA_QUBIT_HDR_LENGTH
+    PACKAGING_FORMAT = "!H"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     def _setVals(self, qubit_id=0):
         """
@@ -515,7 +733,7 @@ class CQCXtraQubitHeader(Header):
         Pack data into packet form. For definitions see cLib/cqc.h
         :returns the packed header
         """
-        header = struct.pack(self.packaging_format, self.qubit_id)
+        header = struct.pack(self.PACKAGING_FORMAT, self.qubit_id)
         return header
 
     def _unpack(self, headerBytes):
@@ -523,7 +741,7 @@ class CQCXtraQubitHeader(Header):
         Unpack packet data. For definitions see cLib/cqc.h
         :param headerBytes: The unpacked headers.
         """
-        header = struct.unpack(self.packaging_format, headerBytes)
+        header = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
         self.qubit_id = header[0]
 
     def _printable(self):
@@ -543,9 +761,9 @@ class CQCCommunicationHeader(Header):
         This header has a size of 8
     """
 
-    packaging_format = "!HHL"
-    packaging_format_v1 = "!HLH"
-    HDR_LENGTH = CQC_COM_HDR_LENGTH
+    PACKAGING_FORMAT = "!HHL"
+    PACKAGING_FORMAT_V1 = "!HLH"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)  # Both versions have the same size
 
     def __init__(self, headerBytes=None, cqc_version=CQC_VERSION):
         """
@@ -573,9 +791,9 @@ class CQCCommunicationHeader(Header):
         :returns the packed header
         """
         if self._cqc_version < 2:
-            header = struct.pack(self.packaging_format_v1, self.remote_app_id, self.remote_node, self.remote_port)
+            header = struct.pack(self.PACKAGING_FORMAT_V1, self.remote_app_id, self.remote_node, self.remote_port)
         else:
-            header = struct.pack(self.packaging_format, self.remote_app_id, self.remote_port, self.remote_node)
+            header = struct.pack(self.PACKAGING_FORMAT, self.remote_app_id, self.remote_port, self.remote_node)
         return header
 
     def _unpack(self, headerBytes):
@@ -585,12 +803,12 @@ class CQCCommunicationHeader(Header):
         :param cqc_version: The CQC version to be used
         """
         if self._cqc_version < 2:
-            header = struct.unpack(self.packaging_format_v1, headerBytes)
+            header = struct.unpack(self.PACKAGING_FORMAT_V1, headerBytes)
             self.remote_app_id = header[0]
             self.remote_node = header[1]
             self.remote_port = header[2]
         else:
-            header = struct.unpack(self.packaging_format, headerBytes)
+            header = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
             self.remote_app_id = header[0]
             self.remote_port = header[1]
             self.remote_node = header[2]
@@ -614,8 +832,8 @@ class CQCFactoryHeader(Header):
 
     # could maybe include the notify flag in num_iter?
     # That halfs the amount of possible num_iter from 256 to 128
-    package_format = "!BB"
-    HDR_LENGTH = CQC_FACTORY_HDR_LENGTH
+    PACKAGING_FORMAT = "!BB"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     def _setVals(self, num_iter=0, notify=0, block=0):
         """
@@ -638,14 +856,14 @@ class CQCFactoryHeader(Header):
         if self.block:
             opt = opt | CQC_OPT_BLOCK
 
-        factH = struct.pack(self.package_format, self.num_iter, opt)
+        factH = struct.pack(self.PACKAGING_FORMAT, self.num_iter, opt)
         return factH
 
     def _unpack(self, headerBytes):
         """
             Unpack packet data. For defnitions see cLib/cqc.h
         """
-        fact_hdr = struct.unpack(self.package_format, headerBytes)
+        fact_hdr = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
 
         self.notify = fact_hdr[1] & CQC_OPT_NOTIFY
         self.block = fact_hdr[1] & CQC_OPT_BLOCK
@@ -666,8 +884,8 @@ class CQCNotifyHeader(Header):
         Header used to specify notification details.
     """
 
-    HDR_LENGTH = CQC_NOTIFY_LENGTH
-    packaging_format = "!HHLQHBB"
+    PACKAGING_FORMAT = "!HHLQHBB"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     def __init__(self, headerBytes=None):
         """
@@ -693,7 +911,7 @@ class CQCNotifyHeader(Header):
         Pack data into packet form. For definitions see cLib/cqc.h
         """
         xtraH = struct.pack(
-            self.packaging_format,
+            self.PACKAGING_FORMAT,
             self.qubit_id,
             self.remote_app_id,
             self.remote_node,
@@ -708,7 +926,7 @@ class CQCNotifyHeader(Header):
         """
             Unpack packet data. For defnitions see cLib/cqc.h
         """
-        xtraH = struct.unpack(self.packaging_format, headerBytes)
+        xtraH = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
 
         self.qubit_id = xtraH[0]
         self.remote_app_id = xtraH[1]
@@ -735,8 +953,8 @@ class CQCMeasOutHeader(Header):
     Header used to send a measurement outcome.
     """
 
-    packaging_format = "!B"
-    HDR_LENGTH = CQC_MEAS_OUT_HDR_LENGTH
+    PACKAGING_FORMAT = "!B"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     def _setVals(self, outcome=0):
         """
@@ -750,7 +968,7 @@ class CQCMeasOutHeader(Header):
         Pack data into packet form. For definitions see cLib/cqc.h
         :returns the packed header
         """
-        header = struct.pack(self.packaging_format, self.outcome)
+        header = struct.pack(self.PACKAGING_FORMAT, self.outcome)
         return header
 
     def _unpack(self, headerBytes):
@@ -758,7 +976,7 @@ class CQCMeasOutHeader(Header):
         Unpack packet data. For definitions see cLib/cqc.h
         :param headerBytes: The unpacked headers.
         """
-        header = struct.unpack(self.packaging_format, headerBytes)
+        header = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
         self.outcome = header[0]
 
     def _printable(self):
@@ -776,8 +994,8 @@ class CQCTimeinfoHeader(Header):
     Header used to send timing information
     """
 
-    packaging_format = "!Q"
-    HDR_LENGTH = CQC_TIMEINFO_HDR_LENGTH
+    PACKAGING_FORMAT = "!Q"
+    HDR_LENGTH = struct.calcsize(PACKAGING_FORMAT)
 
     def _setVals(self, datetime=0):
         """
@@ -791,7 +1009,7 @@ class CQCTimeinfoHeader(Header):
         Pack data into packet form. For definitions see cLib/cqc.h
         :returns the packed header
         """
-        header = struct.pack(self.packaging_format, self.datetime)
+        header = struct.pack(self.PACKAGING_FORMAT, self.datetime)
         return header
 
     def _unpack(self, headerBytes):
@@ -799,7 +1017,7 @@ class CQCTimeinfoHeader(Header):
         Unpack packet data. For definitions see cLib/cqc.h
         :param headerBytes: The unpacked headers.
         """
-        header = struct.unpack(self.packaging_format, headerBytes)
+        header = struct.unpack(self.PACKAGING_FORMAT, headerBytes)
         self.datetime = header[0]
 
     def _printable(self):
@@ -813,8 +1031,8 @@ class CQCTimeinfoHeader(Header):
 
 
 class CQCEPRRequestHeader(Header):
-    HDR_LENGTH = CQC_EPR_REQ_LENGTH
-    package_format = (
+    HDR_LENGTH = 16
+    PACKAGING_FORMAT = (
         "uint:32=remote_ip, "
         "float:32=min_fidelity, "
         "float:32=max_time, "
@@ -876,7 +1094,7 @@ class CQCEPRRequestHeader(Header):
             "atomic": self.atomic,
             "measure_directly": self.measure_directly,
         }
-        request_Bitstring = bitstring.pack(self.package_format, **to_pack)
+        request_Bitstring = bitstring.pack(self.PACKAGING_FORMAT, **to_pack)
         requestH = request_Bitstring.tobytes()
 
         return requestH
@@ -888,7 +1106,7 @@ class CQCEPRRequestHeader(Header):
         :return:
         """
         request_Bitstring = bitstring.BitString(headerBytes)
-        request_fields = request_Bitstring.unpack(self.package_format)
+        request_fields = request_Bitstring.unpack(self.PACKAGING_FORMAT)
         self.remote_ip = request_fields[0]
         self.min_fidelity = request_fields[1]
         self.max_time = request_fields[2]
