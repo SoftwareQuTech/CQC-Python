@@ -17,6 +17,9 @@ python-deps:
 _verified:
 	@echo "CQC-Python is verified!"
 
+tests:
+	@${PYTHON} -m pytest tests
+
 verify: clean python-deps lint _verified
 
 _remove_build:
@@ -35,4 +38,4 @@ _build:
 
 build: _clear_build _build
 
-.PHONY: clean lint python-deps verify build
+.PHONY: clean lint python-deps verify build tests

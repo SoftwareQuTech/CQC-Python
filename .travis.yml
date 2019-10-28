@@ -23,6 +23,7 @@ install:
 - pip3 install dist/*.whl
 script:
 - make lint
+- make tests
 deploy:
   provider: pypi
   user: adahlberg
