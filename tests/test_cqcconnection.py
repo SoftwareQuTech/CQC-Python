@@ -68,11 +68,12 @@ def test_commands(commands_to_apply, get_expected_headers, monkeypatch, mock_soc
 
     expected_headers = get_expected_headers()
 
-    commands_send = list(filter(lambda call: call.name == 'send', cqc._s.calls))
-    assert len(expected_headers) == len(commands_send)
-    for command, expected in zip(commands_send, expected_headers):
+    commands_sent = list(filter(lambda call: call.name == 'send', cqc._s.calls))
+    assert len(expected_headers) == len(commands_sent)
+    for command, expected in zip(commands_sent, expected_headers):
         print(command.args[0])
         print(expected)
         print()
+        # Excluding None gives the opportunity to not specify all expected headers but still check the number of them
         if expected is not None:
             assert command.args[0] == expected

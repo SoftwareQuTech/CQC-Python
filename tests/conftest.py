@@ -55,7 +55,7 @@ def mock_socket(monkeypatch):
 
 
 class MockedFirstMessage:
-    """Mocks the second header returned by CQCConnection.readMessage"""
+    """Mocks the first header returned by CQCConnection.readMessage"""
     class MockedTypeEntry:
         def __eq__(self, other):
             """This type will be equal to any integer."""
