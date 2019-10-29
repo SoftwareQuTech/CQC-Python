@@ -2,6 +2,7 @@ PYTHON        = python3
 PIP           = pip3
 CQC_DIR	      = cqc
 EXAMPLES      = examples
+TESTS         = tests
 
 clean: _clear_pyc _clear_build
 
@@ -9,15 +10,24 @@ _clear_pyc:
 	@find . -name '*.pyc' -delete
 
 lint:
-	@${PYTHON} -m flake8 ${CQC_DIR} ${EXAMPLES}
+	@${PYTHON} -m flake8 ${CQC_DIR} ${EXAMPLES} ${TESTS}
 
 python-deps:
-	@cat requirements.txt | xargs -n 1 -L 1 $(PIP) install
+	@${PIP} install -r requirements.txt
+
+test-deps:
+	@${PIP} install -r test_requirements.txt
 
 _verified:
 	@echo "CQC-Python is verified!"
 
-verify: clean python-deps lint _verified
+tests:
+	@${PYTHON} -m pytest ${TESTS}
+
+verify: clean python-deps lint tests _verified
+
+install: test-deps build
+	@${PIP} install dist/*whl
 
 _remove_build:
 	@rm -f -r build
@@ -35,4 +45,4 @@ _build:
 
 build: _clear_build _build
 
-.PHONY: clean lint python-deps verify build
+.PHONY: clean lint python-deps verify build tests

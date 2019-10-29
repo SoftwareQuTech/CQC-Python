@@ -674,7 +674,7 @@ class CQCConnection:
 
         return qubits
 
-    def release_qubits(self, qubits, notify=True, block=False, action=False):
+    def release_qubits(self, qubits, notify=True, block=True, action=False):
         """
         Release qubits so backend can free them up for other uses
         :param qubits: a list of qubits to be released
@@ -2339,7 +2339,7 @@ class qubit:
                 message = self._cqc.readMessage()
                 self._cqc.print_CQC_msg(message)
 
-    def release(self, notify=True, block=False):
+    def release(self, notify=True, block=True):
         """
         Release the current qubit
         :param notify: Do we wish to be notified when done
