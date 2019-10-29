@@ -6,9 +6,10 @@ For more details refer to the [documentation](https://softwarequtech.github.io/S
 Upcoming
 --------
 
-2019-10-16 (v3.1.4)
+2019-10-16 (v3.1.0)
 -------------------
 - CQC now supports logic. That is one can send a batch of CQC-instructions to the backend which can have conditional logic based on measurement results.
+  Note, that this is different from having logic in the application in the Python library since this requires communcation back and fourth from the backend to the application.
   The Python library is also updated to be able to construct these instructions.
   For examople:
   - to apply instructions a certain number of times you can now do:
