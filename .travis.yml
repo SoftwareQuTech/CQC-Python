@@ -17,12 +17,11 @@ matrix:
     os: osx
     osx_image: xcode10.2
     language: shell
-before_install:
-- make build
 install:
-- pip3 install dist/*.whl
+- make install
 script:
 - make lint
+- make tests
 deploy:
   provider: pypi
   user: adahlberg
