@@ -43,6 +43,7 @@ deploy:
   committer_from_gh: true
   local_dir: docs/build/html
   on:
+    branch: master
     condition: "$BUILD = True"
 env:
   global:
