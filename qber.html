@@ -1,0 +1,371 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Estimating QBER &mdash; cqc 3.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Distribute a GHZ-state" href="extend_ghz.html" />
+    <link rel="prev" title="Teleport" href="teleport.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cqc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classical_communication.html">Classical Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="useful_commands.html">Useful commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interface.html">CQC Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="examples.html">Examples using the python library</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="teleport.html">Teleport</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Estimating QBER</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-protocol">The protocol</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setting-up">Setting up</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#programming-alice">Programming Alice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#programming-bob">Programming Bob</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="extend_ghz.html">Distribute a GHZ-state</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cqc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="examples.html">Examples using the python library</a> &raquo;</li>
+        
+      <li>Estimating QBER</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/qber.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="estimating-qber">
+<h1>Estimating QBER<a class="headerlink" href="#estimating-qber" title="Permalink to this headline">¶</a></h1>
+<p>In this example the two nodes Alice and Bob will estimate the QBER (qubit error rate) of their produced entangled pairs.
+To make the below example more interesting you should try to turn on the probabilistic noise option in SimulaQron.
+You can do this be setting the entry <code class="code docutils literal notranslate"><span class="pre">noisy-qubits</span></code> to <code class="code docutils literal notranslate"><span class="pre">True</span></code> by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">cli</span><span class="o">/</span><span class="n">SimulaQron</span> <span class="nb">set</span> <span class="n">noisy</span><span class="o">-</span><span class="n">qubits</span> <span class="n">on</span>
+</pre></div>
+</div>
+<p>You can also tune the coherence time <code class="code docutils literal notranslate"><span class="pre">t1</span></code> of the qubits (lower means more noisy).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This probabilistic noise in SimulaQron is not intended and should not be used to benchmark the performence of protocols in noisy settings, since noise is applied in a rate related to the wall clock time of your computer. Thus, if your computer or network is slower, more noise will be applied to the qubits! However you can use this example to tune the <code class="code docutils literal notranslate"><span class="pre">t1</span></code>-parameter to a realistic value for your setup. A realistic QBER is around 5 -10 %.</p>
+</div>
+<div class="section" id="the-protocol">
+<h2>The protocol<a class="headerlink" href="#the-protocol" title="Permalink to this headline">¶</a></h2>
+<p>Alice and Bob will produce EPR pairs between them and measure their qubits in either the <span class="math notranslate nohighlight">\(X\)</span>-, <span class="math notranslate nohighlight">\(Y\)</span>- or <span class="math notranslate nohighlight">\(Z\)</span>-basis, where <span class="math notranslate nohighlight">\(X=\begin{pmatrix}0 &amp; 1 \\ 1 &amp; 0\end{pmatrix}\)</span>, <span class="math notranslate nohighlight">\(Y=\begin{pmatrix}0 &amp; -i \\ i &amp; 0\end{pmatrix}\)</span> or <span class="math notranslate nohighlight">\(Z=\begin{pmatrix}1 &amp; 0 \\ 0 &amp; -1\end{pmatrix}\)</span>. If there is no noise Alice’s and Bob’s measurement will be perfectly correlated if they both measure in the <span class="math notranslate nohighlight">\(Z\)</span>-basis and the same for the <span class="math notranslate nohighlight">\(X\)</span>-basis but perfectly anti-correlated for the <span class="math notranslate nohighlight">\(Y\)</span>-basis. The QBER (qubit error rate) is then the number of rounds where this is not the case, i.e. when the nodes measurement outcomes are anti-correlated for the <span class="math notranslate nohighlight">\(Z\)</span> and <span class="math notranslate nohighlight">\(X\)</span> bases and correlated for the <span class="math notranslate nohighlight">\(Y\)</span>-basis.</p>
+<p>Alice and Bob have beforehand agreed that they will measure the the first EPR pair in the <span class="math notranslate nohighlight">\(Z\)</span>-basis, the second in the <span class="math notranslate nohighlight">\(X\)</span>-basis, the third in the <span class="math notranslate nohighlight">\(Y\)</span>-basis and then back to <span class="math notranslate nohighlight">\(Z\)</span>-basis and so on. However, the qubits received from the entanglement generation process are not necessarily ordered. They therefore need to use the entanglement identifier that is attached to any entangled qubit. In particular the entanglement identifier contains a sequence number which is guaranteed to be consistent between the two nodes. This sequence number can be accessed from an entangled qubit as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">q</span><span class="o">.</span><span class="n">get_entInfo</span><span class="p">()</span><span class="o">.</span><span class="n">id_AB</span>
+</pre></div>
+</div>
+<p>Alice and Bob will therefore make use of the following decision rules for the measurement basis:</p>
+<ul class="simple">
+<li><p>Measure in the <span class="math notranslate nohighlight">\(Z\)</span>-basis if the sequence number modulus 3 is 0.</p></li>
+<li><p>Measure in the <span class="math notranslate nohighlight">\(X\)</span>-basis if the sequence number modulus 3 is 1.</p></li>
+<li><p>Measure in the <span class="math notranslate nohighlight">\(Y\)</span>-basis if the sequence number modulus 3 is 2.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>More details on the explicit entanglement generation protocol and the generation of the entanglement identifiers will soon be available in a paper which is under construction.</p>
+</div>
+</div>
+<div class="section" id="setting-up">
+<h2>Setting up<a class="headerlink" href="#setting-up" title="Permalink to this headline">¶</a></h2>
+<p>We will run everything locally (localhost) using two nodes, Alice and Bob. Start up the backend of the simulation by running (to make this example more interesting you should before turn on the noise on the qubits as described above):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">cli</span><span class="o">/</span><span class="n">SimulaQron</span> <span class="n">start</span> <span class="o">--</span><span class="n">nodes</span> <span class="n">Alice</span><span class="p">,</span><span class="n">Bob</span>
+</pre></div>
+</div>
+<p>The below example can then be executed when in the folder <a class="reference external" href="https://github.com/SoftwareQuTech/CQC-Python/tree/master/examples/pythonLib/QBER">examples/pythonLib/QBER</a> in the repo <a class="reference external" href="https://github.com/SoftwareQuTech/CQC-Python">pythonLib</a>  by typing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sh</span> <span class="n">run</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>which will execute the Python scripts <cite>aliceTest.py</cite> and <cite>bobTest.py</cite> containing the code below. By default 500 EPR pairs are produced to estimate the QBER, see above. You can choose to produce a different number of pairs by passing this as an argument. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sh</span> <span class="n">run</span><span class="o">.</span><span class="n">sh</span> <span class="mi">300</span>
+</pre></div>
+</div>
+<p>When running this example the estimated QBER will be printed. If the noise in SimulaQron is off the QBER should be 0.</p>
+</div>
+<div class="section" id="programming-alice">
+<h2>Programming Alice<a class="headerlink" href="#programming-alice" title="Permalink to this headline">¶</a></h2>
+<p>Here we program what Alice should do using the python library:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">meas_outcomes</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Estimating QBER by measuring </span><span class="si">{}</span><span class="s2"> produced EPR pairs.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nr_runs</span><span class="p">))</span>
+
+<span class="c1"># Initialize the connection</span>
+<span class="k">with</span> <span class="n">CQCConnection</span><span class="p">(</span><span class="s2">&quot;Alice&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">Alice</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nr_runs</span><span class="p">):</span>
+
+                <span class="c1"># Create an EPR pair</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">Alice</span><span class="o">.</span><span class="n">createEPR</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Get the identifier of this EPR pair such that we can relate our measurement outcomes to Bobs</span>
+                <span class="n">sequence_nr</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get_entInfo</span><span class="p">()</span><span class="o">.</span><span class="n">id_AB</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generated EPR pair number </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sequence_nr</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">sequence_nr</span> <span class="o">%</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="c1"># Measure in Z</span>
+                        <span class="n">basis</span> <span class="o">=</span> <span class="s1">&#39;Z&#39;</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">sequence_nr</span> <span class="o">%</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="c1"># Measure in X</span>
+                        <span class="n">q</span><span class="o">.</span><span class="n">H</span><span class="p">()</span>
+                        <span class="n">basis</span> <span class="o">=</span> <span class="s1">&#39;X&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Measure in Y</span>
+                        <span class="n">q</span><span class="o">.</span><span class="n">K</span><span class="p">()</span>
+                        <span class="n">basis</span> <span class="o">=</span> <span class="s1">&#39;Y&#39;</span>
+
+                <span class="n">m</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span>
+                <span class="c1"># We save both the measurement outcome and the measurement basis</span>
+                <span class="n">meas_outcomes</span><span class="p">[</span><span class="n">sequence_nr</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">basis</span><span class="p">)</span>
+
+<span class="c1"># Get the measurement outcomes from Bob</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">Alice</span><span class="o">.</span><span class="n">recvClassical</span><span class="p">(</span><span class="n">msg_size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Decode the message</span>
+<span class="n">bob_meas_outcomes</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+<span class="c1"># Check the measurement outcomes</span>
+<span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">sequence_nr</span><span class="p">,</span> <span class="n">mB</span><span class="p">)</span> <span class="ow">in</span> <span class="n">bob_meas_outcomes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">mA</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">meas_outcomes</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">sequence_nr</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">basis</span> <span class="o">==</span> <span class="s1">&#39;Y&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mA</span> <span class="o">==</span> <span class="n">mB</span><span class="p">:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mA</span> <span class="o">!=</span> <span class="n">mB</span><span class="p">:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">nr_data_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+<span class="n">avg_QBER</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="o">/</span> <span class="n">nr_data_points</span>
+<span class="n">to_print</span><span class="o">=</span><span class="s2">&quot;Estimated QBER is </span><span class="si">{}</span><span class="s2"> (from </span><span class="si">{}</span><span class="s2"> data-points.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">avg_QBER</span><span class="p">,</span> <span class="n">nr_data_points</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="o">+</span><span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">to_print</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;| &quot;</span><span class="o">+</span><span class="n">to_print</span><span class="o">+</span><span class="s2">&quot; |&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="o">+</span><span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">to_print</span><span class="p">)</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="programming-bob">
+<h2>Programming Bob<a class="headerlink" href="#programming-bob" title="Permalink to this headline">¶</a></h2>
+<p>Here we program what Bob should do using the python library:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">meas_outcomes</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Initialize the connection</span>
+<span class="k">with</span> <span class="n">CQCConnection</span><span class="p">(</span><span class="s2">&quot;Bob&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">Bob</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nr_runs</span><span class="p">):</span>
+
+                <span class="c1"># Create an EPR pair</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">Bob</span><span class="o">.</span><span class="n">recvEPR</span><span class="p">()</span>
+
+                <span class="c1"># Get the identifier of this EPR pair such that Alice can relate the measuement outcomes to hers</span>
+                <span class="n">sequence_nr</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get_entInfo</span><span class="p">()</span><span class="o">.</span><span class="n">id_AB</span>
+
+                <span class="k">if</span> <span class="p">(</span><span class="n">sequence_nr</span> <span class="o">%</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="c1"># Measure in Z</span>
+                        <span class="k">pass</span>
+                <span class="k">elif</span> <span class="p">(</span><span class="n">sequence_nr</span> <span class="o">%</span> <span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="c1"># Measure in X</span>
+                        <span class="n">q</span><span class="o">.</span><span class="n">H</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Measure in Y</span>
+                        <span class="n">q</span><span class="o">.</span><span class="n">K</span><span class="p">()</span>
+
+                <span class="n">m</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span>
+                <span class="n">meas_outcomes</span><span class="p">[</span><span class="n">sequence_nr</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span>
+
+<span class="c1"># Encode the measurement outcomes to bytes, such that we can send them</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">meas_outcomes</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+<span class="c1"># Send the measurement outcomes to Alice</span>
+<span class="n">Bob</span><span class="o">.</span><span class="n">sendClassical</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="extend_ghz.html" class="btn btn-neutral float-right" title="Distribute a GHZ-state" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="teleport.html" class="btn btn-neutral float-left" title="Teleport" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stephanie Wehner and Axel Dahlberg
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Useful commands &mdash; cqc 3.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="CQC Interface" href="interface.html" />
+    <link rel="prev" title="Classical Communication" href="classical_communication.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cqc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classical_communication.html">Classical Communication</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Useful commands</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cqcconnection">CQCConnection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#qubit">qubit</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#factory-and-sequences">Factory and Sequences</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#conditional-logic">Conditional logic</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="interface.html">CQC Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples using the python library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cqc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Useful commands</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/useful_commands.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="useful-commands">
+<h1>Useful commands<a class="headerlink" href="#useful-commands" title="Permalink to this headline">¶</a></h1>
+<p>Here we list some useful methods that can be applied to a <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection" title="cqc.pythonLib.CQCConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQCConnection</span></code></a> object or a <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.qubit" title="cqc.pythonLib.qubit"><code class="xref py py-class docutils literal notranslate"><span class="pre">qubit</span></code></a> object below.</p>
+<div class="section" id="cqcconnection">
+<h2>CQCConnection<a class="headerlink" href="#cqcconnection" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection" title="cqc.pythonLib.CQCConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQCConnection</span></code></a> is initialized with the name of the node (<code class="docutils literal notranslate"><span class="pre">string</span></code>) as an argument, an optional application ID (<code class="docutils literal notranslate"><span class="pre">int</span></code>) (if multiple Connections connect to a single node), and an optional <code class="docutils literal notranslate"><span class="pre">pend_messages</span></code> (<code class="docutils literal notranslate"><span class="pre">bool</span></code>) flag for when sending commands in sequence. Additionally one can specify the socket address to the corresponding CQC server. If the socket address is not explicitely specified, this is taken from the cqc config-file (default <cite>config/cqcNodes.cfg</cite>)</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendQubit" title="cqc.pythonLib.CQCConnection.sendQubit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sendQubit()</span></code></a>: Sends the qubit q (<a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.qubit" title="cqc.pythonLib.qubit"><code class="xref py py-class docutils literal notranslate"><span class="pre">qubit</span></code></a>) to the node name (<code class="docutils literal notranslate"><span class="pre">string</span></code>).</p></li>
+<li><p><a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.recvQubit" title="cqc.pythonLib.CQCConnection.recvQubit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">recvQubit()</span></code></a> Receives a qubit that has been sent to this node.</p></li>
+<li><p><a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.createEPR" title="cqc.pythonLib.CQCConnection.createEPR"><code class="xref py py-meth docutils literal notranslate"><span class="pre">createEPR()</span></code></a> Creates an EPR-pair <span class="math notranslate nohighlight">\(\frac{1}{\sqrt{2}}(|00\rangle+|11\rangle)\)</span> with the node name (<code class="docutils literal notranslate"><span class="pre">string</span></code>).</p></li>
+<li><p><a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.recvEPR" title="cqc.pythonLib.CQCConnection.recvEPR"><code class="xref py py-meth docutils literal notranslate"><span class="pre">recvEPR()</span></code></a> Receives qubit from an EPR-pair created with another node (that called <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.createEPR" title="cqc.pythonLib.CQCConnection.createEPR"><code class="xref py py-meth docutils literal notranslate"><span class="pre">createEPR()</span></code></a>).</p></li>
+<li><p><a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendClassical" title="cqc.pythonLib.CQCConnection.sendClassical"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sendClassical()</span></code></a> Sends a classical message msg (<code class="docutils literal notranslate"><span class="pre">int</span></code> in range(0,256) or list of such <code class="docutils literal notranslate"><span class="pre">int</span></code> s) to the node name (<code class="docutils literal notranslate"><span class="pre">string</span></code>). Opens a socket connection if not already opened.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">recvClassical()</span></code> Receives a classical message sent by another node by <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendClassical" title="cqc.pythonLib.CQCConnection.sendClassical"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sendClassical()</span></code></a>.</p></li>
+</ul>
+</div>
+<div class="section" id="qubit">
+<h2>qubit<a class="headerlink" href="#qubit" title="Permalink to this headline">¶</a></h2>
+<p>Here are some useful commands that can be applied to a <code class="xref py py-class docutils literal notranslate"><span class="pre">qubit</span></code> object.
+A <code class="xref py py-class docutils literal notranslate"><span class="pre">CQCConnection</span></code> as input and will be in the state <span class="math notranslate nohighlight">\(|0\rangle\)</span>.</p>
+<ul class="simple">
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">X()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">Y()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">Z()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">H()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">K()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">T()</span></code> Single-qubit gates.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">rot_X()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">rot_Y()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">rot_Z()</span></code> Single-qubit rotations with the angle <span class="math notranslate nohighlight">\(\left(\mathrm{step}\cdot\frac{2\pi}{256}\right)\)</span>.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">CNOT()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">CPHASE()</span></code> Two-qubit gates with q (<a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.qubit" title="cqc.pythonLib.qubit"><code class="xref py py-class docutils literal notranslate"><span class="pre">qubit</span></code></a>) as target.</p></li>
+<li><p><code class="xref py py-meth docutils literal notranslate"><span class="pre">measure()</span></code> Measures the qubit and returns outcome. If inplace (<code class="docutils literal notranslate"><span class="pre">bool</span></code>) then the post-measurement state is kept afterwards, otherwise the qubit is removed (default).</p></li>
+</ul>
+<div class="section" id="factory-and-sequences">
+<h3>Factory and Sequences<a class="headerlink" href="#factory-and-sequences" title="Permalink to this headline">¶</a></h3>
+<p>When the <cite>pend_messages</cite> flag is set to True in the <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection" title="cqc.pythonLib.CQCConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQCConnection</span></code></a>, ALL commands (on both <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.qubit" title="cqc.pythonLib.qubit"><code class="xref py py-class docutils literal notranslate"><span class="pre">qubit</span></code></a> and <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection" title="cqc.pythonLib.CQCConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQCConnection</span></code></a>) that you create are stored in a list, to be send all at once when flushed for a <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection" title="cqc.pythonLib.CQCConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQCConnection</span></code></a>.</p>
+<ul>
+<li><p><a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.set_pending" title="cqc.pythonLib.CQCConnection.set_pending"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_pending()</span></code></a> Set the <cite>pend_messages</cite> flag to True/False</p></li>
+<li><p><a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.flush" title="cqc.pythonLib.CQCConnection.flush"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flush()</span></code></a> Send all pending messages to the backend at once. If <cite>do_sequence</cite> == True then it will send <cite>CMDSequenceHeaders</cite> between the commands, if it is False it will add the <cite>ACTION</cite> flag to the commands instead.</p>
+<p>Return <code class="docutils literal notranslate"><span class="pre">list</span></code>. Returns a list with measurement outcomes (<code class="docutils literal notranslate"><span class="pre">int</span></code> ‘s) and <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.qubit" title="cqc.pythonLib.qubit"><code class="xref py py-class docutils literal notranslate"><span class="pre">qubit</span></code></a> depending if <cite>MEASURE</cite> and/or <cite>NEW</cite> commands were used in the sequence.</p>
+</li>
+<li><p><a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.flush_factory" title="cqc.pythonLib.CQCConnection.flush_factory"><code class="xref py py-meth docutils literal notranslate"><span class="pre">flush_factory()</span></code></a> Send all pending messages to the backend at once as a factory, doing the sequence num_iter (<code class="docutils literal notranslate"><span class="pre">int</span></code>) times. If <cite>do_sequence</cite> == True then it will send <cite>CMDSequenceHeaders</cite> between the commands, if it is False it will add the <cite>ACTION</cite> flag to the commands instead.</p>
+<p>Return <code class="docutils literal notranslate"><span class="pre">list</span></code>. Returns a list with measurement outcomes (<code class="docutils literal notranslate"><span class="pre">int</span></code> ‘s) and <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.qubit" title="cqc.pythonLib.qubit"><code class="xref py py-class docutils literal notranslate"><span class="pre">qubit</span></code></a> depending if <cite>MEASURE</cite> and/or <cite>NEW</cite> commands were used in the sequence.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="conditional-logic">
+<h3>Conditional logic<a class="headerlink" href="#conditional-logic" title="Permalink to this headline">¶</a></h3>
+<p>One can of course have conditional logic in the python library and send messages depending on this logic.
+However this can become inefficient when many messages have to be sent back and fourth between the application and the backend.
+For this reason, CQC also supports conditional logic natively.
+For examople:</p>
+<ul>
+<li><p>To apply instructions a certain number of times you can now do:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cqc.pythonLib</span> <span class="kn">import</span> <span class="n">CQCConnection</span><span class="p">,</span> <span class="n">qubit</span><span class="p">,</span> <span class="n">CQCMix</span>
+
+<span class="k">with</span> <span class="n">CQCConnection</span><span class="p">(</span><span class="s1">&#39;Alice&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">node</span><span class="p">:</span>
+
+   <span class="c1"># qubit is created beforehand</span>
+   <span class="n">qbit</span> <span class="o">=</span> <span class="n">qubit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+   <span class="c1"># Start of the CQCMix</span>
+   <span class="k">with</span> <span class="n">CQCMix</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="k">as</span> <span class="n">pgrm</span><span class="p">:</span>
+      <span class="n">qbit</span><span class="o">.</span><span class="n">X</span><span class="p">()</span>
+
+      <span class="c1"># Start of the Factory</span>
+      <span class="c1"># Apply H three times</span>
+      <span class="k">with</span> <span class="n">pgrm</span><span class="o">.</span><span class="n">loop</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">qbit</span><span class="o">.</span><span class="n">H</span><span class="p">()</span>
+
+      <span class="c1"># Y gate which is not part of</span>
+      <span class="c1"># the loop (i.e. Factory) above</span>
+      <span class="n">qbit</span><span class="o">.</span><span class="n">Y</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p>Or to perform certain instructions based on a measurement outcome you can do:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cqc.pythonLib</span> <span class="kn">import</span> <span class="n">CQCConnection</span><span class="p">,</span> <span class="n">qubit</span><span class="p">,</span> <span class="n">CQCMix</span>
+
+<span class="k">with</span> <span class="n">CQCConnection</span><span class="p">(</span><span class="s1">&#39;Alice&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">node</span><span class="p">:</span>
+
+   <span class="c1"># qubits are created beforehand</span>
+   <span class="n">qbit1</span> <span class="o">=</span> <span class="n">qubit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+   <span class="n">qbit2</span> <span class="o">=</span> <span class="n">qubit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+   <span class="c1"># Start of the CQCMix</span>
+   <span class="k">with</span> <span class="n">CQCMix</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="k">as</span> <span class="n">pgrm</span><span class="p">:</span>
+
+      <span class="n">result</span> <span class="o">=</span> <span class="n">qbit1</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span>
+
+      <span class="c1"># if measurement yielded 1, apply X</span>
+      <span class="k">with</span> <span class="n">pgrm</span><span class="o">.</span><span class="n">cqc_if</span><span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+         <span class="n">qbit2</span><span class="o">.</span><span class="n">X</span><span class="p">()</span>
+
+      <span class="c1"># else, apply H</span>
+      <span class="k">with</span> <span class="n">pgrm</span><span class="o">.</span><span class="n">cqc_else</span><span class="p">():</span>
+         <span class="n">qbit2</span><span class="o">.</span><span class="n">H</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="interface.html" class="btn btn-neutral float-right" title="CQC Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="classical_communication.html" class="btn btn-neutral float-left" title="Classical Communication" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stephanie Wehner and Axel Dahlberg
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

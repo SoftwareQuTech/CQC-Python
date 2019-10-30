@@ -1,0 +1,422 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cqcHeader &mdash; cqc 3.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="entInfoHeader" href="entInfoHeader.html" />
+    <link rel="prev" title="pythonLib" href="pythonLib.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> cqc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../classical_communication.html">Classical Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../useful_commands.html">Useful commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interface.html">CQC Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples using the python library</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pythonLib.html">pythonLib</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">cqcHeader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entInfoHeader.html">entInfoHeader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Protocol.html">Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MessageHandler.html">MessageHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hostConfig.html">hostConfig</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cqc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API documentation</a> &raquo;</li>
+        
+      <li>cqcHeader</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/modules/cqcHeader.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-cqc.cqcHeader">
+<span id="cqcheader"></span><h1>cqcHeader<a class="headerlink" href="#module-cqc.cqcHeader" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCType">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCType</code><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCType" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCLogicalOperator">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCLogicalOperator</code><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCLogicalOperator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCLogicalOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.Header">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">Header</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#Header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.Header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstact class for headers.
+Should be subclassed</p>
+<dl class="method">
+<dt id="cqc.cqcHeader.Header.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#Header.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.Header.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize using values received from a packet.
+Don’t override this but rather _setVals</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.cqcHeader.Header.setVals">
+<code class="sig-name descname">setVals</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#Header.setVals"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.Header.setVals" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Set using given values.
+Don’t override this but rather _setVals</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.cqcHeader.Header.unpack">
+<code class="sig-name descname">unpack</code><span class="sig-paren">(</span><em class="sig-param">headerBytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#Header.unpack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.Header.unpack" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Unpack packet data.
+Don’t override this but rather _unpack</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.cqcHeader.Header.pack">
+<code class="sig-name descname">pack</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#Header.pack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.Header.pack" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Pack data into packet format.
+Don’t override this but rather _pack</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>bytes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.cqcHeader.Header.printable">
+<code class="sig-name descname">printable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#Header.printable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.Header.printable" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Produce a printable string for information purposes.
+Don’t override this but rather _printable</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Definition of the general CQC header.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCTypeHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCTypeHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCTypeHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCTypeHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Definition of the CQC Type header. This header announces the type of the headers that will follow.</p>
+<dl class="method">
+<dt id="cqc.cqcHeader.CQCTypeHeader.make_equivalent_CQCHeader">
+<code class="sig-name descname">make_equivalent_CQCHeader</code><span class="sig-paren">(</span><em class="sig-param">version: int</em>, <em class="sig-param">app_id: int</em><span class="sig-paren">)</span> &#x2192; cqc.cqcHeader.CQCHeader<a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCTypeHeader.make_equivalent_CQCHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCTypeHeader.make_equivalent_CQCHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a CQC Header that is equivalent to this CQCTypeHeader.
+This method does not make any modifications to self.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCIfHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCIfHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCIfHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCIfHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Definition of the CQC IF header.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCCmdHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCCmdHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCCmdHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCCmdHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Header for a command instruction packet.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCAssignHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCAssignHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCAssignHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCAssignHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sub header that follows a CMD Measure header. It contains the reference id which can be used
+to refer to the measurement outcome</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCXtraHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCXtraHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCXtraHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCXtraHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional addtional cmd header information. Only relevant for certain commands.</p>
+<dl class="method">
+<dt id="cqc.cqcHeader.CQCXtraHeader.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCXtraHeader.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCXtraHeader.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize using values received from a packet.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCSequenceHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCSequenceHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCSequenceHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCSequenceHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Header used to indicate size of a sequence.
+Currently exactly the same as CQCRotationHeaer.
+Seperate classes used clearity and for possible future adaptability. (Increase length for example)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCRotationHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCRotationHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCRotationHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCRotationHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Header used to define the rotation angle of a gate</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCXtraQubitHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCXtraQubitHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCXtraQubitHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCXtraQubitHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Header used to send qubit of a secondary qubit for two qubit gates</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCCommunicationHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCCommunicationHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em>, <em class="sig-param">cqc_version=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCCommunicationHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCCommunicationHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Header used to send information to which node to send information to.
+Used for example in Send and EPR commands
+This header has a size of 8</p>
+<dl class="method">
+<dt id="cqc.cqcHeader.CQCCommunicationHeader.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em>, <em class="sig-param">cqc_version=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCCommunicationHeader.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCCommunicationHeader.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize from packet data
+:param headerBytes:  packet data</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCFactoryHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCFactoryHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCFactoryHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCFactoryHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Header used to send factory information</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCNotifyHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCNotifyHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCNotifyHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCNotifyHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Header used to specify notification details.</p>
+<dl class="method">
+<dt id="cqc.cqcHeader.CQCNotifyHeader.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCNotifyHeader.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCNotifyHeader.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize from packet data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCMeasOutHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCMeasOutHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCMeasOutHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCMeasOutHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Header used to send a measurement outcome.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCTimeinfoHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCTimeinfoHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCTimeinfoHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCTimeinfoHeader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Header used to send timing information</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.cqcHeader.CQCEPRRequestHeader">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.cqcHeader.</code><code class="sig-name descname">CQCEPRRequestHeader</code><span class="sig-paren">(</span><em class="sig-param">headerBytes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/cqcHeader.html#CQCEPRRequestHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.cqcHeader.CQCEPRRequestHeader" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="entInfoHeader.html" class="btn btn-neutral float-right" title="entInfoHeader" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pythonLib.html" class="btn btn-neutral float-left" title="pythonLib" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stephanie Wehner and Axel Dahlberg
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

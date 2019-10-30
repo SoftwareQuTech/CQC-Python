@@ -1,0 +1,803 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CQC Interface &mdash; cqc 3.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples using the python library" href="examples.html" />
+    <link rel="prev" title="Useful commands" href="useful_commands.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cqc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classical_communication.html">Classical Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="useful_commands.html">Useful commands</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CQC Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-interface">The interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cqc-header-format">CQC Header format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-header">CQC Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-command-header">CQC Command Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-xtra-header">CQC Xtra Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-sequence-header">CQC Sequence Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-rotation-header">CQC Rotation Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-extra-qubit-header">CQC Extra Qubit Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-communication-header">CQC Communication Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-factory-header">CQC Factory Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-notify-header">CQC Notify Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-meas-out-header">CQC Meas Out Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-timeinfo-header">CQC Timeinfo Header</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#entanglement-header-format">Entanglement Header format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#entanglement-information-header">Entanglement Information Header</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples using the python library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cqc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>CQC Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/interface.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cqc-interface">
+<h1>CQC Interface<a class="headerlink" href="#cqc-interface" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-interface">
+<h2>The interface<a class="headerlink" href="#the-interface" title="Permalink to this headline">¶</a></h2>
+<p>Here we specifiy the CQC message interface. For programming SimulaQron via the CQC Interface using the Python or C provided, you do not need to know the extend of this message format. The below will be necessary, if you want to write your own library in another language. The easiest way of programming SimulaQron is via the Python CQC lib, so we recommend to get started there. Documentation of how to use the Python CQC lib can be found here <a class="reference internal" href="usage.html"><span class="doc">Getting started</span></a>: and examples here
+<a class="reference internal" href="examples.html"><span class="doc">Examples using the python library</span></a>.</p>
+<p>Upon establishing a connection to the CQC Backend, the following packet format can be used to issue commands to the simulated quantum network. Each interaction to and from the interface starts with a CQC Header, followed by additional headers as appropriate to the message type.</p>
+<p>When accessing the interface directly, you must keep track of qubit IDs for each application ID yourself. It is a deliberate choice that the CQC Backend does not itself keep track of qubit or application IDs, leaving such management to you (and indeed higher levels of abstraction if you wish).
+When a qubit is created with the command <cite>CQC_CMD_NEW</cite> a CQC message will be returned of the type <cite>CQC_TP_NEW_OK</cite> followed by a CQCXtraQubitHeader containing the qubit ID.
+Note that if the option notify, see below, is set to true a message of type <cite>CQC_TP_DONE</cite> will also be returned, after the notification header, saying that the command is finished.</p>
+</div>
+<div class="section" id="cqc-header-format">
+<h2>CQC Header format<a class="headerlink" href="#cqc-header-format" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="cqc-header">
+<h3>CQC Header<a class="headerlink" href="#cqc-header" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 24%" />
+<col style="width: 8%" />
+<col style="width: 58%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comment</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>version</p></td>
+<td><p>unsigned integer (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Current version is 2</p></td>
+</tr>
+<tr class="row-odd"><td><p>type</p></td>
+<td><p>unsigned integer (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Message type (see below)</p></td>
+</tr>
+<tr class="row-even"><td><p>app_id</p></td>
+<td><p>unsigned integer (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Application ID, return messages will be tagged appropriately</p></td>
+</tr>
+<tr class="row-odd"><td><p>length</p></td>
+<td><p>unsigned integer (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>Total length of the CQC instruction packet (excluding this header)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Possible message types are listed below. Depending on the message type additional headers may be required as specified below.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span> <span class="n">Possible</span> <span class="n">CQC</span> <span class="n">Types</span> <span class="o">*/</span>
+<span class="c1">#define CQC_TP_HELLO            0       /* Alive check */</span>
+<span class="c1">#define CQC_TP_COMMAND          1       /* Execute a command list */</span>
+<span class="c1">#define CQC_TP_FACTORY          2       /* Start executing command list repeatedly */</span>
+<span class="c1">#define CQC_TP_EXPIRE           3       /* Qubit has expired */</span>
+<span class="c1">#define CQC_TP_DONE             4       /* Command execution done */</span>
+<span class="c1">#define CQC_TP_RECV             5       /* Recevied qubit */</span>
+<span class="c1">#define CQC_TP_EPR_OK           6       /* Created EPR pair */</span>
+<span class="c1">#define CQC_TP_MEASOUT          7       /* Measurement outcome */</span>
+<span class="c1">#define CQC_TP_GET_TIME         8       /* Get creation time of qubit */</span>
+<span class="c1">#define CQC_TP_INF_TIME         9       /* Inform about time */</span>
+<span class="c1">#define CQC_TP_NEW_OK           10      /* Inform about time */</span>
+
+<span class="c1">#define CQC_ERR_GENERAL         20      /* General purpose error (no details */</span>
+<span class="c1">#define CQC_ERR_NOQUBIT         21      /* No more qubits available */</span>
+<span class="c1">#define CQC_ERR_UNSUPP          22      /* Command sequence not supported */</span>
+<span class="c1">#define CQC_ERR_TIMEOUT         23      /* Timeout */</span>
+<span class="c1">#define CQC_ERR_INUSE           24      /* Qubit already in use */</span>
+<span class="c1">#define CQC_ERR_UNKNOWN         25      /* Unknown qubit ID */</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cqc-command-header">
+<h3>CQC Command Header<a class="headerlink" href="#cqc-command-header" title="Permalink to this headline">¶</a></h3>
+<p>If the message type is <cite>CQC_TP_COMMAND</cite>, <cite>CQC_TP_FACTORY</cite> or <cite>CQC_TP_GET_TIME</cite>, then the following additional command header must be supplied. It identifies the specific instruction to execute, as well as the qubit ID on which to perform this instructions. For rotations, two qubit gates, request to send or receive, and produce entanglement, the additional headers are required supplying further information.</p>
+<p>If <cite>CQC_OPT_NOTIFY</cite> set to true, each of these commmands return a CQC message of type <cite>CQC_TP_DONE</cite>. Some commands also return additional messages before the optional done-message, as described below:</p>
+<ul class="simple">
+<li><p><cite>CQC_CMD_NEW</cite>: Returns <cite>CQC_TP_NEW_OK</cite> followed by a <cite>CQCXtraQubitHeader</cite> containing the qubit ID.</p></li>
+<li><p><cite>CQC_CMD_MEASURE(_INPLACE)</cite>: Returns <cite>CQC_TP_MEASOUT</cite> followed by a <cite>CQCMeasOutHeader</cite> containing the measurement outcome.</p></li>
+<li><p><cite>CQC_CMD_RECV</cite>: Returns <cite>CQC_TP_RECV</cite> followed by a <cite>CQCXtraQubitHeader</cite> containing the qubit ID.</p></li>
+<li><p><cite>CQC_CMD_EPR(_RECV)</cite>: Returns <cite>CQC_TP_EPR_OK</cite> followed by <cite>CQCXtraQubitHeader</cite> and an entanglement information header.</p></li>
+</ul>
+<p>Example sequences of headers:</p>
+<ul class="simple">
+<li><p><cite>CQCHeader</cite> (type <cite>CQC_TP_COMMAND</cite>)</p></li>
+<li><p><cite>CQCCmdHeader</cite> (instr <cite>CQC_CMD_ROT_X</cite>)</p></li>
+<li><p><cite>CQCRotationHeader</cite> (specifying the angle)</p></li>
+<li><p><cite>CQCSequenceHeader</cite> (Telling more commands after this one will come)</p></li>
+<li><p><cite>CQCCmdHeader</cite> (instr <cite>CQC_CMD_Z</cite>)</p></li>
+</ul>
+<p>(Can also use the action=1 flag in the first Command Header instead of using the sequence header)</p>
+<p>An example with factory that does X rotation, then a Z gate, 4 times:</p>
+<ul class="simple">
+<li><p><cite>CQCHeader</cite> (type <cite>CQC_TP_FACTORY</cite>)</p></li>
+<li><p><cite>CQCFactoryHeader</cite> (num_iter = 4)</p></li>
+<li><p><cite>CQCCmdHeader</cite> (instr <cite>CQC_CMD_ROT_X</cite>)</p></li>
+<li><p><cite>CQCRotationHeader</cite> (specifying the angle)</p></li>
+<li><p><cite>CQCSequenceHeader</cite> (Telling more commands after this one will come)</p></li>
+<li><p><cite>CQCCmdHeader</cite> (instr <cite>CQC_CMD_Z</cite>)</p></li>
+</ul>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 25%" />
+<col style="width: 9%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comment</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>qubit_id</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Qubit ID to perform the operation on</p></td>
+</tr>
+<tr class="row-odd"><td><p>instr</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Instruction to perform (see below)</p></td>
+</tr>
+<tr class="row-even"><td><p>options</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Options when executing the command</p></td>
+</tr>
+</tbody>
+</table>
+<p>The value of instr can be any of the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span> <span class="n">Possible</span> <span class="n">commands</span> <span class="o">*/</span>
+<span class="c1">#define CQC_CMD_I               0       /* Identity (do nothing, wait one step) */</span>
+<span class="c1">#define CQC_CMD_NEW             1       /* Ask for a new qubit */</span>
+<span class="c1">#define CQC_CMD_MEASURE         2       /* Measure qubit */</span>
+<span class="c1">#define CQC_CMD_MEASURE_INPLACE 3       /* Measure qubit inplace */</span>
+<span class="c1">#define CQC_CMD_RESET           4       /* Reset qubit to |0&gt; */</span>
+<span class="c1">#define CQC_CMD_SEND            5       /* Send qubit to another node */</span>
+<span class="c1">#define CQC_CMD_RECV            6       /* Ask to receive qubit */</span>
+<span class="c1">#define CQC_CMD_EPR             7       /* Create EPR pair with the specified node */</span>
+<span class="c1">#define CQC_CMD_EPR_RECV        8       /* Create EPR pair with the specified node */</span>
+
+<span class="c1">#define CQC_CMD_X               10      /* Pauli X */</span>
+<span class="c1">#define CQC_CMD_Z               11      /* Pauli Z */</span>
+<span class="c1">#define CQC_CMD_Y               12      /* Pauli Y */</span>
+<span class="c1">#define CQC_CMD_T               13      /* T Gate */</span>
+<span class="c1">#define CQC_CMD_ROT_X           14      /* Rotation over angle around X in pi/256 increments */</span>
+<span class="c1">#define CQC_CMD_ROT_Y           15      /* Rotation over angle around Y in pi/256 increments */</span>
+<span class="c1">#define CQC_CMD_ROT_Z           16      /* Rotation over angle around Z in pi/256 increments */</span>
+<span class="c1">#define CQC_CMD_H               17      /* Hadamard Gate */</span>
+<span class="c1">#define CQC_CMD_K               18      /* K Gate - taking computational to Y eigenbasis */</span>
+
+<span class="c1">#define CQC_CMD_CNOT            20      /* CNOT Gate with this as control */</span>
+<span class="c1">#define CQC_CMD_CPHASE          21      /* CPHASE Gate with this as control */</span>
+
+<span class="o">/*</span> <span class="n">Command</span> <span class="n">options</span> <span class="o">*/</span>
+<span class="c1">#define CQC_OPT_NOTIFY          0x01    /* Send a notification when cmd done */</span>
+<span class="c1">#define CQC_OPT_ACTION          0x02    /* On if there are actions to execute when done */</span>
+<span class="c1">#define CQC_OPT_BLOCK           0x04    /* Block until command is done */</span>
+<span class="c1">#define CQC_OPT_IFTHEN          0x08    /* Execute command after done */</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cqc-xtra-header">
+<h3>CQC Xtra Header<a class="headerlink" href="#cqc-xtra-header" title="Permalink to this headline">¶</a></h3>
+<p><strong>The CQCXtraHeader is deprecated and will be removed in the future. It is split up in multiple headers now.</strong>
+Additional header containing further information.
+The following commands require an xtra header when issued to the CQC Backend: CQC_CMD_SEND, CQC_CMD_RECV, CQC_CMD_CPHASE, CQC_CMD_CNOT, CQC_CMD_ROT_X, CQC_CMD_ROT_Y, CQC_CMD_ROT_Z</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>xtra_qubit_id</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>ID of the target qubit in a 2 qubit controlled gate</p></td>
+</tr>
+<tr class="row-odd"><td><p>remote_app_id</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Remote Application ID</p></td>
+</tr>
+<tr class="row-even"><td><p>remote_node</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>IP of the remote node (IPv4)</p></td>
+</tr>
+<tr class="row-odd"><td><p>cmdLength</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>Length of the additional commands to execute upon completion.</p></td>
+</tr>
+<tr class="row-even"><td><p>remote_port</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Port of the remode node for sending classical control info</p></td>
+</tr>
+<tr class="row-odd"><td><p>steps</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Angle step of rotation (ROT) OR number of repetitions (FACTORY)</p></td>
+</tr>
+<tr class="row-even"><td><p>unused</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>4 byte align</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cqc-sequence-header">
+<h3>CQC Sequence Header<a class="headerlink" href="#cqc-sequence-header" title="Permalink to this headline">¶</a></h3>
+<p>Additional header used to indicate size of a sequence. Used when sending multiple commands at once. It tells the backend how many more messages are coming.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cmd_length</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 bytes</p></td>
+<td><p>The length (in bytes) of messages still to come</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cqc-rotation-header">
+<h3>CQC Rotation Header<a class="headerlink" href="#cqc-rotation-header" title="Permalink to this headline">¶</a></h3>
+<p>Additional header used to define the rotation angle of a rotation gate.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>step</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 bytes</p></td>
+<td><p>Angle step of rotation (increments in 1/256 per step)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cqc-extra-qubit-header">
+<h3>CQC Extra Qubit Header<a class="headerlink" href="#cqc-extra-qubit-header" title="Permalink to this headline">¶</a></h3>
+<p>Additional header used to send a qubit_id</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>qubit_id</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Qubit_id of the target qubit</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cqc-communication-header">
+<h3>CQC Communication Header<a class="headerlink" href="#cqc-communication-header" title="Permalink to this headline">¶</a></h3>
+<p>Additional header used to send to which node to send information to. Used in send and EPR commands.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>remote_app_id</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Remote Application ID</p></td>
+</tr>
+<tr class="row-odd"><td><p>remote_port</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Port of the remode node for sending classical control info</p></td>
+</tr>
+<tr class="row-even"><td><p>remote_node</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>IP of the remote node (IPv4)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cqc-factory-header">
+<h3>CQC Factory Header<a class="headerlink" href="#cqc-factory-header" title="Permalink to this headline">¶</a></h3>
+<p>Additional header used to send factory information. Factory commands are used to tell the backend to do the following command or a sequence of commands multiple times.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>num_iter</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Number of iterations to do the sequence</p></td>
+</tr>
+<tr class="row-odd"><td><p>options</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Options when executing the factory</p></td>
+</tr>
+</tbody>
+</table>
+<p>The value of options can be any of the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#define CQC_OPT_NOTIFY          0x01    /* Send a notification when cmd is done */</span>
+<span class="c1">#define CQC_OPT_BLOCK           0x04    /* Block until factory is done */</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cqc-notify-header">
+<h3>CQC Notify Header<a class="headerlink" href="#cqc-notify-header" title="Permalink to this headline">¶</a></h3>
+<p><strong>The CQCNotifyHeader is deprecated and will be removed in the future. It is split up in `CQCXtraQubitHeader`, `CQCMeasOutHeader`and `CQCTimeinfoHeader` now.</strong>
+In some cases, the CQC Backend will return notifications to the client that require additional information. For example, where a qubit was received from, the lifetime of a qubit, the measurement outcome etc.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>qubit_id</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>ID of the received qubit</p></td>
+</tr>
+<tr class="row-odd"><td><p>remote_app_id</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Remote application ID</p></td>
+</tr>
+<tr class="row-even"><td><p>remote_node</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>IP of the remote node</p></td>
+</tr>
+<tr class="row-odd"><td><p>datetime</p></td>
+<td><p>unsigned int (uint64_t)</p></td>
+<td><p>8 bytes</p></td>
+<td><p>Time of creation</p></td>
+</tr>
+<tr class="row-even"><td><p>remote_port</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Port of the remote node for sending classical control info</p></td>
+</tr>
+<tr class="row-odd"><td><p>outcome</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Measurement outcome</p></td>
+</tr>
+<tr class="row-even"><td><p>unused</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>4 byte align</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cqc-meas-out-header">
+<h3>CQC Meas Out Header<a class="headerlink" href="#cqc-meas-out-header" title="Permalink to this headline">¶</a></h3>
+<p>Additional header used to send the outcome of a measurement.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>meas_out</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Measurement outcome</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cqc-timeinfo-header">
+<h3>CQC Timeinfo Header<a class="headerlink" href="#cqc-timeinfo-header" title="Permalink to this headline">¶</a></h3>
+<p>Additional header used to send time information (return of <cite>CQC_TP_GET_TIME</cite>).</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>datetime</p></td>
+<td><p>unsigned int (uint64_t)</p></td>
+<td><p>8 bytes</p></td>
+<td><p>Time of creation</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="entanglement-header-format">
+<h2>Entanglement Header format<a class="headerlink" href="#entanglement-header-format" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="entanglement-information-header">
+<h3>Entanglement Information Header<a class="headerlink" href="#entanglement-information-header" title="Permalink to this headline">¶</a></h3>
+<p>When an EPR-pair is created the CQC Backend will return information about the entanglement which can be used in a entanglement management protocol.
+The entanglement information header contains information about the parties that share the EPR-pair, the time of creation, how good the entanglement is (goodness).
+Furthermore, the entanglement information header contain a entanglement ID (id_AB) which can be used to keep track of the entanglement in the network.
+The entanglement ID is incremented with respect to the pair of nodes and who initialized the entanglement (DF).
+For this reason the entanglement ID together with the nodes and the directionality flag gives a unique way to identify the entanglement in the network.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 24%" />
+<col style="width: 9%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>node_A</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>IP of this node</p></td>
+</tr>
+<tr class="row-odd"><td><p>port_A</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Port of this node</p></td>
+</tr>
+<tr class="row-even"><td><p>app_id_A</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>App ID of this node</p></td>
+</tr>
+<tr class="row-odd"><td><p>node_B</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>IP of other node</p></td>
+</tr>
+<tr class="row-even"><td><p>port_B</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 bytes</p></td>
+<td><p>Port of other node</p></td>
+</tr>
+<tr class="row-odd"><td><p>app_id_B</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 byte</p></td>
+<td><p>App ID of other node</p></td>
+</tr>
+<tr class="row-even"><td><p>id_AB</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 byte</p></td>
+<td><p>Entanglement ID</p></td>
+</tr>
+<tr class="row-odd"><td><p>timestamp</p></td>
+<td><p>unsigned int (uint64_t)</p></td>
+<td><p>8 byte</p></td>
+<td><p>Time of creation</p></td>
+</tr>
+<tr class="row-even"><td><p>ToG</p></td>
+<td><p>unsigned int (uint64_t)</p></td>
+<td><p>8 byte</p></td>
+<td><p>Time of goodness</p></td>
+</tr>
+<tr class="row-odd"><td><p>goodness</p></td>
+<td><p>unsigned int (uint16_t)</p></td>
+<td><p>2 byte</p></td>
+<td><p>Goodness (estimate of the fidelity of state)</p></td>
+</tr>
+<tr class="row-even"><td><p>DF</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Directionality flag (0=Mid-source, 1=node_A, 2=node_B)</p></td>
+</tr>
+<tr class="row-odd"><td><p>unused</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>4 byte align</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples using the python library" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="useful_commands.html" class="btn btn-neutral float-left" title="Useful commands" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stephanie Wehner and Axel Dahlberg
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

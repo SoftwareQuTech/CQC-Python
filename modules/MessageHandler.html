@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MessageHandler &mdash; cqc 3.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="hostConfig" href="hostConfig.html" />
+    <link rel="prev" title="Protocol" href="Protocol.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> cqc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../classical_communication.html">Classical Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../useful_commands.html">Useful commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../interface.html">CQC Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples using the python library</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pythonLib.html">pythonLib</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cqcHeader.html">cqcHeader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entInfoHeader.html">entInfoHeader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Protocol.html">Protocol</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">MessageHandler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="hostConfig.html">hostConfig</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cqc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API documentation</a> &raquo;</li>
+        
+      <li>MessageHandler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/modules/MessageHandler.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-cqc.MessageHandler">
+<span id="messagehandler"></span><h1>MessageHandler<a class="headerlink" href="#module-cqc.MessageHandler" title="Permalink to this headline">¶</a></h1>
+<dl class="exception">
+<dt id="cqc.MessageHandler.UnknownQubitError">
+<em class="property">exception </em><code class="sig-prename descclassname">cqc.MessageHandler.</code><code class="sig-name descname">UnknownQubitError</code><span class="sig-paren">(</span><em class="sig-param">message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#UnknownQubitError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.UnknownQubitError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="cqc.MessageHandler.has_extra">
+<code class="sig-prename descclassname">cqc.MessageHandler.</code><code class="sig-name descname">has_extra</code><span class="sig-paren">(</span><em class="sig-param">cmd</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#has_extra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.has_extra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether this command includes an extra header with additional information.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cqc.MessageHandler.CQCMessageHandler">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.MessageHandler.</code><code class="sig-name descname">CQCMessageHandler</code><span class="sig-paren">(</span><em class="sig-param">factory</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#CQCMessageHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.CQCMessageHandler" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="cqc.MessageHandler.CQCMessageHandler.handle_cqc_message">
+<code class="sig-name descname">handle_cqc_message</code><span class="sig-paren">(</span><em class="sig-param">header</em>, <em class="sig-param">message</em>, <em class="sig-param">transport=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#CQCMessageHandler.handle_cqc_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.CQCMessageHandler.handle_cqc_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>This calls the correct method to handle the cqcmessage, based on the type specified in the header</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.MessageHandler.CQCMessageHandler.retrieve_return_messages">
+<code class="sig-name descname">retrieve_return_messages</code><span class="sig-paren">(</span><em class="sig-param">app_id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#CQCMessageHandler.retrieve_return_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.CQCMessageHandler.retrieve_return_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the return messages of a given app_id</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.MessageHandler.CQCMessageHandler.create_return_message">
+<em class="property">static </em><code class="sig-name descname">create_return_message</code><span class="sig-paren">(</span><em class="sig-param">app_id</em>, <em class="sig-param">msg_type</em>, <em class="sig-param">length=0</em>, <em class="sig-param">cqc_version=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#CQCMessageHandler.create_return_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.CQCMessageHandler.create_return_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a messaage that the protocol should send back
+:param app_id: the app_id to which the message should be send
+:param msg_type: the type of message to return
+:param length: the length of additional message
+:param cqc_version: The cqc version of the message
+:return: a new header message to be send back</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.MessageHandler.CQCMessageHandler.create_extra_header">
+<em class="property">static </em><code class="sig-name descname">create_extra_header</code><span class="sig-paren">(</span><em class="sig-param">cmd</em>, <em class="sig-param">cmd_data</em>, <em class="sig-param">cqc_version=2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#CQCMessageHandler.create_extra_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.CQCMessageHandler.create_extra_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the extra header (communication header, rotation header, etc) based on the command</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.MessageHandler.CQCMessageHandler.handle_command">
+<code class="sig-name descname">handle_command</code><span class="sig-paren">(</span><em class="sig-param">header</em>, <em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#CQCMessageHandler.handle_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.CQCMessageHandler.handle_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle incoming command requests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.MessageHandler.CQCMessageHandler.handle_mix">
+<code class="sig-name descname">handle_mix</code><span class="sig-paren">(</span><em class="sig-param">header: cqc.cqcHeader.CQCHeader</em>, <em class="sig-param">data: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#CQCMessageHandler.handle_mix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.CQCMessageHandler.handle_mix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler for messages of TP_MIX. Notice that header is the CQC Header,
+and data is the complete body, excluding the CQC Header.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.MessageHandler.CQCMessageHandler.handle_conditional">
+<code class="sig-name descname">handle_conditional</code><span class="sig-paren">(</span><em class="sig-param">header: cqc.cqcHeader.CQCHeader</em>, <em class="sig-param">data: bytes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/MessageHandler.html#CQCMessageHandler.handle_conditional"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.MessageHandler.CQCMessageHandler.handle_conditional" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler for messages of TP_IF.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="hostConfig.html" class="btn btn-neutral float-right" title="hostConfig" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="Protocol.html" class="btn btn-neutral float-left" title="Protocol" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stephanie Wehner and Axel Dahlberg
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
