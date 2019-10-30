@@ -123,6 +123,9 @@ The value of instr can be any of the following::
 	#define CQC_CMD_CNOT		20	/* CNOT Gate with this as control */
 	#define CQC_CMD_CPHASE		21	/* CPHASE Gate with this as control */
 
+	#define CQC_CMD_ALLOCATE	22	/* Allocate a number of qubits */
+	#define CQC_CMD_RELEASE		23	/* Release a qubit */
+
 	/* Command options */
 	#define CQC_OPT_NOTIFY		0x01	/* Send a notification when cmd done */
 	#define CQC_OPT_ACTION		0x02	/* On if there are actions to execute when done */
