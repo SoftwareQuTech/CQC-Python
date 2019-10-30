@@ -22,12 +22,29 @@ install:
 script:
 - make lint
 - make tests
+before_deploy:
+- cd docs
+- make build
+- cd ..
 deploy:
-  provider: pypi
+- provider: pypi
   user: adahlberg
   password:
     secure: cQUlOGHX5ksULLBM2kOE9s2hdaJn4WK8rhD4LUuWndUG7rLeqtVfEMVrqWuMmzWcHXKOti143vgthSgp+akixfnQD7jWupVVSRiz5SFgq+1DRezGlkvYcZz2833on28lNFRiTjuPHkY3WoK0sS1iESxwTBvvi4y+q+AGtFzKE8hr+Pej+HnqFMMeXfqE7d/ZhoOrcBiRRcOrV/2JjpET5CMqimCYR4rz25yzpvVWlakC24vCqGs0Py+JL+VlZszjQz25NAQuuVwOAKnH/bapCV/JFmpvrFF5gKqAly9d1/+ZVgQVT9swMPjwmQs3zQ9E7IlL+4BPhdDly1H/GchyTRvf3uFt6Lok8ySvDyIkZUM2HlIoJIJCAESRCoEK7K7t1ySovBKjXI1Jc8O3QhAvdVMFWPpVxq5ZKwvUAEKtt7vRzN2KVmSi1nJxEzL89iuZkUtihws6DD8Y/6VgcemCFEZlP8ubxxRqR6gSaAhxSHppTdlNK2xUKq5AOwuS8A/3ur7SsMGasmMXTgQ/ElkrlHSZDvub4A89EMxfCMKrutIDPXSdpgYkmAvMFBsop+il/HJwWLc14xiNRsod4XVV5143M3pGg1wNKCifl2tTjbgoho9kFyso6RFkK28Qy3oSqZ+Sdw346M6jD6r2JVm7xsQZI7a5iR2Uq3PESkjkTP0=
-  distributions: "sdist bdist_wheel"
+  distributions: sdist bdist_wheel
+  skip_existing: true
   on:
-    tags: true
-    condition: $BUILD = True
+    branch: master
+    condition: "$BUILD = True"
+- provider: pages
+  skip_cleanup: true
+  github_token: "$GITHUB_TOKEN"
+  keep_history: true
+  committer_from_gh: true
+  local_dir: docs/build/html
+  on:
+    branch: master
+    condition: "$BUILD = True"
+env:
+  global:
+    secure: N94e7sUoGlXFNe8Gr3nXhRHg0kpG4cNmqO6V1Ie532PoN0m2Wb/7rUosdBYceR9jWl9f5ZeksvcP/1nKwgc3uMxKKdRsyG0PAi35z2+TM9m4Uz1BZ0dNwLjfOcUIIJHGn9qDSQGsbSfmd9QuhOBblLvjL5R7f/hZovND6dgQRSImvYuY7cJ9o6eWvsfG4CUB2SaKez9wexXpxM0sQCuNh5KHSts1YPUoW5QEC9A3cV4tYksAO66I98hLjoBdCDk7YPV9WfesNyw+sD2JlD/l7vHpUpI+67DCll1LNIV3x4Ju46uEai1VoptLytPhWkx0nceBhQ2WQMCrZfb2sA9+4e0QrxCP7kv7EAej7o+HIBKUgrH/VaOpYz1pdrBbbtIanEHb7nB/tiGTMwmfTD8fu/bXSNh5OM644GFyUyjDAjiXqq70zZPIxmGxW2CUYPudkb4pkwt1uLSVKW0UX3wf/NybqEanmldKCKgZhy0pbiqF1N4Ir27/6IznpYhB6WXaFWEHqck0RUB/dnjeKag/VTzFfTjREkltxSMJOpasgdQt0AE1NIBLzXWdn4OgSe22gGFCdgRG51ZP7zidoYjDrId0+Jkp9qm3HkYZKpG/bNdtJK5oo7YsndjwgzkrpqO2PuCc3UXHMMEdL7TeWZReAYh/xwy59N1P3VoXqNeobno=

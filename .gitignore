@@ -1,7 +1,9 @@
 *.pyc
 .*.sw?
 *.DS_Store
-/docs/_build/*
+/docs/build/*
+/docs/_static/*
+/docs/_templates/*
 /build/*
 /dist/*
 /cqc.egg-info/*
