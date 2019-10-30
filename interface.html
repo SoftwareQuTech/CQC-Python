@@ -335,6 +335,9 @@ Note that if the option notify, see below, is set to true a message of type <cit
 <span class="c1">#define CQC_CMD_CNOT            20      /* CNOT Gate with this as control */</span>
 <span class="c1">#define CQC_CMD_CPHASE          21      /* CPHASE Gate with this as control */</span>
 
+<span class="c1">#define CQC_CMD_ALLOCATE        22      /* Allocate a number of qubits */</span>
+<span class="c1">#define CQC_CMD_RELEASE         23      /* Release a qubit */</span>
+
 <span class="o">/*</span> <span class="n">Command</span> <span class="n">options</span> <span class="o">*/</span>
 <span class="c1">#define CQC_OPT_NOTIFY          0x01    /* Send a notification when cmd done */</span>
 <span class="c1">#define CQC_OPT_ACTION          0x02    /* On if there are actions to execute when done */</span>
