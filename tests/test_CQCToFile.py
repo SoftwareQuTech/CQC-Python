@@ -53,6 +53,7 @@ def test_createqubit(tmpdir):
     with CQCToFile(filename=filename) as cqc:
          
         q = qubit(cqc)
+        q.H()
 
         with open(filename) as f:
             
@@ -70,9 +71,11 @@ def test_releasequbit(tmpdir):
     with CQCToFile(filename=filename) as cqc:
          
         q = qubit(cqc)
+        q.H()
 
     with open(filename) as f:
             
+        line = f.readline()
         line = f.readline()
         line = f.readline()
         print(line)
