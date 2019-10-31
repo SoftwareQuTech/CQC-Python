@@ -184,6 +184,7 @@ def createXtraHeader(command, values):
         header = None
     return header
 
+
 class CQCHandler(ABC):
     """This class defines the things any CQCHandler must do.
 
@@ -249,8 +250,8 @@ class CQCHandler(ABC):
         self.close(release_qubits=True)
 
     def commit_command(self, qID, command, notify=1, block=1, action=0, 
-                    xtra_qID=0, step=0, remote_appID=0, remote_node=0, 
-                    remote_port=0, ref_id=0):
+                       xtra_qID=0, step=0, remote_appID=0, remote_node=0, 
+                       remote_port=0, ref_id=0):
         """Construct and commit command."""
 
         msg = self.construct_command(
@@ -289,8 +290,8 @@ class CQCHandler(ABC):
         elif command == CQC_CMD_CNOT or command == CQC_CMD_CPHASE:
             xtra_hdr = CQCXtraQubitHeader()
             xtra_hdr.setVals(xtra_qID)
-        elif (command == CQC_CMD_ROT_X or command == CQC_CMD_ROT_Y or 
-              command == CQC_CMD_ROT_Z):
+        elif (command == CQC_CMD_ROT_X or command == CQC_CMD_ROT_Y 
+              or command == CQC_CMD_ROT_Z):
             xtra_hdr = CQCRotationHeader()
             xtra_hdr.setVals(step)
         elif command == CQC_CMD_MEASURE or command == CQC_CMD_MEASURE_INPLACE:
@@ -422,7 +423,7 @@ class CQCHandler(ABC):
         pass
 
     @abstractmethod
-    def commit(self):
+    def commit(self, msg):
         """Commit a message. 
 
         This can mean sending it to the backend or just writing to file.
@@ -467,7 +468,7 @@ class CQCConnection(CQCHandler):
                 Used if simulaqron is used to load socket addresses for the backend
         """
 
-        super().__init__(pend_messages = pend_messages)
+        super().__init__(pend_messages=pend_messages)
 
         self._setup_logging(log_level)
 
@@ -1143,8 +1144,8 @@ class CQCConnection(CQCHandler):
                 )
             )
             self.commit_command(q._qID, CQC_CMD_SEND, notify=int(notify), 
-                             block=int(block), remote_appID=remote_appID, 
-                             remote_node=remote_ip, remote_port=remote_port)
+                                block=int(block), remote_appID=remote_appID, 
+                                remote_node=remote_ip, remote_port=remote_port)
 
             if notify:
                 message = self.readMessage()
@@ -1535,7 +1536,7 @@ class CQCConnection(CQCHandler):
         msg = self.readMessage()
 
         try:
-            otherHdr = message[1]
+            otherHdr = msg[1]
             return otherHdr.outcome
         except AttributeError:
             return None
@@ -2458,7 +2459,7 @@ class CQCToFile(CQCHandler):
                  overwrite=False):
 
         # Call init of CQCHandler
-        super().__init__(pend_messages = pend_messages)
+        super().__init__(pend_messages=pend_messages)
 
         self.name = "CQCToFile"
 
@@ -2467,7 +2468,7 @@ class CQCToFile(CQCHandler):
         # Set path of file to write to
         script_dir = sys.path[0]
         self.filename = os.path.join(script_dir, filename)
-        self.filenameb = self.filename+"binary"
+        self.filenameb = self.filename + "binary"
 
         # Check if file exists
         if overwrite:
@@ -2490,7 +2491,8 @@ class CQCToFile(CQCHandler):
                 num = 0
                 while True:
                     if (os.path.isfile(self.filename + str(num)) 
-                        or os.path.isfile(self.filename +str(num) + "binary")):
+                            or os.path.isfile(self.filename + str(num) 
+                                              + "binary")):
                         num += 1
                     else:
                         self.filename = self.filename + str(num)
@@ -2530,8 +2532,7 @@ class CQCToFile(CQCHandler):
     def createEPR(self, name, remote_appID=0, notify=True, block=True):
         """Create EPR pair."""
 
-
-        remote_ip, remote_port = 0,0 #TODO: some function that assigns based on name?
+        remote_ip, remote_port = 0, 0  # TODO: some function that assigns based on name?
 
         # Initialize the qubit
         q = qubit(self, createNew=False)
@@ -2553,10 +2554,10 @@ class CQCToFile(CQCHandler):
             )
 
             self.commit_command(0, CQC_CMD_EPR, notify=int(notify), 
-                             block=int(block), remote_appID=remote_appID, 
-                             remote_node=remote_ip, remote_port=remote_port)
+                                block=int(block), remote_appID=remote_appID, 
+                                remote_node=remote_ip, remote_port=remote_port)
 
-            entInfoHdr = None #TODO: create function that returns some fake entanglement info
+            entInfoHdr = None  # TODO: create function that returns some fake entanglement info
             q_id = self.new_qubitID()
 
             q.set_entInfo(entInfoHdr)
@@ -2582,12 +2583,10 @@ class CQCToFile(CQCHandler):
             # print info
             logging.debug("App {} tells CQC: 'Receive half of EPR'".format(self.name))
             self.commit_command(0, CQC_CMD_EPR_RECV, notify=int(notify), 
-                             block=int(block))
+                                block=int(block))
 
-            
-            entInfoHdr = None #TODO: create function that returns some fake entanglement info?
+            entInfoHdr = None  # TODO: create function that returns some fake entanglement info?
             q_id = self.new_qubitID()
-
 
             # initialize the qubit
             q.set_entInfo(entInfoHdr)
@@ -2601,7 +2600,7 @@ class CQCToFile(CQCHandler):
                   notify=True, block=True):
         """Send qubit."""
 
-        remote_ip, remote_port = 0,0 #TODO: some function that assigns based on name?
+        remote_ip, remote_port = 0, 0  # TODO: some function that assigns based on name?
 
         if self.pend_messages:
             # print info
@@ -2610,16 +2609,16 @@ class CQCToFile(CQCHandler):
                 .format(self.name, q._qID, name, remote_appID))
 
             self._pending_headers.append([q, CQC_CMD_SEND, 
-                                        int(notify), int(block), 
-                                        [remote_appID, remote_ip, remote_port]])
+                                         int(notify), int(block), 
+                                         [remote_appID, remote_ip, remote_port]])
         else:
             # print info
             logging.debug(
                 "App {} tells CQC: 'Send qubit with ID {} to {} and appID {}'"
                 .format(self.name, q._qID, name, remote_appID))
             self.commit_command(q._qID, CQC_CMD_SEND, notify=int(notify), 
-                             block=int(block), remote_appID=remote_appID, 
-                             remote_node=remote_ip, remote_port=remote_port)
+                                block=int(block), remote_appID=remote_appID, 
+                                remote_node=remote_ip, remote_port=remote_port)
 
             # Deactivate qubit
             q._set_active(False)
@@ -2642,7 +2641,7 @@ class CQCToFile(CQCHandler):
             logging.debug("App {} tells CQC: 'Receive qubit'"
                           .format(self.name))
             self.commit_command(0, CQC_CMD_RECV, notify=int(notify), 
-                             block=int(block))
+                                block=int(block))
 
             q_id = self.new_qubitID()
 
@@ -2700,17 +2699,16 @@ class CQCToFile(CQCHandler):
                     if header.instr in (2, 3):
                         res.append(self.return_meas_outcome())
                     else:
-                        q == None
+                        q = None
                         if num_iter != 1:
                             q._set_active(False)
                             q = qubit(self, createNew=False)
-                        if q == None:
+                        if q is None:
                             q = qubit(self, createNew=False)
                         q._qID = self.new_qubitID()
                         q.set_entInfo(None)
                         q._set_active(True)
                         res.append(q)
-
 
         # Determine the CQC Header type
         if num_iter == 1:
