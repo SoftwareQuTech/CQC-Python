@@ -2511,6 +2511,9 @@ class CQCToFile(CQCHandler):
         with open(self.filename, 'a') as f:
             f.write(str(msg) + '\n')
 
+        with open(self.filenameb, 'ab') as f:
+            f.write(msg)
+
     def new_qubitID(self):
         """Provice new qubit ID."""
 
@@ -2523,7 +2526,7 @@ class CQCToFile(CQCHandler):
     def close(self, release_qubits=True):
         """Handle exiting context."""
 
-        if release_qubits:
+        if release_qubits and self.active_qubits:
 
             msg = self.construct_release(self.active_qubits[:], notify=True, 
                                          block=True, action=False)
