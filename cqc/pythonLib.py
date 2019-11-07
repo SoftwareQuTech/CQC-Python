@@ -343,6 +343,10 @@ class CQCConnection:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        # Flush all remaining commands
+        if self._pending_headers:
+            self.flush()
+        
         # All qubits should now be released
         self.close(release_qubits=True)
 
