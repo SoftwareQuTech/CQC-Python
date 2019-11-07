@@ -22,7 +22,7 @@ A :class:`~.pythonLib. object is initialized with the corresponding :class:`~.py
 
 * :meth:`~.pythonlib.qubit.X`, :meth:`~.pythonlib.qubit.Y`, :meth:`~.pythonlib.qubit.Z`, :meth:`~.pythonlib.qubit.H`, :meth:`~.pythonlib.qubit.K`, :meth:`~.pythonlib.qubit.T` Single-qubit gates. 
 * :meth:`~.pythonlib.qubit.rot_X`, :meth:`~.pythonlib.qubit.rot_Y`, :meth:`~.pythonlib.qubit.rot_Z` Single-qubit rotations with the angle :math:`\left(\mathrm{step}\cdot\frac{2\pi}{256}\right)`. 
-* :meth:`~.pythonlib.qubit.CNOT`, :meth:`~.pythonlib.qubit.CPHASE` Two-qubit gates with q (:class:`~.pythonLib.qubit`) as target. 
+* :meth:`~.pythonlib.qubit.cnot`, :meth:`~.pythonlib.qubit.cphase` Two-qubit gates with q (:class:`~.pythonLib.qubit`) as target. 
 * :meth:`~.pythonlib.qubit.measure` Measures the qubit and returns outcome. If inplace (``bool``) then the post-measurement state is kept afterwards, otherwise the qubit is removed (default). 
 
 
