@@ -6,6 +6,7 @@ from cqc.cqcHeader import CQCHeader, CQCCmdHeader, CQC_TP_COMMAND,\
 
 from utilities import get_header
 
+
 def commands_to_apply_flush(cqc):
     """Test if CQCConnection automatically flushes when exiting context."""
     cqc.set_pending(True)
