@@ -62,7 +62,7 @@ def commands_to_apply_simple_h(cqc):
 def commands_to_apply_flush(cqc):
     """Test if CQCConnection automatically flushes when exiting context."""
     cqc.set_pending(True)
-    assert cqc.pend_messages == True
+    assert cqc.pend_messages is True
     q = qubit(cqc)
     q.H()
     q.X()
@@ -90,7 +90,7 @@ def get_expected_headers_flush():
         version=2,
         tp=CQC_TP_COMMAND,
         app_id=0,
-        length=2*CQC_CMD_HDR_LENGTH,
+        length=2 * CQC_CMD_HDR_LENGTH,
     )
     hdr_cmd_h = get_header(
         CQCCmdHeader, 
@@ -127,6 +127,7 @@ def get_expected_headers_flush():
     ]
 
     return expected_headers
+
 
 @pytest.mark.parametrize("commands_to_apply, get_expected_headers", [
     (commands_to_apply_simple_h, get_expected_headers_simple_h),
