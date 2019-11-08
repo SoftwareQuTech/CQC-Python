@@ -62,6 +62,7 @@ def commands_to_apply_simple_h(cqc):
 def commands_to_apply_flush(cqc):
     """Test if CQCConnection automatically flushes when exiting context."""
     cqc.set_pending(True)
+    assert cqc.pend_messages == True
     q = qubit(cqc)
     q.H()
     q.X()
