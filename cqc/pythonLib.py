@@ -369,9 +369,16 @@ class CQCConnection:
         return self._appID
 
     def close(self, release_qubits=True):
+        """Handle closing actions.
+
+        Flushes remaining headers, releases all qubits, closes the 
+        connections, and removes the app ID from the used app IDs.
         """
-        Closes the connection. Releases all qubits and remove the app ID from the used app IDs.
-        """
+
+        # Flush all remaining commands
+        if self._pending_headers:
+            self.flush()
+
         if release_qubits:
             self.release_all_qubits()
         self._s.close()

@@ -6,6 +6,10 @@ from cqc.cqcHeader import CQCHeader, CQCCmdHeader, CQC_TP_COMMAND,\
 
 from utilities import get_header
 
+from test_cases_cqcconnection.flush import (
+    commands_to_apply_flush, get_expected_headers_flush
+)
+
 
 def get_expected_headers_simple_h():
     """What headers we expect"""
@@ -60,6 +64,7 @@ def commands_to_apply_simple_h(cqc):
 
 @pytest.mark.parametrize("commands_to_apply, get_expected_headers", [
     (commands_to_apply_simple_h, get_expected_headers_simple_h),
+    (commands_to_apply_flush, get_expected_headers_flush)
 ])
 def test_commands(commands_to_apply, get_expected_headers, monkeypatch, mock_socket, mock_read_message):
 
