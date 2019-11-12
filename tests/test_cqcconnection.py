@@ -6,7 +6,7 @@ from cqc.cqcHeader import CQCHeader, CQCCmdHeader, CQC_TP_COMMAND,\
 
 from utilities import get_header
 
-from help_cqcconnection import (
+from test_cases_cqcconnection.flush import (
     commands_to_apply_flush, get_expected_headers_flush
 )
 
