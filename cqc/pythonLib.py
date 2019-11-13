@@ -596,10 +596,16 @@ class CQCConnection(CQCHandler):
         self._s.send(msg)
 
     def close(self, release_qubits=True, notify=True):
-        """Closes the connection. 
-        
-        Releases all qubits if that option is set.
+        """Handle closing actions.
+
+        Flushes remaining headers, releases all qubits, closes the 
+        connections, and removes the app ID from the used app IDs.
         """
+
+        # Flush all remaining commands
+        if self._pending_headers:
+            self.flush()
+
         if release_qubits:
             if len(self.active_qubits[:]) != 0:
                 msg = self.construct_release(self.active_qubits[:], block=True)
