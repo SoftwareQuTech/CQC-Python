@@ -2532,6 +2532,10 @@ class CQCToFile(CQCHandler):
     def close(self, release_qubits=True):
         """Handle exiting context."""
 
+        # Flush all remaining commands
+        if self._pending_headers:
+            self.flush()
+
         if release_qubits and self.active_qubits:
 
             msg = self.construct_release(self.active_qubits[:], notify=True, 
