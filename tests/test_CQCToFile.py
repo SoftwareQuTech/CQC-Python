@@ -156,3 +156,29 @@ def test_measurement(tmpdir):
         q = qubit(cqc)
         a = q.measure()
         assert a == 0
+
+def test_flush_on_exit(tmpdir):
+
+    filename = os.path.join(str(tmpdir), 'CQC_File')
+
+    with CQCToFile(filename=filename, pend_messages=True) as cqc:
+
+        q = qubit(cqc)
+        q.H()
+        q.X()
+
+    with open(filename) as f:
+
+        line = f.readline()
+        print(line)
+        assert line[6:10] == "\\x01"
+        assert line[42:46] == "\\x01"
+        line = f.readline()
+        print(line)
+        assert line[6:10] == "\\x01"
+        line = f.readline()
+        print(line)
+        assert line[10:14] == "\\x11"
+        line = f.readline()
+        print(line)
+        assert line[10:12] == "\\n"
