@@ -157,6 +157,7 @@ def test_measurement(tmpdir):
         a = q.measure()
         assert a == 0
 
+
 def test_flush_on_exit(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
