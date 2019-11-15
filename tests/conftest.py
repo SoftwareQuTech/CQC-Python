@@ -51,8 +51,10 @@ def mock_socket(monkeypatch):
         mock_socket = MockSocket(*args, **kwargs)
         return mock_socket
 
+    # Reset MockedOtherMessage class variable
     MockedOtherMessage.next_qubit_id = 1
 
+    # Reset CQCVariable class variable
     CQCVariable._next_ref_id = 0
 
     monkeypatch.setattr(socket, "socket", get_mocked_socket)
