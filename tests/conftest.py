@@ -3,7 +3,7 @@ import inspect
 import socket
 from collections import namedtuple
 
-from cqc.pythonLib import CQCConnection
+from cqc.pythonLib import CQCConnection, CQCVariable
 
 Call = namedtuple("Call", ["name", "args", "kwargs"])
 
@@ -51,6 +51,12 @@ def mock_socket(monkeypatch):
         mock_socket = MockSocket(*args, **kwargs)
         return mock_socket
 
+    # Reset MockedOtherMessage class variable
+    MockedOtherMessage.next_qubit_id = 1
+
+    # Reset CQCVariable class variable
+    CQCVariable._next_ref_id = 0
+
     monkeypatch.setattr(socket, "socket", get_mocked_socket)
 
 
@@ -68,12 +74,12 @@ class MockedFirstMessage:
 
 class MockedOtherMessage:
     """Mocks the second header returned by CQCConnection.readMessage"""
-    next_qubit_id = 0
+    next_qubit_id = 1
 
     @property
     def qubit_id(self):
         qid = self.next_qubit_id
-        self.next_qubit_id += 1
+        MockedOtherMessage.next_qubit_id += 1
         return qid
 
     @property
