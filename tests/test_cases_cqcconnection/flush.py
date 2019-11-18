@@ -42,7 +42,7 @@ def get_expected_headers_flush():
     )
     hdr_cmd_h = get_header(
         CQCCmdHeader, 
-        qubit_id=0,
+        qubit_id=1,
         instr=CQC_CMD_H,
         notify=True,
         action=False,
@@ -50,7 +50,7 @@ def get_expected_headers_flush():
     )
     hdr_cmd_x = get_header(
         CQCCmdHeader,
-        qubit_id=0,
+        qubit_id=1,
         instr=CQC_CMD_X,
         notify=True,
         action=False,
@@ -58,7 +58,7 @@ def get_expected_headers_flush():
     )
     hdr_cmd_release = get_header(
         CQCCmdHeader, 
-        qubit_id=0,
+        qubit_id=1,
         instr=CQC_CMD_RELEASE,
         notify=True,
         action=False,

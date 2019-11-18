@@ -549,6 +549,22 @@ class CQCConnection(CQCHandler):
             except Exception:
                 raise TypeError("When specifying the socket address, this should be a tuple (str,int).")
 
+        # All qubits active for this connection
+        self.active_qubits = []
+
+        # List of pended header objects waiting to be sent to the backend
+        self._pending_headers = []  # ONLY cqc.cqcHeader.Header objects should be in this list
+
+        # Bool that indicates whether we are in a factory and thus should pend commands
+        self.pend_messages = pend_messages
+
+        # Bool that indicates wheter we are in a CQCType.MIX
+        self._inside_cqc_mix = False
+
+        # Variable of type NodeMixin. This variable is used in CQCMix types to create a
+        # scoping mechanism.
+        self.current_scope = None
+
         self._s = None
         while True:
             try:
