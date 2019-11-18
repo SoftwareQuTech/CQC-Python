@@ -13,3 +13,4 @@ Further examples can also be found at https://github.com/SoftwareQuTech/CQC-Pyth
         qber
         extend_ghz
         Using CQCMix
+        CQCToFile
