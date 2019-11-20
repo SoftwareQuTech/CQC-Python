@@ -1204,12 +1204,8 @@ class CQCConnection(CQCHandler):
             logging.debug("App {} tells CQC: 'Receive qubit'".format(self.name))
             self.commit_command(0, CQC_CMD_RECV, notify=int(notify), block=int(block))
 
-            # Get RECV message
-            message = self.readMessage()
-            otherHdr = message[1]
-            q_id = otherHdr.qubit_id
-
-            self.print_CQC_msg(message)
+            # Get qubit id
+            q_id = self.new_qubitID(print_cqc=True)
 
             if notify:
                 message = self.readMessage()
