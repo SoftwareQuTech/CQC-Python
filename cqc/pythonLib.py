@@ -653,11 +653,14 @@ class CQCConnection(CQCHandler):
         except ValueError:
             pass  # Already removed
 
-    def new_qubitID(self):
+    def new_qubitID(self, print_cqc=False):
         """Provide new qubit ID."""
 
         msg = self.readMessage()
         otherHdr = msg[1]
+
+        if print_cqc:
+            self.print_CQC_msg(msg)
 
         return otherHdr.qubit_id
 
@@ -2681,7 +2684,7 @@ class CQCToFile(CQCHandler):
         q = qubit(self, createNew=False)
 
         if self.pend_messages:
-            
+
             # print info
             logging.debug("App {} pends message: 'Receive qubit'".format(self.name))
 
