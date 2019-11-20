@@ -2567,15 +2567,23 @@ class CQCToFile(CQCHandler):
         q = qubit(self, createNew=False)
 
         if self.pend_messages:
+
+            # Build command header and communication sub header
+            command_header = CQCCmdHeader()
+            command_header.setVals(0, CQC_CMD_EPR, notify, block)
+
+            comm_sub_header = CQCCommunicationHeader()
+            comm_sub_header.setVals(remote_appID, remote_ip, remote_port)
+
+            # Pend header
+            self._pend_header(command_header)
+            self._pend_header(comm_sub_header)
+
             # print info
             logging.debug(
                 "App {} pends message: 'Create EPR-pair with {} and appID {}'".format(self.name, name, remote_appID)
             )
 
-            self._pending_headers.append([q, CQC_CMD_EPR, int(notify), 
-                                          int(block), [remote_appID, remote_ip,
-                                                       remote_port]])
-            return q
         else:
             # print info
             logging.debug(
@@ -2603,11 +2611,17 @@ class CQCToFile(CQCHandler):
         # initialize the qubit
         q = qubit(self, createNew=False)
         if self.pend_messages:
+
+            # Build header
+            header = CQCCmdHeader()
+            header.setVals(0, CQC_CMD_EPR_RECV, notify, block)
+
+            # Pend header
+            self._pend_header(header)
+
             # print info
             logging.debug("App {} pends message: 'Receive half of EPR'".format(self.name))
-            self._pending_headers.append([q, CQC_CMD_EPR_RECV, int(notify), 
-                                          int(block)])
-            return q
+
         else:
             # print info
             logging.debug("App {} tells CQC: 'Receive half of EPR'".format(self.name))
@@ -2632,14 +2646,26 @@ class CQCToFile(CQCHandler):
         remote_ip, remote_port = 0, 0  # TODO: some function that assigns based on name?
 
         if self.pend_messages:
+
+            # Build command header and communication sub header
+            command_header = CQCCmdHeader()
+            command_header.setVals(q._qID, CQC_CMD_SEND, notify, block)
+
+            comm_sub_header = CQCCommunicationHeader()
+            comm_sub_header.setVals(remote_appID, remote_ip, remote_port)
+
+            # Pend header
+            self._pend_header(command_header)
+            self._pend_header(comm_sub_header)
+
+            # Deactivate qubit
+            q._set_active(False)
+
             # print info
             logging.debug(
-                "App {} pends message: 'Send qubit with ID {} to {} and appID {}'"
-                .format(self.name, q._qID, name, remote_appID))
+                "App {} pends message: 'Send qubit with ID {} to {} and appID {}'".format(
+                    self.name, q._qID, name, remote_appID))
 
-            self._pending_headers.append([q, CQC_CMD_SEND, 
-                                         int(notify), int(block), 
-                                         [remote_appID, remote_ip, remote_port]])
         else:
             # print info
             logging.debug(
@@ -2659,12 +2685,17 @@ class CQCToFile(CQCHandler):
         q = qubit(self, createNew=False)
 
         if self.pend_messages:
+            
             # print info
-            logging.debug("App {} pends message: 'Receive qubit'"
-                          .format(self.name))
-            self._pending_headers.append([q, CQC_CMD_RECV, int(notify), 
-                                          int(block)])
-            return q
+            logging.debug("App {} pends message: 'Receive qubit'".format(self.name))
+
+            # Build header
+            header = CQCCmdHeader()
+            header.setVals(0, CQC_CMD_RECV, notify, block)
+
+            # Pend header
+            self._pend_header(header)
+
         else:
             # print info
             logging.debug("App {} tells CQC: 'Receive qubit'"
