@@ -181,10 +181,10 @@
 
 <span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">from</span> <span class="nn">twisted.internet.defer</span> <span class="k">import</span> <span class="n">inlineCallbacks</span>
-<span class="kn">from</span> <span class="nn">twisted.internet.protocol</span> <span class="k">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">connectionDone</span>
+<span class="kn">from</span> <span class="nn">twisted.internet.defer</span> <span class="kn">import</span> <span class="n">inlineCallbacks</span>
+<span class="kn">from</span> <span class="nn">twisted.internet.protocol</span> <span class="kn">import</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">connectionDone</span>
 
-<span class="kn">from</span> <span class="nn">cqc.cqcHeader</span> <span class="k">import</span> <span class="n">CQC_VERSION</span><span class="p">,</span> <span class="n">CQCHeader</span>
+<span class="kn">from</span> <span class="nn">cqc.cqcHeader</span> <span class="kn">import</span> <span class="n">CQC_VERSION</span><span class="p">,</span> <span class="n">CQCHeader</span>
 
 <span class="c1">###############################################################################</span>
 <span class="c1">#</span>
@@ -203,7 +203,7 @@
     <span class="c1"># (host_app_id,remote_node,remote_app_id)</span>
     <span class="n">_next_ent_id</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factory</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factory</span><span class="p">):</span>
 
         <span class="c1"># CQC Factory, including our connection to the SimulaQron backend</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">factory</span>

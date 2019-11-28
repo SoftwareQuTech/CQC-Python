@@ -234,7 +234,9 @@ Used if simulaqron is used to load socket addresses for the backend</p>
 <dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.close">
 <code class="sig-name descname">close</code><span class="sig-paren">(</span><em class="sig-param">release_qubits=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Closes the connection. Releases all qubits and remove the app ID from the used app IDs.</p>
+<dd><p>Handle closing actions.</p>
+<p>Flushes remaining headers, releases all qubits, closes the
+connections, and removes the app ID from the used app IDs.</p>
 </dd></dl>
 
 <dl class="method">

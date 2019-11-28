@@ -186,7 +186,7 @@
 <span class="kn">import</span> <span class="nn">bitstring</span>
 <span class="kn">import</span> <span class="nn">abc</span>
 
-<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">IntEnum</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">IntEnum</span>
 
 <span class="c1"># Constant defining CQC version</span>
 <span class="n">CQC_VERSION</span> <span class="o">=</span> <span class="mi">2</span>
@@ -322,7 +322,7 @@
     <span class="n">PACKAGING_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;!&quot;</span>
     <span class="n">HDR_LENGTH</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">PACKAGING_FORMAT</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Header.__init__"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.Header.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headerBytes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Header.__init__"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.Header.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headerBytes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Initialize using values received from a packet.</span>
 <span class="sd">            Don&#39;t override this but rather _setVals</span>
@@ -720,7 +720,7 @@
     <span class="n">HDR_LENGTH</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">PACKAGING_FORMAT</span><span class="p">)</span>
 
     <span class="c1"># Deprecated, split into multiple headers</span>
-<div class="viewcode-block" id="CQCXtraHeader.__init__"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.CQCXtraHeader.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headerBytes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CQCXtraHeader.__init__"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.CQCXtraHeader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headerBytes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize using values received from a packet.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -918,7 +918,7 @@
     <span class="n">PACKAGING_FORMAT_V1</span> <span class="o">=</span> <span class="s2">&quot;!HLH&quot;</span>
     <span class="n">HDR_LENGTH</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">PACKAGING_FORMAT</span><span class="p">)</span>  <span class="c1"># Both versions have the same size</span>
 
-<div class="viewcode-block" id="CQCCommunicationHeader.__init__"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.CQCCommunicationHeader.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headerBytes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cqc_version</span><span class="o">=</span><span class="n">CQC_VERSION</span><span class="p">):</span>
+<div class="viewcode-block" id="CQCCommunicationHeader.__init__"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.CQCCommunicationHeader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headerBytes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cqc_version</span><span class="o">=</span><span class="n">CQC_VERSION</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize from packet data</span>
 <span class="sd">        :param headerBytes:  packet data</span>
@@ -1040,7 +1040,7 @@
     <span class="n">PACKAGING_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;!HHLQHBB&quot;</span>
     <span class="n">HDR_LENGTH</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">calcsize</span><span class="p">(</span><span class="n">PACKAGING_FORMAT</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CQCNotifyHeader.__init__"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.CQCNotifyHeader.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headerBytes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CQCNotifyHeader.__init__"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.CQCNotifyHeader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headerBytes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            Initialize from packet data.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

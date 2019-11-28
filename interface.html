@@ -88,12 +88,12 @@
 <li class="toctree-l1"><a class="reference internal" href="classical_communication.html">Classical Communication</a></li>
 <li class="toctree-l1"><a class="reference internal" href="useful_commands.html">Useful commands</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">CQC Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#the-interface">The interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#cqc-header-format">CQC Header format</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#header-definitions">Header definitions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#cqc-header">CQC Header</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cqc-command-header">CQC Command Header</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cqc-xtra-header">CQC Xtra Header</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cqc-sequence-header">CQC Sequence Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-assign-header">CQC Assign Header</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cqc-rotation-header">CQC Rotation Header</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cqc-extra-qubit-header">CQC Extra Qubit Header</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cqc-communication-header">CQC Communication Header</a></li>
@@ -101,10 +101,9 @@
 <li class="toctree-l3"><a class="reference internal" href="#cqc-notify-header">CQC Notify Header</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cqc-meas-out-header">CQC Meas Out Header</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cqc-timeinfo-header">CQC Timeinfo Header</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#entanglement-header-format">Entanglement Header format</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#entanglement-information-header">Entanglement Information Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-type-header">CQC Type Header</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cqc-if-header">CQC If Header</a></li>
 </ul>
 </li>
 </ul>
@@ -177,8 +176,8 @@
             
   <div class="section" id="cqc-interface">
 <h1>CQC Interface<a class="headerlink" href="#cqc-interface" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="the-interface">
-<h2>The interface<a class="headerlink" href="#the-interface" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Here we specifiy the CQC message interface. For programming SimulaQron via the CQC Interface using the Python or C provided, you do not need to know the extend of this message format. The below will be necessary, if you want to write your own library in another language. The easiest way of programming SimulaQron is via the Python CQC lib, so we recommend to get started there. Documentation of how to use the Python CQC lib can be found here <a class="reference internal" href="usage.html"><span class="doc">Getting started</span></a>: and examples here
 <a class="reference internal" href="examples.html"><span class="doc">Examples using the python library</span></a>.</p>
 <p>Upon establishing a connection to the CQC Backend, the following packet format can be used to issue commands to the simulated quantum network. Each interaction to and from the interface starts with a CQC Header, followed by additional headers as appropriate to the message type.</p>
@@ -186,10 +185,11 @@
 When a qubit is created with the command <cite>CQC_CMD_NEW</cite> a CQC message will be returned of the type <cite>CQC_TP_NEW_OK</cite> followed by a CQCXtraQubitHeader containing the qubit ID.
 Note that if the option notify, see below, is set to true a message of type <cite>CQC_TP_DONE</cite> will also be returned, after the notification header, saying that the command is finished.</p>
 </div>
-<div class="section" id="cqc-header-format">
-<h2>CQC Header format<a class="headerlink" href="#cqc-header-format" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="header-definitions">
+<h2>Header definitions<a class="headerlink" href="#header-definitions" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="cqc-header">
 <h3>CQC Header<a class="headerlink" href="#cqc-header" title="Permalink to this headline">¶</a></h3>
+<p>The <cite>CQC header</cite> indicates the start of a new CQC program. Therefore, every CQC program must start with a <cite>CQC header</cite>. The end of the program is indicated by the <cite>length</cite> field of this header, which contains the number of bytes following this header which constitute the current CQC program. NOTE: CQC defines many headers, but <em>the</em> <cite>CQC header</cite> is one specific header.</p>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 10%" />
@@ -227,56 +227,55 @@ Note that if the option notify, see below, is set to true a message of type <cit
 </tr>
 </tbody>
 </table>
-<p>Possible message types are listed below. Depending on the message type additional headers may be required as specified below.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/*</span> <span class="n">Possible</span> <span class="n">CQC</span> <span class="n">Types</span> <span class="o">*/</span>
-<span class="c1">#define CQC_TP_HELLO            0       /* Alive check */</span>
-<span class="c1">#define CQC_TP_COMMAND          1       /* Execute a command list */</span>
-<span class="c1">#define CQC_TP_FACTORY          2       /* Start executing command list repeatedly */</span>
-<span class="c1">#define CQC_TP_EXPIRE           3       /* Qubit has expired */</span>
-<span class="c1">#define CQC_TP_DONE             4       /* Command execution done */</span>
-<span class="c1">#define CQC_TP_RECV             5       /* Recevied qubit */</span>
-<span class="c1">#define CQC_TP_EPR_OK           6       /* Created EPR pair */</span>
-<span class="c1">#define CQC_TP_MEASOUT          7       /* Measurement outcome */</span>
-<span class="c1">#define CQC_TP_GET_TIME         8       /* Get creation time of qubit */</span>
-<span class="c1">#define CQC_TP_INF_TIME         9       /* Inform about time */</span>
-<span class="c1">#define CQC_TP_NEW_OK           10      /* Inform about time */</span>
+<p>Possible message types are listed below. Depending on the message type additional headers may be required as specified below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CQCType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+        <span class="n">HELLO</span>           <span class="o">=</span>       <span class="mi">0</span>  <span class="c1"># Alive check</span>
+        <span class="n">COMMAND</span>         <span class="o">=</span>       <span class="mi">1</span>  <span class="c1"># Execute a command list</span>
+        <span class="n">FACTORY</span>         <span class="o">=</span>       <span class="mi">2</span>  <span class="c1"># Start executing command list repeatedly</span>
+        <span class="n">EXPIRE</span>          <span class="o">=</span>       <span class="mi">3</span>  <span class="c1"># Qubit has expired</span>
+        <span class="n">DONE</span>            <span class="o">=</span>       <span class="mi">4</span>  <span class="c1"># Done with command</span>
+        <span class="n">RECV</span>            <span class="o">=</span>       <span class="mi">5</span>  <span class="c1"># Received qubit</span>
+        <span class="n">EPR_OK</span>          <span class="o">=</span>       <span class="mi">6</span>  <span class="c1"># Created EPR pair</span>
+        <span class="n">MEASOUT</span>         <span class="o">=</span>       <span class="mi">7</span>  <span class="c1"># Measurement outcome</span>
+        <span class="n">GET_TIME</span>        <span class="o">=</span>       <span class="mi">8</span>  <span class="c1"># Get creation time of qubit</span>
+        <span class="n">INF_TIME</span>        <span class="o">=</span>       <span class="mi">9</span>  <span class="c1"># Return timinig information</span>
+        <span class="n">NEW_OK</span>          <span class="o">=</span>       <span class="mi">10</span>  <span class="c1"># Created a new qubit</span>
+        <span class="n">MIX</span>             <span class="o">=</span>       <span class="mi">11</span>  <span class="c1"># Indicate that the CQC program will contain multiple header types</span>
+        <span class="n">IF</span>              <span class="o">=</span>       <span class="mi">12</span>  <span class="c1"># Announce a CQC IF header</span>
 
-<span class="c1">#define CQC_ERR_GENERAL         20      /* General purpose error (no details */</span>
-<span class="c1">#define CQC_ERR_NOQUBIT         21      /* No more qubits available */</span>
-<span class="c1">#define CQC_ERR_UNSUPP          22      /* Command sequence not supported */</span>
-<span class="c1">#define CQC_ERR_TIMEOUT         23      /* Timeout */</span>
-<span class="c1">#define CQC_ERR_INUSE           24      /* Qubit already in use */</span>
-<span class="c1">#define CQC_ERR_UNKNOWN         25      /* Unknown qubit ID */</span>
+        <span class="n">ERR_GENERAL</span>     <span class="o">=</span>       <span class="mi">20</span>  <span class="c1"># General purpose error (no details</span>
+        <span class="n">ERR_NOQUBIT</span>     <span class="o">=</span>       <span class="mi">21</span>  <span class="c1"># No more qubits available</span>
+        <span class="n">ERR_UNSUPP</span>      <span class="o">=</span>       <span class="mi">22</span>  <span class="c1"># No sequence not supported</span>
+        <span class="n">ERR_TIMEOUT</span>     <span class="o">=</span>       <span class="mi">23</span>  <span class="c1"># Timeout</span>
+        <span class="n">ERR_INUSE</span>       <span class="o">=</span>       <span class="mi">24</span>  <span class="c1"># Qubit already in use</span>
+        <span class="n">ERR_UNKNOWN</span>     <span class="o">=</span>       <span class="mi">25</span>  <span class="c1"># Unknown qubit ID</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="cqc-command-header">
 <h3>CQC Command Header<a class="headerlink" href="#cqc-command-header" title="Permalink to this headline">¶</a></h3>
-<p>If the message type is <cite>CQC_TP_COMMAND</cite>, <cite>CQC_TP_FACTORY</cite> or <cite>CQC_TP_GET_TIME</cite>, then the following additional command header must be supplied. It identifies the specific instruction to execute, as well as the qubit ID on which to perform this instructions. For rotations, two qubit gates, request to send or receive, and produce entanglement, the additional headers are required supplying further information.</p>
-<p>If <cite>CQC_OPT_NOTIFY</cite> set to true, each of these commmands return a CQC message of type <cite>CQC_TP_DONE</cite>. Some commands also return additional messages before the optional done-message, as described below:</p>
+<p>If the message type is <code class="code docutils literal notranslate"><span class="pre">CQC_TP_COMMAND</span></code>, <code class="code docutils literal notranslate"><span class="pre">CQC_TP_FACTORY</span></code> or <code class="code docutils literal notranslate"><span class="pre">CQC_TP_GET_TIME</span></code>, then the following additional command header must be supplied. It identifies the specific instruction to execute, as well as the qubit ID on which to perform this instructions. For rotations, two qubit gates, request to send or receive, and produce entanglement, the additional headers are required supplying further information.</p>
+<p>If <code class="code docutils literal notranslate"><span class="pre">CQC_OPT_NOTIFY</span></code> set to true, each of these commmands return a CQC message of type <code class="code docutils literal notranslate"><span class="pre">CQC_TP_DONE</span></code>. Some commands also return additional messages before the optional done-message, as described below:</p>
 <ul class="simple">
-<li><p><cite>CQC_CMD_NEW</cite>: Returns <cite>CQC_TP_NEW_OK</cite> followed by a <cite>CQCXtraQubitHeader</cite> containing the qubit ID.</p></li>
-<li><p><cite>CQC_CMD_MEASURE(_INPLACE)</cite>: Returns <cite>CQC_TP_MEASOUT</cite> followed by a <cite>CQCMeasOutHeader</cite> containing the measurement outcome.</p></li>
-<li><p><cite>CQC_CMD_RECV</cite>: Returns <cite>CQC_TP_RECV</cite> followed by a <cite>CQCXtraQubitHeader</cite> containing the qubit ID.</p></li>
-<li><p><cite>CQC_CMD_EPR(_RECV)</cite>: Returns <cite>CQC_TP_EPR_OK</cite> followed by <cite>CQCXtraQubitHeader</cite> and an entanglement information header.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">CQC_CMD_NEW</span></code>: Returns <code class="code docutils literal notranslate"><span class="pre">CQC_TP_NEW_OK</span></code> followed by a <code class="code docutils literal notranslate"><span class="pre">CQCXtraQubitHeader</span></code> containing the qubit ID.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">CQC_CMD_MEASURE(_INPLACE)</span></code>: Returns <code class="code docutils literal notranslate"><span class="pre">CQC_TP_MEASOUT</span></code> followed by a <code class="code docutils literal notranslate"><span class="pre">CQCMeasOutHeader</span></code> containing the measurement outcome.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">CQC_CMD_RECV</span></code>: Returns <code class="code docutils literal notranslate"><span class="pre">CQC_TP_RECV</span></code> followed by a <code class="code docutils literal notranslate"><span class="pre">CQCXtraQubitHeader</span></code> containing the qubit ID.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">CQC_CMD_EPR(_RECV)</span></code>: Returns <code class="code docutils literal notranslate"><span class="pre">CQC_TP_EPR_OK</span></code> followed by <code class="code docutils literal notranslate"><span class="pre">CQCXtraQubitHeader</span></code> and an entanglement information header.</p></li>
 </ul>
 <p>Example sequences of headers:</p>
 <ul class="simple">
-<li><p><cite>CQCHeader</cite> (type <cite>CQC_TP_COMMAND</cite>)</p></li>
-<li><p><cite>CQCCmdHeader</cite> (instr <cite>CQC_CMD_ROT_X</cite>)</p></li>
+<li><p><cite>CQCHeader</cite> (type <code class="code docutils literal notranslate"><span class="pre">CQC_TP_COMMAND</span></code>)</p></li>
+<li><p><cite>CQCCmdHeader</cite> (instr <code class="code docutils literal notranslate"><span class="pre">CQC_CMD_ROT_X</span></code>)</p></li>
 <li><p><cite>CQCRotationHeader</cite> (specifying the angle)</p></li>
-<li><p><cite>CQCSequenceHeader</cite> (Telling more commands after this one will come)</p></li>
-<li><p><cite>CQCCmdHeader</cite> (instr <cite>CQC_CMD_Z</cite>)</p></li>
+<li><p><cite>CQCCmdHeader</cite> (instr <code class="code docutils literal notranslate"><span class="pre">CQC_CMD_Z</span></code>)</p></li>
 </ul>
-<p>(Can also use the action=1 flag in the first Command Header instead of using the sequence header)</p>
 <p>An example with factory that does X rotation, then a Z gate, 4 times:</p>
 <ul class="simple">
-<li><p><cite>CQCHeader</cite> (type <cite>CQC_TP_FACTORY</cite>)</p></li>
-<li><p><cite>CQCFactoryHeader</cite> (num_iter = 4)</p></li>
-<li><p><cite>CQCCmdHeader</cite> (instr <cite>CQC_CMD_ROT_X</cite>)</p></li>
+<li><p><cite>CQCHeader</cite> (type <code class="code docutils literal notranslate"><span class="pre">CQC_TP_FACTORY</span></code>)</p></li>
+<li><p><cite>CQCFactoryHeader</cite> (<code class="code docutils literal notranslate"><span class="pre">num_iter</span> <span class="pre">=</span> <span class="pre">4</span></code>)</p></li>
+<li><p><cite>CQCCmdHeader</cite> (instr <code class="code docutils literal notranslate"><span class="pre">CQC_CMD_ROT_X</span></code>)</p></li>
 <li><p><cite>CQCRotationHeader</cite> (specifying the angle)</p></li>
-<li><p><cite>CQCSequenceHeader</cite> (Telling more commands after this one will come)</p></li>
-<li><p><cite>CQCCmdHeader</cite> (instr <cite>CQC_CMD_Z</cite>)</p></li>
+<li><p><cite>CQCCmdHeader</cite> (instr <code class="code docutils literal notranslate"><span class="pre">CQC_CMD_Z</span></code>)</p></li>
 </ul>
 <table class="docutils align-default">
 <colgroup>
@@ -340,7 +339,7 @@ Note that if the option notify, see below, is set to true a message of type <cit
 
 <span class="o">/*</span> <span class="n">Command</span> <span class="n">options</span> <span class="o">*/</span>
 <span class="c1">#define CQC_OPT_NOTIFY          0x01    /* Send a notification when cmd done */</span>
-<span class="c1">#define CQC_OPT_ACTION          0x02    /* On if there are actions to execute when done */</span>
+<span class="c1">#define CQC_OPT_ACTION          0x02    /* Deprecated. The value of this option has no effect. */</span>
 <span class="c1">#define CQC_OPT_BLOCK           0x04    /* Block until command is done */</span>
 <span class="c1">#define CQC_OPT_IFTHEN          0x08    /* Execute command after done */</span>
 </pre></div>
@@ -404,15 +403,15 @@ The following commands require an xtra header when issued to the CQC Backend: CQ
 </tbody>
 </table>
 </div>
-<div class="section" id="cqc-sequence-header">
-<h3>CQC Sequence Header<a class="headerlink" href="#cqc-sequence-header" title="Permalink to this headline">¶</a></h3>
-<p>Additional header used to indicate size of a sequence. Used when sending multiple commands at once. It tells the backend how many more messages are coming.</p>
+<div class="section" id="cqc-assign-header">
+<h3>CQC Assign Header<a class="headerlink" href="#cqc-assign-header" title="Permalink to this headline">¶</a></h3>
+<p>Additional header used to store a measurement outcome in the backend and assign it a reference ID. Every measurement command (<cite>CQC_CMD_MEASURE</cite> or <cite>CQC_CMD_MEASURE_INPLACE</cite>) is followed by a <cite>CQC Assign Header</cite>. The value can be retrieved by future instructions by refering to this ID. Currently, only the <a class="reference internal" href="#cqc-if-header">CQC If Header</a> supports retrieving measurement outcomes by reference ID.</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 12%" />
-<col style="width: 24%" />
-<col style="width: 9%" />
-<col style="width: 55%" />
+<col style="width: 11%" />
+<col style="width: 21%" />
+<col style="width: 8%" />
+<col style="width: 60%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Function</p></th>
@@ -422,10 +421,10 @@ The following commands require an xtra header when issued to the CQC Backend: CQ
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>cmd_length</p></td>
-<td><p>unsigned int (uint8_t)</p></td>
-<td><p>1 bytes</p></td>
-<td><p>The length (in bytes) of messages still to come</p></td>
+<tr class="row-even"><td><p>reference ID</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>Reference ID to which to assign the value that the preceding header yielded</p></td>
 </tr>
 </tbody>
 </table>
@@ -663,9 +662,6 @@ In some cases, the CQC Backend will return notifications to the client that requ
 </tbody>
 </table>
 </div>
-</div>
-<div class="section" id="entanglement-header-format">
-<h2>Entanglement Header format<a class="headerlink" href="#entanglement-header-format" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="entanglement-information-header">
 <h3>Entanglement Information Header<a class="headerlink" href="#entanglement-information-header" title="Permalink to this headline">¶</a></h3>
 <p>When an EPR-pair is created the CQC Backend will return information about the entanglement which can be used in a entanglement management protocol.
@@ -750,6 +746,89 @@ For this reason the entanglement ID together with the nodes and the directionali
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="cqc-type-header">
+<h3>CQC Type Header<a class="headerlink" href="#cqc-type-header" title="Permalink to this headline">¶</a></h3>
+<p>In CQC, all headers are <em>announced</em> by a preovious header of a higher level (except the CQC header, which is announced by the absence of a previous header). The parser depends on these announcements to know how to interpret an incoming stream of bytes. Simple CQC programs contain only one type of header, which is indicated by the <cite>type</cite> field of the CQC header. The <cite>CQC Type Header</cite> makes it possible to construct CQC programs which are built up of multiple types. The <cite>CQC Type Header</cite> must be used if and only if the <cite>type</cite> field of the CQC header is set to type <cite>MIX</cite> (i.e. 11). In a CQC program of type <cite>MIX</cite>, every block of headers which would otherwise require its own CQC header, is preceded by a <cite>CQC Type Header</cite>, indicating the type of the block.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 21%" />
+<col style="width: 8%" />
+<col style="width: 61%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Length</p></th>
+<th class="head"><p>Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>type</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 bytes</p></td>
+<td><p>Type of next header. Any of the types <a class="reference internal" href="#cqc-header">CQC Header</a> supports, except type <cite>Mix</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>length</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>Number of bytes until the next <cite>type header</cite></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="cqc-if-header">
+<h3>CQC If Header<a class="headerlink" href="#cqc-if-header" title="Permalink to this headline">¶</a></h3>
+<p>The If header can only be used inside programs of type <cite>Mix</cite>. It enables comparison of a measurement outcome to a value in the backend.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 22%" />
+<col style="width: 8%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Function</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"></th>
+<th class="head"><p>Length     Comments</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>first operand</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>Reference ID of the first operand</p></td>
+</tr>
+<tr class="row-odd"><td><p>operator</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Operator ID. See table below.</p></td>
+</tr>
+<tr class="row-even"><td><p>type of second operand</p></td>
+<td><p>unsigned int (uint8_t)</p></td>
+<td><p>1 byte</p></td>
+<td><p>Can be 0 or 1. 0 means value, 1 means reference ID</p></td>
+</tr>
+<tr class="row-odd"><td><p>second operand</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>Reference ID or value of the second operand</p></td>
+</tr>
+<tr class="row-even"><td><p>length</p></td>
+<td><p>unsigned int (uint32_t)</p></td>
+<td><p>4 bytes</p></td>
+<td><p>Number of bytes to skip if the conditional is <em>False</em>.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Field <cite>operator</cite> can be any of the following comparison operators:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Equality</span>        <span class="mi">0</span>
+<span class="n">Inequality</span>      <span class="mi">1</span>
+</pre></div>
+</div>
+<p>The field <cite>type of second operand</cite> indicates whether <cite>second operand</cite> is a value or a reference ID. This enables comparison of a reference to a value, as well as comparison of a reference to another reference.</p>
 </div>
 </div>
 </div>

@@ -187,10 +187,10 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">anytree</span> <span class="k">import</span> <span class="n">NodeMixin</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">anytree</span> <span class="kn">import</span> <span class="n">NodeMixin</span>
 
-<span class="kn">from</span> <span class="nn">cqc.cqcHeader</span> <span class="k">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">cqc.cqcHeader</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Header</span><span class="p">,</span>
     <span class="n">CQCCmdHeader</span><span class="p">,</span>
     <span class="n">CQC_CMD_SEND</span><span class="p">,</span>
@@ -246,13 +246,13 @@
     <span class="n">CQCType</span><span class="p">,</span>
     <span class="n">CQCAssignHeader</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">cqc.entInfoHeader</span> <span class="k">import</span> <span class="n">EntInfoHeader</span>
-<span class="kn">from</span> <span class="nn">cqc.hostConfig</span> <span class="k">import</span> <span class="n">cqc_node_id_from_addrinfo</span>
+<span class="kn">from</span> <span class="nn">cqc.entInfoHeader</span> <span class="kn">import</span> <span class="n">EntInfoHeader</span>
+<span class="kn">from</span> <span class="nn">cqc.hostConfig</span> <span class="kn">import</span> <span class="n">cqc_node_id_from_addrinfo</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">simulaqron</span>
-    <span class="kn">from</span> <span class="nn">simulaqron.general.hostConfig</span> <span class="k">import</span> <span class="n">socketsConfig</span>
-    <span class="kn">from</span> <span class="nn">simulaqron.settings</span> <span class="k">import</span> <span class="n">simulaqron_settings</span>
+    <span class="kn">from</span> <span class="nn">simulaqron.general.hostConfig</span> <span class="kn">import</span> <span class="n">socketsConfig</span>
+    <span class="kn">from</span> <span class="nn">simulaqron.settings</span> <span class="kn">import</span> <span class="n">simulaqron_settings</span>
     <span class="n">_simulaqron_version</span> <span class="o">=</span> <span class="n">simulaqron</span><span class="o">.</span><span class="n">__version__</span>
     <span class="n">_simulaqron_major</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">_simulaqron_version</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
@@ -340,7 +340,7 @@
 <div class="viewcode-block" id="CQCConnection"><a class="viewcode-back" href="../../modules/pythonLib.html#cqc.pythonLib.CQCConnection">[docs]</a><span class="k">class</span> <span class="nc">CQCConnection</span><span class="p">:</span>
     <span class="n">_appIDs</span> <span class="o">=</span> <span class="p">{}</span>
 
-<div class="viewcode-block" id="CQCConnection.__init__"><a class="viewcode-back" href="../../modules/pythonLib.html#cqc.pythonLib.CQCConnection.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">socket_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">appID</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pend_messages</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="CQCConnection.__init__"><a class="viewcode-back" href="../../modules/pythonLib.html#cqc.pythonLib.CQCConnection.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">socket_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">appID</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pend_messages</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">retry_connection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">conn_retry_time</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">use_classical_communication</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">network_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -450,6 +450,22 @@
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;When specifying the socket address, this should be a tuple (str,int).&quot;</span><span class="p">)</span>
 
+        <span class="c1"># All qubits active for this connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_qubits</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># List of pended header objects waiting to be sent to the backend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pending_headers</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># ONLY cqc.cqcHeader.Header objects should be in this list</span>
+
+        <span class="c1"># Bool that indicates whether we are in a factory and thus should pend commands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pend_messages</span> <span class="o">=</span> <span class="n">pend_messages</span>
+
+        <span class="c1"># Bool that indicates wheter we are in a CQCType.MIX</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inside_cqc_mix</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Variable of type NodeMixin. This variable is used in CQCMix types to create a</span>
+        <span class="c1"># scoping mechanism.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_scope</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_s</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -468,38 +484,22 @@
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;App </span><span class="si">{}</span><span class="s2"> : Critical error when connection to CQC server: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-                <span class="k">raise</span> <span class="n">err</span>
-
-        <span class="c1"># All qubits active for this connection</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">active_qubits</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="c1"># List of pended header objects waiting to be sent to the backend</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pending_headers</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># ONLY cqc.cqcHeader.Header objects should be in this list</span>
-
-        <span class="c1"># Bool that indicates whether we are in a factory and thus should pend commands</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pend_messages</span> <span class="o">=</span> <span class="n">pend_messages</span>
-
-        <span class="c1"># Bool that indicates wheter we are in a CQCType.MIX</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_inside_cqc_mix</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="c1"># Variable of type NodeMixin. This variable is used in CQCMix types to create a</span>
-        <span class="c1"># scoping mechanism.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">current_scope</span> <span class="o">=</span> <span class="kc">None</span></div>
+                <span class="k">raise</span> <span class="n">err</span></div>
 
     <span class="k">def</span> <span class="nf">_pend_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="n">Header</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pending_headers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># This flag is used to check if CQCConnection is opened using a &#39;with&#39; statement.</span>
         <span class="c1"># Otherwise an deprecation warning is printed when instantiating qubits.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opened_with_with</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
         <span class="c1"># All qubits should now be released</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">release_qubits</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;Socket to cqc server &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
@@ -522,9 +522,16 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_appID</span></div>
 
 <div class="viewcode-block" id="CQCConnection.close"><a class="viewcode-back" href="../../modules/pythonLib.html#cqc.pythonLib.CQCConnection.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">release_qubits</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Closes the connection. Releases all qubits and remove the app ID from the used app IDs.</span>
+        <span class="sd">&quot;&quot;&quot;Handle closing actions.</span>
+
+<span class="sd">        Flushes remaining headers, releases all qubits, closes the </span>
+<span class="sd">        connections, and removes the app ID from the used app IDs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Flush all remaining commands</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending_headers</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">release_qubits</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">release_all_qubits</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -1622,7 +1629,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_next_ref_id</span> <span class="o">=</span> <span class="mi">0</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Increments the reference ID, and assigns the new unique reference ID to this CQCVariable.</span>
 <span class="sd">        This system ensures no two CQCVariable instances have the same reference ID.</span>
@@ -1640,11 +1647,11 @@
 
     <span class="c1"># override the == operator</span>
     <span class="c1"># other can be a CQCVariable or int</span>
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s1">&#39;CQCVariable&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s1">&#39;CQCVariable&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
         <span class="k">return</span> <span class="n">_LogicalFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CQCLogicalOperator</span><span class="o">.</span><span class="n">EQ</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
     
     <span class="c1"># override the != operator</span>
-    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s1">&#39;CQCVariable&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s1">&#39;CQCVariable&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
         <span class="k">return</span> <span class="n">_LogicalFunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">CQCLogicalOperator</span><span class="o">.</span><span class="n">NEQ</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
         
 
@@ -1653,7 +1660,7 @@
 <span class="sd">    Private helper class. This class should never be used outside this pythonLib.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> 
         <span class="n">operand_one</span><span class="p">:</span> <span class="n">CQCVariable</span><span class="p">,</span> 
         <span class="n">operator</span><span class="p">:</span> <span class="n">CQCLogicalOperator</span><span class="p">,</span> 
@@ -1708,7 +1715,7 @@
 <span class="sd">    Hence the name CQC Mix. Programs of this type can consist of any number and mix of the other CQC types. </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CQCMix.__init__"><a class="viewcode-back" href="../../modules/pythonLib.html#cqc.pythonLib.CQCMix.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cqc_connection</span><span class="p">:</span> <span class="n">CQCConnection</span><span class="p">):</span>
+<div class="viewcode-block" id="CQCMix.__init__"><a class="viewcode-back" href="../../modules/pythonLib.html#cqc.pythonLib.CQCMix.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cqc_connection</span><span class="p">:</span> <span class="n">CQCConnection</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the Mix context.</span>
 
@@ -1722,7 +1729,7 @@
         <span class="c1"># Set the current scope to self</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">current_scope</span> <span class="o">=</span> <span class="bp">self</span></div>
 
-    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Set the _inside_cqc_mix bool to True on the connection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">_inside_cqc_mix</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1731,7 +1738,7 @@
         <span class="c1"># Return self so that this instance is bound to the variable after &quot;as&quot;, i.e.: &quot;with CQCMix() as pgrm&quot;</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
         
         <span class="c1"># Only do these things if there was no exception.</span>
         <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1800,11 +1807,11 @@
 <span class="sd">    Instead, use CQCMix.loop(x), where x is the amount of times to repeat.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cqc_connection</span><span class="p">:</span> <span class="n">CQCConnection</span><span class="p">,</span> <span class="n">repetition_amount</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cqc_connection</span><span class="p">:</span> <span class="n">CQCConnection</span><span class="p">,</span> <span class="n">repetition_amount</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span> <span class="o">=</span> <span class="n">cqc_connection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_repetition_amount</span> <span class="o">=</span> <span class="n">repetition_amount</span>
 
-    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="c1"># Inside a TP_FACTORY, we don&#39;t want CQCType headers before every instruction.</span>
         <span class="c1"># Therefore, we set this bool to False</span>
@@ -1822,7 +1829,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">_pend_header</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_header</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">_pend_header</span><span class="p">(</span><span class="n">factory_header</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
 
         <span class="c1"># Outside a TP_FACTORY, we want CQCType headers before every instruction.</span>
         <span class="c1"># Therefore, we set this bool to True</span>
@@ -1855,7 +1862,7 @@
     <span class="c1"># _CQCConditional was an ELSE.</span>
     <span class="n">_last_closed_conditional</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cqc_connection</span><span class="p">:</span> <span class="n">CQCConnection</span><span class="p">,</span> <span class="n">is_else</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">logical_function</span><span class="p">:</span> <span class="n">_LogicalFunction</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cqc_connection</span><span class="p">:</span> <span class="n">CQCConnection</span><span class="p">,</span> <span class="n">is_else</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">logical_function</span><span class="p">:</span> <span class="n">_LogicalFunction</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span> <span class="o">=</span> <span class="n">cqc_connection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_else</span> <span class="o">=</span> <span class="n">is_else</span>
 
@@ -1871,7 +1878,7 @@
             
         <span class="bp">self</span><span class="o">.</span><span class="n">_logical_function</span> <span class="o">=</span> <span class="n">logical_function</span>
 
-    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Pend CQC Type header</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">_pend_type_header</span><span class="p">(</span><span class="n">CQCType</span><span class="o">.</span><span class="n">IF</span><span class="p">,</span> <span class="n">CQCIfHeader</span><span class="o">.</span><span class="n">HDR_LENGTH</span><span class="p">)</span>
 
@@ -1885,7 +1892,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">current_scope</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_conn</span><span class="o">.</span><span class="n">current_scope</span> <span class="o">=</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
 
         <span class="c1"># Set _last_closed_conditional to the correct value</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_else</span><span class="p">):</span>
@@ -1909,7 +1916,7 @@
 
 
 <span class="k">class</span> <span class="nc">ProgressBar</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxitr</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maxitr</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maxitr</span> <span class="o">=</span> <span class="n">maxitr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">itr</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
@@ -1971,7 +1978,7 @@
 <span class="sd">    A qubit.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="qubit.__init__"><a class="viewcode-back" href="../../modules/pythonLib.html#cqc.pythonLib.qubit.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cqc</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">createNew</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">q_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">entInfo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="qubit.__init__"><a class="viewcode-back" href="../../modules/pythonLib.html#cqc.pythonLib.qubit.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cqc</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">createNew</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">q_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">entInfo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the qubit. The cqc connection must be given.</span>
 <span class="sd">        If notify, the return message is received before the method finishes.</span>
@@ -2046,7 +2053,7 @@
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_remote_entNode</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;Qubit at the node </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>

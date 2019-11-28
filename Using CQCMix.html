@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Using CQCMix &mdash; cqc 3.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API documentation" href="api.html" />
+    <link rel="prev" title="Distribute a GHZ-state" href="extend_ghz.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cqc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classical_communication.html">Classical Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="useful_commands.html">Useful commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="interface.html">CQC Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="examples.html">Examples using the python library</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="teleport.html">Teleport</a></li>
+<li class="toctree-l2"><a class="reference internal" href="qber.html">Estimating QBER</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extend_ghz.html">Distribute a GHZ-state</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using CQCMix</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-protocol">The protocol</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-program-using-cqcmix">The program using CQCMix</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cqc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="examples.html">Examples using the python library</a> &raquo;</li>
+        
+      <li>Using CQCMix</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/Using CQCMix.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="using-cqcmix">
+<h1>Using CQCMix<a class="headerlink" href="#using-cqcmix" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCMix" title="cqc.pythonLib.CQCMix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cqc.pythonLib.CQCMix()</span></code></a> Context Manager class can be used to create CQC programs of type <cite>MIX</cite> (i.e. 11). All instructions inside the CQCMix context are shipped in one package, thereby incurring less travel time due to latency between the application and the SimulaQron backend than an equivalent program which doesn’t use CQCMix. This page provides an example program which performs a syndrome measurement and a recovery following the protocol of the <a class="reference external" href="https://en.wikipedia.org/wiki/Quantum_error_correction#The_bit_flip_code">bit flip error correction code</a>.
+More examples can be found in the test file: <a class="reference external" href="https://github.com/SoftwareQuTech/CQC-Python/blob/Develop/tests/test_cases_cqcconnection/cqc_mix.py">tests/test_cases_cqcconnection/cqc_mix.py</a>.</p>
+<div class="section" id="the-protocol">
+<h2>The protocol<a class="headerlink" href="#the-protocol" title="Permalink to this headline">¶</a></h2>
+<p>The bit flip code is an error correction code which ensures that a qubit can be recovered in its original state after noise potentially damaged it, provided two ancillary qubits are used and the noise only applies 0 or 1 bit flips (i.e. X gate) to any of the three qubits. The following is a circuit representation of the bit flip code.</p>
+<img alt="_images/bfc_circuit.png" src="_images/bfc_circuit.png" />
+<p>The example of the CQCMix provided here only deals with the syndrome measurement and recovery. These are all steps after <em>noise</em> in the circuit above.</p>
+<p>This is a pseudocode description of the syndrome measurement and recovery step:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CNOT</span><span class="p">(</span><span class="n">control</span> <span class="o">=</span> <span class="n">qubit_1</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">qubit_2</span><span class="p">)</span>
+<span class="n">measure</span><span class="p">(</span><span class="n">qubit_2</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">measurement</span> <span class="n">yielded</span> <span class="mi">1</span>
+    <span class="n">CNOT</span><span class="p">(</span><span class="n">control</span> <span class="o">=</span> <span class="n">qubit_1</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="n">qubit_3</span><span class="p">)</span>
+    <span class="n">measure</span><span class="p">(</span><span class="n">qubit_3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">measurement</span> <span class="n">yielded</span> <span class="mi">1</span>
+        <span class="n">X</span><span class="p">(</span><span class="n">qubit_1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the pseudocode applies a slight optimization: it only measures the second ancillary qubit if the first yielded 1. Because the two ancillary qubits will both yield 1 if and only if the designated qubit has been damaged by the noise, the syndrome measurement has already concluded if one of the two ancillary qubits does not yield 1. This optomization saves execution time in architectures were CNOT gates have a relatively great gate execution time, as is the case in the NV center architecture.</p>
+</div>
+<div class="section" id="the-program-using-cqcmix">
+<h2>The program using CQCMix<a class="headerlink" href="#the-program-using-cqcmix" title="Permalink to this headline">¶</a></h2>
+<p>This is the implementation using <a class="reference internal" href="modules/pythonLib.html#cqc.pythonLib.CQCMix" title="cqc.pythonLib.CQCMix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cqc.pythonLib.CQCMix()</span></code></a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cqc.pythonLib</span> <span class="kn">import</span> <span class="n">CQCConnection</span><span class="p">,</span> <span class="n">qubit</span><span class="p">,</span> <span class="n">CQCMix</span>
+
+<span class="k">with</span> <span class="n">CQCConnection</span><span class="p">(</span><span class="s1">&#39;Alice&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">node</span><span class="p">:</span>
+
+    <span class="c1"># We assume variables qbit1, qbit2,</span>
+    <span class="c1"># and qbit3 are initialized and led through noise here.</span>
+
+    <span class="k">with</span> <span class="n">CQCMix</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="k">as</span> <span class="n">pgrm</span><span class="p">:</span>
+
+        <span class="n">qbit1</span><span class="o">.</span><span class="n">cnot</span><span class="p">(</span><span class="n">qbit2</span><span class="p">)</span>
+        <span class="n">result1</span> <span class="o">=</span> <span class="n">qbit2</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="n">pgrm</span><span class="o">.</span><span class="n">cqc_if</span><span class="p">(</span><span class="n">result1</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">qbit1</span><span class="o">.</span><span class="n">cnot</span><span class="p">(</span><span class="n">qbit3</span><span class="p">)</span>
+            <span class="n">result2</span> <span class="o">=</span> <span class="n">qbit3</span><span class="o">.</span><span class="n">measure</span><span class="p">()</span>
+
+            <span class="k">with</span> <span class="n">pgrm</span><span class="o">.</span><span class="n">cqc_if</span><span class="p">(</span><span class="n">result2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">qbit1</span><span class="o">.</span><span class="n">X</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="api.html" class="btn btn-neutral float-right" title="API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="extend_ghz.html" class="btn btn-neutral float-left" title="Distribute a GHZ-state" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stephanie Wehner and Axel Dahlberg
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
