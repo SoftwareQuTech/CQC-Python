@@ -628,19 +628,18 @@ class CQCConnection(CQCHandler):
         if self._pending_headers:
             self.flush()
 
-        if release_qubits:
-            if len(self.active_qubits[:]) != 0:
-                msg = self.construct_release(self.active_qubits[:], block=True)
-                self.commit(msg)
+        if release_qubits and self.active_qubits:
+            msg = self.construct_release(self.active_qubits[:], block=True)
+            self.commit(msg)
 
-                if notify:
-                    msg = self.readMessage()
-                    self.check_error(msg[0])
-                    if msg[0].tp != CQC_TP_DONE:
-                        raise CQCUnsuppError(
-                            "Unexpected message sent back from the server. Message: {}".format(msg[0].printable())
-                        )
-                    self.print_CQC_msg(msg)
+            if notify:
+                msg = self.readMessage()
+                self.check_error(msg[0])
+                if msg[0].tp != CQC_TP_DONE:
+                    raise CQCUnsuppError(
+                        "Unexpected message sent back from the server. Message: {}".format(msg[0].printable())
+                    )
+                self.print_CQC_msg(msg)
 
         self._s.close()
         self._pop_app_id()
