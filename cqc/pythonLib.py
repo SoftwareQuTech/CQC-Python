@@ -2454,7 +2454,17 @@ class qubit:
         :param block: Do we want the qubit to be blocked
         :return:
         """
-        return self._cqc.release_qubits([self], notify=notify, block=block)
+        msg = self._cqc.construct_release([self], notify=notify, block=block)
+        self._cqc.commit(msg)
+
+        if notify:
+            msg = self.readMessage()
+            self.check_error(msg[0])
+            if msg[0].tp != CQC_TP_DONE:
+                raise CQCUnsuppError(
+                    "Unexpected message sent back from the server. Message: {}".format(msg[0].printable())
+                )
+            self.print_CQC_msg(msg)
 
     def getTime(self, block=True):
         """
