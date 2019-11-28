@@ -2496,7 +2496,7 @@ class CQCToFile(CQCHandler):
     """Handler to be used when writing the CQC commands to a file."""
 
     def __init__(self, filename='CQC_File', pend_messages=False,
-                 overwrite=False):
+                 overwrite=False, binary=True):
 
         # Call init of CQCHandler
         super().__init__(pend_messages=pend_messages)
@@ -2505,10 +2505,11 @@ class CQCToFile(CQCHandler):
 
         self.next_qubitID = 0
 
+        self.binary = True
+
         # Set path of file to write to
         script_dir = sys.path[0]
         self.filename = os.path.join(script_dir, filename)
-        self.filenameb = self.filename + "binary"
 
         # Check if file exists
         if overwrite:
@@ -2517,26 +2518,17 @@ class CQCToFile(CQCHandler):
                 os.remove(self.filename)
             except FileNotFoundError:
                 pass
-            
-            try:
-                os.remove(self.filenameb)
-            except FileNotFoundError:
-                pass
         else:
-            if not (os.path.isfile(self.filename) 
-                    or os.path.isfile(self.filename + "binary")):
+            if not os.path.isfile(self.filename):
                 pass
             else:
                 # Append number to filename if can't overwrite
                 num = 0
                 while True:
-                    if (os.path.isfile(self.filename + str(num)) 
-                            or os.path.isfile(self.filename + str(num) 
-                                              + "binary")):
+                    if os.path.isfile(self.filename + str(num)):
                         num += 1
                     else:
                         self.filename = self.filename + str(num)
-                        self.filenameb = self.filename + "binary"
                         break 
 
         # Don't want notify when writing to file
@@ -2545,14 +2537,16 @@ class CQCToFile(CQCHandler):
     def commit(self, msg):
         """Write a message to file.
 
-        Message is written as the bytes turned into a string.
+        Message is written as string or as bytes depending on 
+        self.binary
         """
 
-        with open(self.filename, 'a') as f:
-            f.write(str(msg) + '\n')
-
-        with open(self.filenameb, 'ab') as f:
-            f.write(msg)
+        if self.binary is True:
+            with open(self.filename, 'ab') as f:
+                f.write(msg)
+        else:
+            with open(self.filename, 'a') as f:      
+                f.write(str(msg) + '\n')
 
     def new_qubitID(self):
         """Provice new qubit ID.
