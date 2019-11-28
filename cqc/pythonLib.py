@@ -389,7 +389,13 @@ class CQCHandler(ABC):
 
     @abstractmethod
     def new_qubitID(self):
-        """Provide new qubit ID."""
+        """Provide new qubit ID.
+        
+        This method must provide the new qubit ID. This qubit ID could 
+        be given by the server you are communicating with, or it might
+        simply be a number that increases by one every time the method
+        is used. This will depend on the type of CQCHandler being used.
+        """
         pass
 
     @abstractmethod
@@ -654,7 +660,11 @@ class CQCConnection(CQCHandler):
             pass  # Already removed
 
     def new_qubitID(self, print_cqc=False):
-        """Provide new qubit ID."""
+        """Provide new qubit ID.
+        
+        For CQCConnection the qubit ID is given by the server. A message
+        has to be read and the qubit ID extracted from it.
+        """
 
         msg = self.readMessage()
         otherHdr = msg[1]
@@ -2536,7 +2546,11 @@ class CQCToFile(CQCHandler):
             f.write(msg)
 
     def new_qubitID(self):
-        """Provice new qubit ID."""
+        """Provice new qubit ID.
+        
+        For CQCToFile we simply increase the qubit ID by one for each
+        new qubit.
+        """
 
         qubitID = self.next_qubitID
 
