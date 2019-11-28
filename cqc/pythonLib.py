@@ -2505,7 +2505,7 @@ class CQCToFile(CQCHandler):
 
         self.next_qubitID = 0
 
-        self.binary = True
+        self.binary = binary
 
         # Set path of file to write to
         script_dir = sys.path[0]
