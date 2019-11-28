@@ -217,6 +217,10 @@ class CQCHandler(ABC):
         self.pend_messages = pend_messages
         self._pending_headers = []
 
+        # This flag is used to check if CQCConnection is opened using a 'with' statement.
+        # Otherwise an deprecation warning is printed when instantiating qubits.
+        self._opened_with_with = False
+
         # Set an app ID
         self._appID = 0
 
@@ -477,10 +481,6 @@ class CQCConnection(CQCHandler):
         super().__init__(pend_messages=pend_messages)
 
         self._setup_logging(log_level)
-
-        # This flag is used to check if CQCConnection is opened using a 'with' statement.
-        # Otherwise an deprecation warning is printed when instantiating qubits.
-        self._opened_with_with = False
 
         # Host name
         self.name = name
