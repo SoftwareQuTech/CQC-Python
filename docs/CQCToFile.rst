@@ -18,7 +18,8 @@ another file with the same name, but with 'binary' appended, which will contain
 the commands in binary form (which is easier to process later).
 
 :meth:`cqc.pythonLib.CQCToFile` does not support sending or receiving 
-classical messages.
+classical messages, sendGetTime(), allocate_qubits(), sendFactory(), create_qubits(),
+tomography(), test_preparation()
 
 -------------
 Example usage
