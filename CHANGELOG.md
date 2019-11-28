@@ -6,6 +6,10 @@ For more details refer to the [documentation](https://softwarequtech.github.io/S
 Upcoming
 --------
 
+2019-11-28 (v3.1.1)
+-------------------
+- Pending messages are now flushed when a connection is closed.
+
 2019-10-16 (v3.1.0)
 -------------------
 - CQC now supports logic. That is one can send a batch of CQC-instructions to the backend which can have conditional logic based on measurement results.
