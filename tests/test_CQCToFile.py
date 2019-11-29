@@ -4,7 +4,7 @@
 #
 # filename = os.path.join(str(tmpdir), 'CQC_File')
 #
-# with CQCToFile(filename=filename) as cqc:
+# with CQCToFile(file=filename) as cqc:
 
 from cqc.pythonLib import CQCToFile, qubit
 import os
@@ -15,7 +15,7 @@ def test_name(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename) as cqc:
+    with CQCToFile(file=filename) as cqc:
         assert cqc.name == 'CQCToFile'
 
 
@@ -23,7 +23,7 @@ def test_sendSimple(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename, binary=False) as cqc:
+    with CQCToFile(file=filename, binary=False) as cqc:
         cqc.sendSimple(CQC_TP_HELLO)
 
         with open(filename) as f:
@@ -36,7 +36,7 @@ def test_createqubit(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename, binary=False) as cqc:
+    with CQCToFile(file=filename, binary=False) as cqc:
          
         q = qubit(cqc)
         q.H()
@@ -54,7 +54,7 @@ def test_releasequbit(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename, binary=False) as cqc:
+    with CQCToFile(file=filename, binary=False) as cqc:
          
         q = qubit(cqc)
         q.H()
@@ -74,7 +74,7 @@ def test_Hgate(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename, binary=False) as cqc:
+    with CQCToFile(file=filename, binary=False) as cqc:
          
         q = qubit(cqc)
         q.H()
@@ -93,7 +93,7 @@ def test_some_combinations(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename) as cqc:
+    with CQCToFile(file=filename) as cqc:
          
         q = cqc.createEPR("Alice")
         q.H()
@@ -112,7 +112,7 @@ def test_flushing(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename, pend_messages=True) as cqc:
+    with CQCToFile(file=filename, pend_messages=True) as cqc:
         
         assert not cqc._pending_headers
 
@@ -132,7 +132,7 @@ def test_qubitIDs(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename) as cqc:
+    with CQCToFile(file=filename) as cqc:
 
         a = qubit(cqc)
         a.X()
@@ -150,7 +150,7 @@ def test_measurement(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename) as cqc:
+    with CQCToFile(file=filename) as cqc:
 
         q = qubit(cqc)
         a = q.measure()
@@ -161,7 +161,7 @@ def test_flush_on_exit(tmpdir):
 
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
-    with CQCToFile(filename=filename, pend_messages=True, binary=False) as cqc:
+    with CQCToFile(file=filename, pend_messages=True, binary=False) as cqc:
 
         q = qubit(cqc)
         q.H()

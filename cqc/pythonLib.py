@@ -2495,7 +2495,7 @@ class qubit:
 class CQCToFile(CQCHandler):
     """Handler to be used when writing the CQC commands to a file."""
 
-    def __init__(self, filename='CQC_File', pend_messages=False,
+    def __init__(self, file='CQC_File', pend_messages=False,
                  overwrite=False, binary=True):
 
         # Call init of CQCHandler
@@ -2507,28 +2507,26 @@ class CQCToFile(CQCHandler):
 
         self.binary = binary
 
-        # Set path of file to write to
-        script_dir = sys.path[0]
-        self.filename = os.path.join(script_dir, filename)
+        self.file = file
 
         # Check if file exists
         if overwrite:
             # Remove file if we can overwrite
             try:
-                os.remove(self.filename)
+                os.remove(self.file)
             except FileNotFoundError:
                 pass
         else:
-            if not os.path.isfile(self.filename):
+            if not os.path.isfile(self.file):
                 pass
             else:
                 # Append number to filename if can't overwrite
                 num = 0
                 while True:
-                    if os.path.isfile(self.filename + str(num)):
+                    if os.path.isfile(self.file + str(num)):
                         num += 1
                     else:
-                        self.filename = self.filename + str(num)
+                        self.file = self.file + str(num)
                         break 
 
         # Don't want notify when writing to file
@@ -2542,10 +2540,10 @@ class CQCToFile(CQCHandler):
         """
 
         if self.binary is True:
-            with open(self.filename, 'ab') as f:
+            with open(self.file, 'ab') as f:
                 f.write(msg)
         else:
-            with open(self.filename, 'a') as f:      
+            with open(self.file, 'a') as f:      
                 f.write(str(msg) + '\n')
 
     def new_qubitID(self):
