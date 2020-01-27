@@ -6,6 +6,10 @@ For more details refer to the [documentation](https://softwarequtech.github.io/S
 Upcoming
 --------
 
+2020-01-27 (v3.1.2)
+-------------------
+- Allow for numpy version up to 2.0.0
+
 2019-11-28 (v3.1.1)
 -------------------
 - Pending messages are now flushed when a connection is closed.
