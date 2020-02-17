@@ -158,7 +158,6 @@ def test_measurement(tmpdir):
 
 
 def test_flush_on_exit(tmpdir):
-
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
     with CQCToFile(file=filename, pend_messages=True, binary=False) as cqc:

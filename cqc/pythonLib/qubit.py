@@ -29,7 +29,6 @@
 
 import logging
 from cqc.cqcHeader import (
-    Header,
     CQC_CMD_NEW,
     CQC_CMD_I,
     CQC_CMD_X,
@@ -47,15 +46,12 @@ from cqc.cqcHeader import (
     CQC_CMD_MEASURE_INPLACE,
     CQC_CMD_RESET,
     CQC_CMD_RELEASE,
-    CQCType,
-    CQCCmdHeader,
 )
 from .util import (
     CQCGeneralError,
     CQCUnsuppError,
     QubitNotActiveError,
 )
-from .cqc_mix import CQCVariable
 
 
 class qubit:
@@ -95,10 +91,6 @@ class qubit:
 
         # Whether the qubit is active. Will be set in the first run
         self._active = None
-
-        # This stores the scope (type NodeMixin) in which this qubit was deactivated
-        # If the qubit has not yet been deactivated, this is set to None
-        self.scope_of_deactivation = None
 
         if createNew:
             # print info
@@ -152,7 +144,7 @@ class qubit:
 
     def print_entInfo(self):
         if self._entInfo:
-            print(self._entInfo.printable())
+            print(self._entInfo)
         else:
             print("No entanglement information")
 
@@ -185,40 +177,9 @@ class qubit:
         Checks if the qubit is active
         """
         if not self._active:
-
-            # This conditional checks whether it is certain that the qubit is inactive at this 
-            # point in the code. If such is the case, an error is raised. 
-            # At this point, it is certain that self_active is False. However, this does not necessarily
-            # mean that the qubit is inactive due to the possibility to write cqc_if blocks.
-            # There are four options:
-            # 1) Control is currently not inside a CQCMix. In that case, the qubit is inactive.
-            # 2) The qubit was deactivated in the current scope. The qubit therefore is inactive.
-            # 3) The qubit was deactivated in an ancestor scope. The qubit therefore is inactive.
-            # 4) The qubit was deactivated in a descendent scope.  The qubit is therefore inactive. 
-            # The only possible way self_active can be False but the qubit is in fact active, is
-            # if the qubit was deactivated in a sibling scope, such as the sibling if-block of an else-block.
-            if (
-                not self._cqc._inside_cqc_mix
-                or self.scope_of_deactivation == self._cqc.current_scope
-                or self.scope_of_deactivation in self._cqc.current_scope.ancestors
-                or self.scope_of_deactivation in self._cqc.current_scope.descendants
-            ):
-
-                raise QubitNotActiveError(
-                    "Qubit is not active. Possible causes:\n"
-                    "- Qubit is sent to another node\n"
-                    "- Qubit is measured (with inplace=False)\n"
-                    "- Qubit is released\n"
-                    "- Qubit is not received\n"
-                    "- Qubit is used and created in the same factory\n"
-                    "- Qubit is measured (with inplace=False) inside a cqc_if block earlier in the code\n"
-                )
+            raise QubitNotActiveError("Qubit is not active")
 
     def _set_active(self, be_active):
-
-        # Set the scope of deactivation to the current scope, if inside a CQCMix.
-        if not be_active and self._cqc._inside_cqc_mix:
-            self.scope_of_deactivation = self._cqc.current_scope
 
         # Check if not already new state
         if self._active == be_active:
@@ -334,25 +295,6 @@ class qubit:
         """
         self._single_qubit_gate(CQC_CMD_K, notify, block)
 
-    def _build_and_pend_command(self, command, notify=False, block=False, subheader: Header = None, *subheader_values):
-
-        # If we are inside a TP_MIX, then insert the CQC Type header before the command header
-        if self._cqc._inside_cqc_mix:
-            self._cqc._pend_type_header(
-                CQCType.COMMAND, 
-                CQCCmdHeader.HDR_LENGTH + (subheader.HDR_LENGTH if subheader is not None else 0)
-            )
-
-        # Build and pend the command header
-        command_header = CQCCmdHeader()
-        command_header.setVals(self._qID, command, notify, block)
-        self._cqc._pend_header(command_header)
-
-        # Build and pend the subheader, if there is one
-        if subheader is not None:
-            subheader.setVals(*subheader_values)
-            self._cqc._pend_header(subheader)
-            
     def _single_gate_rotation(self, command, step, notify, block):
         """
         Perform a rotation on a qubit
@@ -494,23 +436,17 @@ class qubit:
             self._set_active(False)
 
         if self._cqc.pend_messages:
-            cqc_variable = CQCVariable()
-            ref_id = cqc_variable.ref_id
-        else:
-            ref_id = 0
+            logging.warning("Cannot pend messages containing measurements at this point, flushing all messages")
+            self._cqc.flush()
 
-        self._cqc.put_command(
+        self._cqc.commit_command(
             qID=self._qID,
             command=command,
             notify=False,
             block=block,
-            ref_id=ref_id,
         )
 
-        if self._cqc.pend_messages:
-            return cqc_variable
-        else:
-            return self._cqc.return_meas_outcome()
+        return self._cqc.return_meas_outcome()
 
     def reset(self, notify=True, block=True):
         """

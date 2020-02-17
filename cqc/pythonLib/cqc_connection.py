@@ -235,7 +235,7 @@ class CQCConnection(CQCHandler):
                 self.check_error(msg[0])
                 if msg[0].tp != CQC_TP_DONE:
                     raise CQCUnsuppError(
-                        "Unexpected message sent back from the server. Message: {}".format(msg[0].printable())
+                        "Unexpected message sent back from the server. Message: {}".format(msg[0])
                     )
                 self.print_CQC_msg(msg)
 
@@ -405,7 +405,7 @@ class CQCConnection(CQCHandler):
             message = self.readMessage()
             if message[0].tp != CQC_TP_DONE:
                 raise CQCUnsuppError(
-                    "Unexpected message send back from the server. Message: {}".format(message[0].printable())
+                    "Unexpected message send back from the server. Message: {}".format(message[0])
                 )
 
         return qubits

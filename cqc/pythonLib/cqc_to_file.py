@@ -136,6 +136,10 @@ class CQCToFile(CQCHandler):
 
         return 0
 
+    def readMessage(self):
+        """For now returns nothing"""
+        return None
+
     def _handle_factory_response(self, num_iter, response_amount, should_notify=False):
         """Handles the responses from a factory command and returns a list of results"""
         res = []

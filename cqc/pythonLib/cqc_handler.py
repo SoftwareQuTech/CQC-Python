@@ -30,7 +30,7 @@
 import abc
 import math
 import logging
-import warning
+import warnings
 from typing import Any, List
 from itertools import count
 
@@ -105,7 +105,7 @@ class CQCHandler(abc.ABC):
 
         # Decides if to send each command as it is received, or only 
         # when flushed
-        self.pend_messages = pend_messages
+        self._pend_messages = pend_messages
         self._pending_headers = []
 
         # This flag is used to check if CQCConnection is opened using a 'with' statement.
@@ -120,13 +120,6 @@ class CQCHandler(abc.ABC):
         # This is a sort of global notify
         self.notify = notify
 
-        # Bool that indicates wheter we are in a CQCType.MIX
-        self._inside_cqc_mix = False
-
-        # Variable of type NodeMixin. This variable is used in CQCMix types to create a
-        # scoping mechanism.
-        self.current_scope = None
-
         # All qubits active for this connection
         self.active_qubits = []
 
@@ -135,6 +128,14 @@ class CQCHandler(abc.ABC):
 
         # Bool that indicates whether we are in a factory and thus should pend commands
         self.pend_messages = pend_messages
+
+    @property
+    def pend_messages(self):
+        return self._pend_messages
+
+    @pend_messages.setter
+    def pend_messages(self, value):
+        self.set_pending(value)
 
     def __str__(self):
         return "CQC handler for node '{}'".format(self.name)
@@ -233,11 +234,11 @@ class CQCHandler(abc.ABC):
                        remote_port=0, ref_id=0):
         """Construct and commit command."""
 
-        msg = self.construct_command(
+        headers = self.construct_headers(
             qID, command, notify=notify, block=block, action=action, 
             xtra_qID=xtra_qID, step=step, remote_appID=remote_appID, 
             remote_node=remote_node, remote_port=remote_port, ref_id=ref_id)
-        self.commit(msg)
+        self.commit_headers(headers)
 
     def commit_headers(self, headers):
         """Packs a list of headers and commits the message"""
@@ -253,8 +254,9 @@ class CQCHandler(abc.ABC):
         otherwise they are commited directly.
         """
         headers = self.construct_headers(qID=qID, command=command, **kwargs)
-        str_of_headers = "".join(["\t{}\n".format(header.printable()) for header in headers])
+        str_of_headers = "".join(["\t{}\n".format(header) for header in headers])
         if self.pend_messages:
+            headers = self._update_headers_before_pending(headers)
             logging.debug("App {} pends a command with headers:\n{}".format(
                 self.name,
                 str_of_headers,
@@ -272,10 +274,14 @@ class CQCHandler(abc.ABC):
                 self._assert_done_message(message)
                 self.print_CQC_msg(message)
 
+    def _update_headers_before_pending(self, headers):
+        # Don't include the CQC Headers since this is a sequence
+        return headers[1:]
+
     def _assert_done_message(self, message):
-        if message[0] != CQC_TP_DONE:
+        if message[0].tp != CQC_TP_DONE:
             raise CQCUnsuppError(
-                "Unexpected message sent back from the server. Message: {}".format(message[0].printable())
+                "Unexpected message sent back from the server. Message: {}".format(message[0])
             )
 
     def pend_headers(self, headers):
@@ -425,8 +431,8 @@ class CQCHandler(abc.ABC):
 
     def sendSimple(self, tp):
         """Construct and commit simple message."""
-        warning.warn("sendSimple is deprecated, use commit_command or put_command instead",
-                     DeprecationWarning)
+        warnings.warn("sendSimple is deprecated, use commit_command or put_command instead",
+                      DeprecationWarning)
         
         msg = self.construct_simple(tp)
         self.commit(msg)
@@ -434,11 +440,14 @@ class CQCHandler(abc.ABC):
     def close(self, release_qubits=True):
         """Handle exiting of context."""
         # Flush all remaining commands
-        if self._pending_headers:
-            self.flush()
+        self.flush()
 
-        if release_qubits and self.active_qubits:
-            release_qubits.release()
+        if release_qubits:
+            for q in self.active_qubits:
+                q.release()
+
+        # Make sure to flush the releases as well
+        self.flush()
 
         self._pop_app_id()
 
@@ -485,8 +494,8 @@ class CQCHandler(abc.ABC):
             :block:         Do we want the qubit to be blocked
             :action:     Are there more commands to be executed
         """
-        warning.warn("sendGetTime is deprecated, use commit_command or put_command instead",
-                     DeprecationWarning)
+        warnings.warn("sendGetTime is deprecated, use commit_command or put_command instead",
+                      DeprecationWarning)
         # Send Header
         hdr = CQCHeader()
         hdr.setVals(CQC_VERSION, CQC_TP_GET_TIME, self._appID, CQCCmdHeader.HDR_LENGTH)
@@ -507,8 +516,8 @@ class CQCHandler(abc.ABC):
 
         :nb_of_qubits: The amount of qubits to be created.
         """
-        warning.warn("allocate_qubits is deprecated, use create_qubits instead",
-                     DeprecationWarning)
+        warnings.warn("allocate_qubits is deprecated, use create_qubits instead",
+                      DeprecationWarning)
 
         return self.create_qubits(nb_of_qubits)
 
@@ -538,8 +547,8 @@ class CQCHandler(abc.ABC):
             comm_sub_header.setVals(remote_appID, remote_ip, remote_port)
 
             # Pend header
-            self._pend_header(command_header)
-            self._pend_header(comm_sub_header)
+            self.pend_header(command_header)
+            self.pend_header(comm_sub_header)
 
         else:
             self.commit_command(
@@ -572,7 +581,7 @@ class CQCHandler(abc.ABC):
             header.setVals(0, CQC_CMD_EPR_RECV, notify, block)
 
             # Pend header
-            self._pend_header(header)
+            self.pend_header(header)
 
         else:
             self.commit_command(0, CQC_CMD_EPR_RECV, notify=int(notify), block=int(block))
@@ -610,8 +619,8 @@ class CQCHandler(abc.ABC):
             comm_sub_header.setVals(remote_appID, remote_ip, remote_port)
 
             # Pend header
-            self._pend_header(command_header)
-            self._pend_header(comm_sub_header)
+            self.pend_header(command_header)
+            self.pend_header(comm_sub_header)
 
         else:
             self.commit_command(q._qID, CQC_CMD_SEND, notify=int(notify), 
@@ -642,7 +651,7 @@ class CQCHandler(abc.ABC):
             header.setVals(0, CQC_CMD_RECV, notify, block)
 
             # Pend header
-            self._pend_header(header)
+            self.pend_header(header)
 
         else:
             self.commit_command(0, CQC_CMD_RECV, notify=int(notify), block=int(block))
@@ -672,6 +681,8 @@ class CQCHandler(abc.ABC):
         :param num_iter: The amount of times the current pending sequence is performed
         :return: A list of outcomes/qubits that are produced by the commands
         """
+        if len(self._pending_headers) == 0:
+            return []
 
         # Initialize should_notify to False
         should_notify = False
@@ -724,9 +735,13 @@ class CQCHandler(abc.ABC):
         """
 
         # Send all pending headers
+        to_log = "App {} sends a message with the following headers:\n".format(self.name)
+        msg = b''
         for header in self._pending_headers:
-            self.commit(header.pack())
-            logging.debug("App {} sends CQC: {}".format(self.name, header.printable()))
+            to_log += "\t{}\n".format(header)
+            msg += header.pack()
+        logging.debug(to_log[:-1])
+        self.commit(msg)
 
     def reset_pending_headers(self):
         """Sets the list of pending headers to empty """
@@ -743,7 +758,7 @@ class CQCHandler(abc.ABC):
         if self._pending_headers:
             logging.warning("List of pending headers is not empty, flushing them")
             self.flush()
-        self.pend_messages = pend_messages
+        self._pend_messages = pend_messages
 
     def insert_cqc_header(self, cqc_type: CQCType, version=CQC_VERSION) -> None:
         """
@@ -769,7 +784,7 @@ class CQCHandler(abc.ABC):
         """
         header = CQCTypeHeader()
         header.setVals(cqc_type, length)
-        self._pend_header(header)
+        self.pend_header(header)
 
     def tomography(self, preparation, iterations, progress=True):
         """

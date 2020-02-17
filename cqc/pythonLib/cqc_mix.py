@@ -31,13 +31,17 @@ from typing import Union
 from anytree import NodeMixin
 
 from cqc.cqcHeader import (
+    CQC_CMD_MEASURE,
+    CQC_CMD_MEASURE_INPLACE,
     CQCIfHeader,
     CQCTypeHeader,
     CQCFactoryHeader,
     CQCType,
     CQCLogicalOperator,
 )
-from .util import CQCGeneralError
+from .util import CQCGeneralError, QubitNotActiveError
+from .qubit import qubit
+from .cqc_connection import CQCConnection
 
 
 class CQCVariable:
@@ -127,13 +131,154 @@ class _LogicalFunction:
         return header
 
 
+class CQCMixConnection(CQCConnection):
+    """Subclass of CQCconnection to be used with CQCMix"""
+    def __init__(self, name, socket_address=None, appID=None, pend_messages=False,
+                 retry_connection=True, conn_retry_time=0.1, log_level=None, backend=None,
+                 use_classical_communication=True, network_name=None):
+        super().__init__(
+            name=name,
+            socket_address=socket_address,
+            appID=appID,
+            pend_messages=pend_messages,
+            retry_connection=retry_connection,
+            conn_retry_time=conn_retry_time,
+            log_level=log_level,
+            backend=backend,
+            use_classical_communication=use_classical_communication,
+            network_name=network_name,
+        )
+
+        # Variable of type NodeMixin. This variable is used in CQCMix types to create a
+        # scoping mechanism.
+        self.current_scope = None
+
+        self._inside_cqc_mix = False
+
+    def _update_headers_before_pending(self, headers):
+        # Insert type headers if in cqc mix
+        if self._inside_cqc_mix:
+            length = sum([hdr.HDR_LENGTH for hdr in headers[1:]])
+            tp_header = CQCTypeHeader()
+            tp_header.setVals(CQCType.COMMAND, length)
+            return [tp_header] + headers[1:]
+        else:
+            return headers[1:]
+
+    def _enter_mix(self):
+        # Set the _inside_cqc_mix bool to True on the connection
+        self._inside_cqc_mix = True
+
+        self.pend_messages = True
+
+
+class mix_qubit(qubit):
+    def __init__(self, cqc: CQCMixConnection, notify=True, block=True, createNew=True, q_id=None, entInfo=None):
+        # This stores the scope (type NodeMixin) in which this qubit was deactivated
+        # If the qubit has not yet been deactivated, this is set to None
+        self.scope_of_deactivation = None
+
+        super().__init__(
+            cqc=cqc,
+            notify=notify,
+            block=block,
+            createNew=createNew,
+            q_id=q_id,
+            entInfo=entInfo,
+        )
+
+    def check_active(self):
+        """
+        Checks if the qubit is active
+        """
+        if not self._active:
+
+            # This conditional checks whether it is certain that the qubit is inactive at this 
+            # point in the code. If such is the case, an error is raised. 
+            # At this point, it is certain that self_active is False. However, this does not necessarily
+            # mean that the qubit is inactive due to the possibility to write cqc_if blocks.
+            # There are four options:
+            # 1) Control is currently not inside a CQCMix. In that case, the qubit is inactive.
+            # 2) The qubit was deactivated in the current scope. The qubit therefore is inactive.
+            # 3) The qubit was deactivated in an ancestor scope. The qubit therefore is inactive.
+            # 4) The qubit was deactivated in a descendent scope.  The qubit is therefore inactive. 
+            # The only possible way self_active can be False but the qubit is in fact active, is
+            # if the qubit was deactivated in a sibling scope, such as the sibling if-block of an else-block.
+            if (
+                not self._cqc._inside_cqc_mix
+                or self.scope_of_deactivation == self._cqc.current_scope
+                or self.scope_of_deactivation in self._cqc.current_scope.ancestors
+                or self.scope_of_deactivation in self._cqc.current_scope.descendants
+            ):
+
+                raise QubitNotActiveError(
+                    "Qubit is not active. Possible causes:\n"
+                    "- Qubit is sent to another node\n"
+                    "- Qubit is measured (with inplace=False)\n"
+                    "- Qubit is released\n"
+                    "- Qubit is not received\n"
+                    "- Qubit is used and created in the same factory\n"
+                    "- Qubit is measured (with inplace=False) inside a cqc_if block earlier in the code\n"
+                )
+
+    def _set_active(self, be_active):
+
+        # Set the scope of deactivation to the current scope, if inside a CQCMix.
+        if not be_active and self._cqc._inside_cqc_mix:
+            self.scope_of_deactivation = self._cqc.current_scope
+
+        super()._set_active(be_active)
+
+    def measure(self, inplace=False, block=True):
+        """
+        Measures the qubit in the standard basis and returns the measurement outcome.
+        If now MEASOUT message is received, None is returned.
+        If inplace=False, the measurement is destructive and the qubit is removed from memory.
+        If inplace=True, the qubit is left in the post-measurement state.
+
+        - **Arguments**
+
+            :inplace:     If false, measure destructively.
+            :block:         Do we want the qubit to be blocked
+        """
+        # check if qubit is active
+        self.check_active()
+
+        if inplace:
+            command = CQC_CMD_MEASURE_INPLACE
+        else:
+            command = CQC_CMD_MEASURE
+            # Set qubit to non active so the user can receive helpful errors during compile time 
+            # if this qubit is used after this measurement
+            self._set_active(False)
+
+        if self._cqc.pend_messages:
+            cqc_variable = CQCVariable()
+            ref_id = cqc_variable.ref_id
+        else:
+            ref_id = 0
+
+        self._cqc.put_command(
+            qID=self._qID,
+            command=command,
+            notify=False,
+            block=block,
+            ref_id=ref_id,
+        )
+
+        if self._cqc.pend_messages:
+            return cqc_variable
+        else:
+            return self._cqc.return_meas_outcome()
+
+
 class CQCMix(NodeMixin):
     """
     This Python Context Manager Type can be used to create CQC programs that consist of more than a single type.
     Hence the name CQC Mix. Programs of this type can consist of any number and mix of the other CQC types. 
     """
 
-    def __init__(self, cqc_connection):
+    def __init__(self, cqc_connection: CQCMixConnection):
         """
         Initializes the Mix context.
 
@@ -141,6 +286,9 @@ class CQCMix(NodeMixin):
 
             :cqc_connection:    The CQCConnection to which this CQC Program must be sent.
         """
+        if not isinstance(cqc_connection, CQCMixConnection):
+            raise TypeError("To use CQCMix the connection needs to be of type CQCMixConnection, "
+                            f"not {type(cqc_connection)}")
 
         self._conn = cqc_connection
 
@@ -148,10 +296,8 @@ class CQCMix(NodeMixin):
         self._conn.current_scope = self
 
     def __enter__(self):
-        # Set the _inside_cqc_mix bool to True on the connection
-        self._conn._inside_cqc_mix = True
-
-        self._conn.pend_messages = True
+        # Update the connection to be compatible with mixing
+        self._conn._enter_mix()
 
         # Return self so that this instance is bound to the variable after "as", i.e.: "with CQCMix() as pgrm"
         return self
@@ -245,8 +391,8 @@ class _CQCFactory:
         factory_header.setVals(self._repetition_amount)
 
         # Pend the headers
-        self._conn._pend_header(self.type_header)
-        self._conn._pend_header(factory_header)
+        self._conn.pend_header(self.type_header)
+        self._conn.pend_header(factory_header)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
 
@@ -305,7 +451,7 @@ class _CQCConditional(NodeMixin):
         self.header = self._logical_function.get_CQCIfHeader()
 
         # Pend the IF header
-        self._conn._pend_header(self.header)
+        self._conn.pend_header(self.header)
 
         # Register the parent scope, and set the current scope to self
         self.parent = self._conn.current_scope

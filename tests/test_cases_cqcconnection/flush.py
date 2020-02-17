@@ -67,9 +67,7 @@ def get_expected_headers_flush():
 
     expected_headers = [
         hdr_tp_cmd + hdr_cmd_new,
-        hdr_tp_cmd_2,
-        hdr_cmd_h,
-        hdr_cmd_x,
+        hdr_tp_cmd_2 + hdr_cmd_h + hdr_cmd_x,
         hdr_tp_cmd + hdr_cmd_release
     ]
 

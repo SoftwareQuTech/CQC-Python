@@ -180,6 +180,9 @@ class Header(metaclass=abc.ABCMeta):
         else:
             self.unpack(headerBytes)
 
+    def __str__(self):
+        return self.printable()
+
     def setVals(self, *args, **kwargs):
         """
             Set using given values.
