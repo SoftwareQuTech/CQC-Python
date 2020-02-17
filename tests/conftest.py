@@ -100,9 +100,13 @@ def mock_read_message(monkeypatch):
     def mocked_print_CQC_msg(self, message):
         pass
 
+    def mocked_parse_CQC_msg(self, message, q=None, is_factory=False):
+        return message
+
     def mocked_check_error(self, hdr):
         pass
 
     monkeypatch.setattr(CQCConnection, "readMessage", mocked_readMessage)
     monkeypatch.setattr(CQCConnection, "print_CQC_msg", mocked_print_CQC_msg)
+    monkeypatch.setattr(CQCConnection, "parse_CQC_msg", mocked_parse_CQC_msg)
     monkeypatch.setattr(CQCConnection, "check_error", mocked_check_error)

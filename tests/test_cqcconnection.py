@@ -96,6 +96,16 @@ def test_commands(commands_to_apply, get_expected_headers, monkeypatch, mock_soc
     expected_headers = get_expected_headers()
 
     commands_sent = list(filter(lambda call: call.name == 'send', cqc._s.calls))
+    for i in range(max(len(expected_headers), len(commands_sent))):
+        if i < len(expected_headers):
+            print(expected_headers[i])
+        else:
+            print("--")
+        if i < len(commands_sent):
+            print(commands_sent[i])
+        else:
+            print("--")
+        print()
     assert len(expected_headers) == len(commands_sent)
     for command, expected in zip(commands_sent, expected_headers):
         print(command.args[0])

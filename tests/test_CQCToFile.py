@@ -16,7 +16,7 @@ def test_name(tmpdir):
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
     with CQCToFile(file=filename) as cqc:
-        assert cqc.name == 'CQCToFile'
+        assert cqc.name == filename
 
 
 def test_sendSimple(tmpdir):
