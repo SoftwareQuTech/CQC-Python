@@ -28,6 +28,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import logging
+import warnings
 from cqc.cqcHeader import (
     CQC_CMD_NEW,
     CQC_CMD_I,
@@ -98,8 +99,7 @@ class qubit:
 
             # Create new qubit at the cqc server
             # TODO how to handle pending headers
-            headers = self._cqc.construct_headers(0, CQC_CMD_NEW, notify=notify, block=block)
-            self._cqc.commit_headers(headers)
+            self._cqc.commit_command(0, CQC_CMD_NEW, notify=notify, block=block)
             
             # Get qubit id
             try:
@@ -118,38 +118,20 @@ class qubit:
             self._set_active(False)  # Why?
 
         # Entanglement information
-        self._entInfo = entInfo
-
-        # Lookup remote entangled node
-        self._remote_entNode = None
-        if self._entInfo:
-            ip = self._entInfo.node_B
-            port = self._entInfo.port_B
-            try:
-                for node in self._cqc._cqcNet.hostDict.values():
-                    if (node.ip == ip) and (node.port == port):
-                        self._remote_entNode = node.name
-                        break
-            except AttributeError:
-                self._remote_entNode = None
+        self._set_entanglement_info(entInfo)
 
     def __str__(self):
-        if self._active:
+        if self.active:
             return "Qubit at the node {}".format(self._cqc.name)
         else:
             return "Not active qubit"
 
-    def get_entInfo(self):
+    @property
+    def entanglement_info(self):
         return self._entInfo
 
-    def print_entInfo(self):
-        if self._entInfo:
-            print(self._entInfo)
-        else:
-            print("No entanglement information")
-
-    def set_entInfo(self, entInfo):
-        self._entInfo = entInfo
+    def _set_entanglement_info(self, ent_info):
+        self._entInfo = ent_info
 
         # Lookup remote entangled node
         self._remote_entNode = None
@@ -163,6 +145,32 @@ class qubit:
                         break
             except AttributeError:
                 self._remote_entNode = None
+
+    @property
+    def active(self):
+        return self._active
+
+    @property
+    def remote_entangled_node(self):
+        return self._remote_entNode
+
+    def get_entInfo(self):
+        warnings.warn("get_entInfo is deprecated, use the property entanglement_info instead",
+                      DeprecationWarning)
+        return self._entInfo
+
+    def print_entInfo(self):
+        warnings.warn("print_entInfo is deprecated",
+                      DeprecationWarning)
+        if self.entanglement_info:
+            print(self.entanglement_info)
+        else:
+            print("No entanglement information")
+
+    def set_entInfo(self, entInfo):
+        warnings.warn("set_entInfo is deprecated, use _set_entanglement_info instead",
+                      DeprecationWarning)
+        self._set_entanglement_info(entInfo)
 
     def is_entangled(self):
         if self._entInfo:
@@ -170,13 +178,15 @@ class qubit:
         return False
 
     def get_remote_entNode(self):
-        return self._remote_entNode
+        warnings.warn("get_remote_entNode is deprecated, use the propery remote_entangled_node instead",
+                      DeprecationWarning)
+        return self.remote_entangled_node
 
     def check_active(self):
         """
         Checks if the qubit is active
         """
-        if not self._active:
+        if not self.active:
             raise QubitNotActiveError("Qubit is not active")
 
     def _set_active(self, be_active):
@@ -490,7 +500,7 @@ class qubit:
     def getTime(self, block=True):
         """
         Returns the time information of the qubit.
-        If now INF_TIME message is received, None is returned.
+        If no INF_TIME message is received, None is returned.
 
         - **Arguments**
 

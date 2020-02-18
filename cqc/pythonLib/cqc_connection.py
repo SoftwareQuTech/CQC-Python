@@ -410,7 +410,7 @@ class CQCConnection(CQCHandler):
 
         return qubits
 
-    def _handle_allocate_qubits(self, num_qubits):
+    def _handle_create_qubits(self, num_qubits):
         qubits = []
         for _ in range(num_qubits):
             msg = self.readMessage()
@@ -595,7 +595,7 @@ class CQCConnection(CQCHandler):
         # initialize the qubit
         q = qubit(self, createNew=False)
 
-        q.set_entInfo(entInfoHdr)
+        q._set_entanglement_info(entInfoHdr)
         q._qID = q_id
         # Activate and return qubit
         q._set_active(True)

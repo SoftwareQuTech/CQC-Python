@@ -89,7 +89,7 @@ class CQCToFile(CQCHandler):
             with open(self.file, 'a') as f:      
                 f.write(str(msg) + '\n')
 
-    def _handle_allocate_qubits(self, num_qubits):
+    def _handle_create_qubits(self, num_qubits):
         qubits = []
         for _ in range(num_qubits):
             q = qubit(self, createNew=False)
@@ -123,7 +123,7 @@ class CQCToFile(CQCHandler):
         entInfoHdr = None  # TODO: create function that returns some fake entanglement info
         q_id = self.new_qubitID()
 
-        q.set_entInfo(entInfoHdr)
+        q._set_entanglement_info(entInfoHdr)
         q._qID = q_id
 
         # Activate and return qubit
@@ -162,7 +162,7 @@ class CQCToFile(CQCHandler):
                         if q is None:
                             q = qubit(self, createNew=False)
                         q._qID = self.new_qubitID()
-                        q.set_entInfo(None)
+                        q._set_entanglement_info(None)
                         q._set_active(True)
                         res.append(q)
 
