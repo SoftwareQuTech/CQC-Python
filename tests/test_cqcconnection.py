@@ -103,11 +103,11 @@ def test_commands(conn_type, commands_to_apply, get_expected_headers, monkeypatc
     full_msg = {}
     # Parse and print what we expect and what we got
     for name, messages in zip(["EXPECTED", "GOT"], [expected_messages, sent_messages]):
-        print(f"\n{name}:")
+        print("\n{}:".format(name))
         for msg in messages:
             print('[')
             for hdr in parse_cqc_message(msg):
-                print(f"  {hdr}")
+                print("  {}".format(hdr))
             print('\n]')
         full_msg[name] = b''.join([msg for msg in messages])
 

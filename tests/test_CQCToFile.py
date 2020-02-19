@@ -6,9 +6,19 @@
 #
 # with CQCToFile(file=filename) as cqc:
 
-from cqc.pythonLib import CQCToFile, qubit
 import os
-from cqc.cqcHeader import CQC_TP_HELLO
+
+from cqc.util import parse_cqc_message
+from cqc.pythonLib import CQCToFile, qubit
+from cqc.cqcHeader import (
+    CQCType,
+    CQC_CMD_NEW,
+    CQC_CMD_H,
+    CQC_CMD_X,
+    CQC_CMD_RELEASE,
+    CQCHeader,
+    CQCCmdHeader
+)
 
 
 def test_name(tmpdir):
@@ -24,12 +34,19 @@ def test_sendSimple(tmpdir):
     filename = os.path.join(str(tmpdir), 'CQC_File')
 
     with CQCToFile(file=filename, binary=False) as cqc:
-        cqc.sendSimple(CQC_TP_HELLO)
+        cqc.sendSimple(CQCType.HELLO)
 
-        with open(filename) as f:
-            contents = f.read()
-            print(contents)
-            assert contents[6:10] == "\\x00"
+    with open(filename) as f:
+        lines = f.readlines()
+            
+    assert len(lines) == 1
+
+    # Check that the first line is a header of hello type
+    headers = parse_cqc_message(eval(lines[0][:-1]))
+    assert len(headers) == 1
+    hdr = headers[0]
+    assert isinstance(hdr, CQCHeader)
+    assert hdr.tp == CQCType.HELLO
 
 
 def test_createqubit(tmpdir):
@@ -38,16 +55,23 @@ def test_createqubit(tmpdir):
 
     with CQCToFile(file=filename, binary=False) as cqc:
          
-        q = qubit(cqc)
-        q.H()
+        qubit(cqc)
 
+        # Read the files before cqc goes out of context and flushes
         with open(filename) as f:
+            lines = f.readlines()
             
-            line = f.readline()
-            print(line)
+    assert len(lines) == 1
 
-            assert line[6:10] == "\\x01"
-            assert line[42:46] == "\\x01"
+    # Check that the first line initialize a qubit
+    headers = parse_cqc_message(eval(lines[0][:-1]))
+    assert len(headers) == 2
+    hdr, cmd = headers
+    assert isinstance(hdr, CQCHeader)
+    assert hdr.tp == CQCType.COMMAND
+    assert isinstance(cmd, CQCCmdHeader)
+    assert cmd.qubit_id == 0
+    assert cmd.instr == CQC_CMD_NEW
 
 
 def test_releasequbit(tmpdir):
@@ -56,18 +80,32 @@ def test_releasequbit(tmpdir):
 
     with CQCToFile(file=filename, binary=False) as cqc:
          
-        q = qubit(cqc)
-        q.H()
+        qubit(cqc)
 
     with open(filename) as f:
+        lines = f.readlines()
             
-        line = f.readline()
-        line = f.readline()
-        line = f.readline()
-        print(line)
+    assert len(lines) == 2
 
-        assert line[6:10] == "\\x01"
-        assert line[42:46] == "\\x17"
+    # Check that the first line initialize a qubit
+    headers = parse_cqc_message(eval(lines[0][:-1]))
+    assert len(headers) == 2
+    hdr, cmd = headers
+    assert isinstance(hdr, CQCHeader)
+    assert hdr.tp == CQCType.COMMAND
+    assert isinstance(cmd, CQCCmdHeader)
+    assert cmd.qubit_id == 0
+    assert cmd.instr == CQC_CMD_NEW
+
+    # Check that the second line releases the qubit
+    headers = parse_cqc_message(eval(lines[1][:-1]))
+    assert len(headers) == 2
+    hdr, cmd = headers
+    assert isinstance(hdr, CQCHeader)
+    assert hdr.tp == CQCType.COMMAND
+    assert isinstance(cmd, CQCCmdHeader)
+    assert cmd.qubit_id == 0
+    assert cmd.instr == CQC_CMD_RELEASE
 
 
 def test_Hgate(tmpdir):
@@ -80,13 +118,40 @@ def test_Hgate(tmpdir):
         q.H()
 
     with open(filename) as f:
-            
-        line = f.readline()
-        line = f.readline()
-        print(line)
+        lines = f.readlines()
+       
+    # Since pend_messages=False there should be three lines
+    assert len(lines) == 3
 
-        assert line[6:10] == "\\x01"
-        assert line[42:46] == "\\x11"
+    # Check that the first line initialize a qubit
+    headers = parse_cqc_message(eval(lines[0][:-1]))
+    assert len(headers) == 2
+    hdr, cmd = headers
+    assert isinstance(hdr, CQCHeader)
+    assert hdr.tp == CQCType.COMMAND
+    assert isinstance(cmd, CQCCmdHeader)
+    assert cmd.qubit_id == 0
+    assert cmd.instr == CQC_CMD_NEW
+
+    # Check that the second line does H
+    headers = parse_cqc_message(eval(lines[1][:-1]))
+    assert len(headers) == 2
+    hdr, cmd = headers
+    assert isinstance(hdr, CQCHeader)
+    assert hdr.tp == CQCType.COMMAND
+    assert isinstance(cmd, CQCCmdHeader)
+    assert cmd.qubit_id == 0
+    assert cmd.instr == CQC_CMD_H
+
+    # Check that the third line releases the qubit
+    headers = parse_cqc_message(eval(lines[2][:-1]))
+    assert len(headers) == 2
+    hdr, cmd = headers
+    assert isinstance(hdr, CQCHeader)
+    assert hdr.tp == CQCType.COMMAND
+    assert isinstance(cmd, CQCCmdHeader)
+    assert cmd.qubit_id == 0
+    assert cmd.instr == CQC_CMD_RELEASE
 
 
 def test_some_combinations(tmpdir):
@@ -167,17 +232,31 @@ def test_flush_on_exit(tmpdir):
         q.X()
 
     with open(filename) as f:
+        lines = f.readlines()
 
-        line = f.readline()
-        print(line)
-        assert line[6:10] == "\\x01"
-        assert line[42:46] == "\\x01"
-        line = f.readline()
-        print(line)
-        assert line[6:10] == "\\x01"
-        line = f.readline()
-        print(line)
-        assert line[10:14] == "\\x11"
-        line = f.readline()
-        print(line)
-        assert line[10:12] == "\\n"
+    # Since pend_messages=True we should only get two lines
+    assert len(lines) == 2
+
+    # Check that the first line initialize a qubit
+    headers = parse_cqc_message(eval(lines[0][:-1]))
+    assert len(headers) == 2
+    hdr, cmd = headers
+    assert isinstance(hdr, CQCHeader)
+    assert hdr.tp == CQCType.COMMAND
+    assert isinstance(cmd, CQCCmdHeader)
+    assert cmd.qubit_id == 0
+    assert cmd.instr == CQC_CMD_NEW
+
+    # Check that the second line applies H, X and releases
+    headers = parse_cqc_message(eval(lines[1][:-1]))
+    assert len(headers) == 4
+    hdr, *cmds = headers
+    assert isinstance(hdr, CQCHeader)
+    assert hdr.tp == CQCType.COMMAND
+    assert len(cmds) == 3
+    for cmd in cmds:
+        assert isinstance(cmd, CQCCmdHeader)
+        assert cmd.qubit_id == 0
+    assert cmds[0].instr == CQC_CMD_H
+    assert cmds[1].instr == CQC_CMD_X
+    assert cmds[2].instr == CQC_CMD_RELEASE

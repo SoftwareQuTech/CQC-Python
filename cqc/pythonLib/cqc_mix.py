@@ -288,7 +288,7 @@ class CQCMix(NodeMixin):
         """
         if not isinstance(cqc_connection, CQCMixConnection):
             raise TypeError("To use CQCMix the connection needs to be of type CQCMixConnection, "
-                            f"not {type(cqc_connection)}")
+                            "not {}".format(type(cqc_connection)))
 
         self._conn = cqc_connection
 

@@ -38,7 +38,7 @@ def get_expected_headers_flush():
         version=2,
         tp=CQC_TP_COMMAND,
         app_id=0,
-        length=2 * CQC_CMD_HDR_LENGTH,
+        length=3 * CQC_CMD_HDR_LENGTH,
     )
     hdr_cmd_h = get_header(
         CQCCmdHeader, 
@@ -67,8 +67,7 @@ def get_expected_headers_flush():
 
     expected_headers = [
         hdr_tp_cmd + hdr_cmd_new,
-        hdr_tp_cmd_2 + hdr_cmd_h + hdr_cmd_x,
-        hdr_tp_cmd + hdr_cmd_release
+        hdr_tp_cmd_2 + hdr_cmd_h + hdr_cmd_x + hdr_cmd_release,
     ]
 
     return expected_headers

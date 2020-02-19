@@ -46,6 +46,7 @@ from cqc.cqcHeader import (
 def parse_cqc_message(msg):
     # TODO finish parser
     hdr_map = {
+        CQCType.HELLO: None,
         CQCType.COMMAND: CQCCmdHeader,
         CQCType.MIX: CQCTypeHeader,
         CQCType.IF: CQCIfHeader,
@@ -81,7 +82,7 @@ def parse_cqc_message(msg):
             elif isinstance(hdr, CQCFactoryHeader):
                 next_hdr = CQCCmdHeader
             else:
-                raise NotImplementedError(f"for {hdr}")
+                raise NotImplementedError("for {}".format(hdr))
             bits_to_next_first_hdr -= hdr.HDR_LENGTH
         if bits_to_next_first_hdr <= 0:
             next_hdr = CQCHeader
