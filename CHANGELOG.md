@@ -6,6 +6,10 @@ For more details refer to the [documentation](https://softwarequtech.github.io/S
 Upcoming
 --------
 
+2020-02-23 (v3.2.0)
+-------------------
+- Major refactoring of `cqc.pythonLib` which splits the code into multiple files and improved extendability by the use of abstract classes etc.
+
 2020-01-27 (v3.1.2)
 -------------------
 - Allow for numpy version up to 2.0.0
