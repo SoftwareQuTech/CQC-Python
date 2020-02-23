@@ -75,7 +75,6 @@ class qubit:
             :q_id:         Qubit id, used internally if createNew
             :entInfo:     Entanglement information, if qubit is part of EPR-pair
         """
-
         # Cqc connection
         self._cqc = cqc
 
@@ -445,18 +444,17 @@ class qubit:
             # if this qubit is used after this measurement
             self._set_active(False)
 
-        if self._cqc.pend_messages:
-            logging.warning("Cannot pend messages containing measurements at this point, flushing all messages")
-            self._cqc.flush()
-
-        self._cqc.commit_command(
+        self._cqc.put_command(
             qID=self._qID,
             command=command,
             notify=False,
             block=block,
         )
 
-        return self._cqc.return_meas_outcome()
+        if self._cqc.pend_messages:
+            return None
+        else:
+            return self._cqc.return_meas_outcome()
 
     def reset(self, notify=True, block=True):
         """

@@ -32,7 +32,6 @@ import socket
 import logging
 
 from cqc.cqcHeader import (
-    CQC_TP_DONE,
     CQC_TP_NEW_OK,
     CQC_TP_RECV,
     CQC_TP_EPR_OK,
@@ -126,6 +125,7 @@ class CQCConnection(CQCHandler):
         self._appNet = app_net
 
         # Open a socket to the backend
+        self._s = None
         cqc_socket = self._setup_socket(addr=addr, retry_connection=retry_connection)
         self._s = cqc_socket
 
@@ -209,17 +209,16 @@ class CQCConnection(CQCHandler):
                 time.sleep(self._conn_retry_time)
                 cqc_socket.close()
                 if not retry_connection:
-                    self.close(release_qubits=False)
+                    self.close()
                     raise err
             except Exception as err:
-                logging.warning("App {} : Critical error when connection to CQC server: {}".format(self.name, err))
+                logging.exception("App {} : Critical error when connection to CQC server: {}".format(self.name, err))
                 cqc_socket.close()
                 raise err
         return cqc_socket
 
     def commit(self, msg):
         """Send message through the socket."""
-
         self._s.send(msg)
 
     def close(self, release_qubits=True, notify=True):
@@ -229,17 +228,9 @@ class CQCConnection(CQCHandler):
         connections, and removes the app ID from the used app IDs.
         """
         super().close()
-        if release_qubits and self.active_qubits:
-            if notify:
-                msg = self.readMessage()
-                self.check_error(msg[0])
-                if msg[0].tp != CQC_TP_DONE:
-                    raise CQCUnsuppError(
-                        "Unexpected message sent back from the server. Message: {}".format(msg[0])
-                    )
-                self.print_CQC_msg(msg)
 
-        self._s.close()
+        if self._s is not None:
+            self._s.close()
 
         self.closeClassicalServer()
 
@@ -387,30 +378,7 @@ class CQCConnection(CQCHandler):
         if close_after:
             self.closeClassicalChannel(name)
 
-    def allocate_qubits(self, num_qubits, notify=True, block=True):
-        """Requests the backend to reserve some qubits
-
-        :param num_qubits: The amount of qubits to reserve
-        :return: A list of qubits
-        :param notify:     Do we wish to be notified when done.
-        :param block:         Do we want the qubit to be blocked
-        """
-        qubits = super().allocate_qubits(
-            num_qubits=num_qubits,
-            notify=notify,
-            block=block,
-        )
-
-        if notify:
-            message = self.readMessage()
-            if message[0].tp != CQC_TP_DONE:
-                raise CQCUnsuppError(
-                    "Unexpected message send back from the server. Message: {}".format(message[0])
-                )
-
-        return qubits
-
-    def _handle_create_qubits(self, num_qubits):
+    def _handle_create_qubits(self, num_qubits, notify):
         qubits = []
         for _ in range(num_qubits):
             msg = self.readMessage()
@@ -419,6 +387,11 @@ class CQCConnection(CQCHandler):
                 raise CQCUnsuppError("Unexpected message of type {} send back from backend".format(msg[0].tp))
             qubits.append(self.parse_CQC_msg(msg))
             self.print_CQC_msg(msg)
+
+        if notify:
+            message = self.readMessage()
+            self._assert_done_message(message)
+            self.print_CQC_msg(message)
 
         return qubits
 
@@ -534,31 +507,6 @@ class CQCConnection(CQCHandler):
             block=block,
             remote_socket=remote_socket,
         )
-        if not self.pend_messages:
-            if notify:
-                message = self.readMessage()
-                self.print_CQC_msg(message)
-
-        return q
-            
-    def recvQubit(self, notify=True, block=True):
-        """Receives a qubit.
-
-        - **Arguments**
-
-            :q:         The qubit to send.
-            :Name:         Name of the node as specified in the cqc network config file.
-            :remote_appID:     The app ID of the application running on the receiving node.
-            :nofify:     Do we wish to be notified when done.
-            :block:         Do we want the qubit to be blocked
-        """
-        q = super().recvQubit(notify=notify, block=block)
-        if not self.pend_messages:
-            if notify:
-                message = self.readMessage()
-                self.print_CQC_msg(message)
-
-        return q
 
     def createEPR(self, name, remote_appID=0, notify=True, block=True, remote_socket=None):
         """Creates epr with other host in cqc network.
@@ -627,7 +575,11 @@ class CQCConnection(CQCHandler):
             otherHdr = msg[1]
             return otherHdr.outcome
         except AttributeError:
-            return None
+            raise RuntimeError("Didn't receive a measurement outcome")
+
+        message = self.readMessage()
+        self._assert_done_message(message)
+        self.print_CQC_msg(message)
 
     def get_remote_from_directory_or_address(self, name, remote_socket=None):
         cqcNet = self._cqcNet

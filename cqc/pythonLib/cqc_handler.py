@@ -100,11 +100,6 @@ class CQCHandler(abc.ABC):
 
         self.name = name
 
-        # Decides if to send each command as it is received, or only 
-        # when flushed
-        self._pend_messages = pend_messages
-        self._pending_headers = []
-
         # This flag is used to check if CQCConnection is opened using a 'with' statement.
         # Otherwise an deprecation warning is printed when instantiating qubits.
         self._opened_with_with = False
@@ -125,6 +120,9 @@ class CQCHandler(abc.ABC):
 
         # Bool that indicates whether we are in a factory and thus should pend commands
         self.pend_messages = pend_messages
+
+        # Keep track of pending messages
+        self._pending_headers = []
 
     @property
     def pend_messages(self):
@@ -179,7 +177,7 @@ class CQCHandler(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _handle_create_qubits(self, num_qubits):
+    def _handle_create_qubits(self, num_qubits, notify):
         """Handles responses after allocating qubits and returns a list of qubits"""
         pass
 
@@ -244,11 +242,21 @@ class CQCHandler(abc.ABC):
             msg += header.pack()
         self.commit(msg)
 
-    def put_command(self, qID, command, **kwargs):
+    def put_command(self, qID, command, read_notify=True, **kwargs):
         """Puts a new command to be executed.
 
         If self.pend_messages is set to True, the messages are kept until flushing,
         otherwise they are commited directly.
+
+        Parameters
+        ----------
+        qID: int
+            Id of the qubit to apply the command on
+        command: int
+            What command to be executed
+        read_notify : bool
+            Whether to listen to a notify message in this function or if this is handled
+            elsewhere (e.g. createEPR)
         """
         headers = self.construct_command_headers(qID=qID, command=command, **kwargs)
         str_of_headers = "".join(["\t{}\n".format(header) for header in headers])
@@ -265,11 +273,12 @@ class CQCHandler(abc.ABC):
                 str_of_headers,
             ))
             self.commit_headers(headers)
-            notify = kwargs.get("notify", True)
-            if notify:
-                message = self.readMessage()
-                self._assert_done_message(message)
-                self.print_CQC_msg(message)
+            if read_notify:
+                notify = kwargs.get("notify", True)
+                if notify:
+                    message = self.readMessage()
+                    self._assert_done_message(message)
+                    self.print_CQC_msg(message)
 
     def _update_headers_before_pending(self, headers):
         # Don't include the CQC Headers since this is a sequence
@@ -402,7 +411,7 @@ class CQCHandler(abc.ABC):
         except ValueError:
             pass  # Already removed
 
-    def create_qubits(self, num_qubits, block=True):
+    def create_qubits(self, num_qubits, block=True, notify=True):
         """Requests the backend to reserve some qubits
 
         :param num_qubits: The amount of qubits to reserve
@@ -410,16 +419,18 @@ class CQCHandler(abc.ABC):
         :param notify:     Do we wish to be notified when done.
         :param block:         Do we want the qubit to be blocked
         """
+        notify = self.notify and notify
+
         # TODO how to handle pending headers?
         headers = self.construct_command_headers(
             qID=num_qubits,
             command=CQC_CMD_ALLOCATE,
-            notify=False,
+            notify=notify,
             block=block,
         )
         self.commit_headers(headers)
 
-        qubits = self._handle_create_qubits(self, num_qubits=num_qubits)
+        qubits = self._handle_create_qubits(num_qubits=num_qubits, notify=notify)
 
         return qubits
 
@@ -471,14 +482,15 @@ class CQCHandler(abc.ABC):
 
         # print info
         logging.debug(
-            "App {} pends message: 'Create EPR-pair with {} and appID {}'".format(self.name, name, remote_appID)
+            "App {} puts message: 'Create EPR-pair with {} and appID {}'".format(self.name, name, remote_appID)
         )
         notify = self.notify and notify
         self.put_command(
             0,
             CQC_CMD_EPR,
-            notify=int(notify),
-            block=int(block),
+            read_notify=False,
+            notify=notify,
+            block=block,
             remote_appID=remote_appID,
             remote_node=remote_ip,
             remote_port=remote_port,
@@ -496,13 +508,14 @@ class CQCHandler(abc.ABC):
             :block:         Do we want the qubit to be blocked
         """
         # print info
-        logging.debug("App {} pends message: 'Receive half of EPR'".format(self.name))
+        logging.debug("App {} puts message: 'Receive half of EPR'".format(self.name))
         notify = self.notify and notify
         self.put_command(
             qID=0,
             command=CQC_CMD_EPR_RECV,
-            notify=int(notify),
-            block=int(block),
+            read_notify=False,
+            notify=notify,
+            block=block,
         )
 
         if not self.pend_messages:
@@ -526,7 +539,7 @@ class CQCHandler(abc.ABC):
 
         # print info
         logging.debug(
-            "App {} pends message: 'Send qubit with ID {} to {} and appID {}'".format(
+            "App {} puts message: 'Send qubit with ID {} to {} and appID {}'".format(
                 self.name, q._qID, name, remote_appID
             )
         )
@@ -534,8 +547,8 @@ class CQCHandler(abc.ABC):
         self.put_command(
             qID=q._qID,
             command=CQC_CMD_SEND,
-            notify=int(notify), 
-            block=int(block),
+            notify=notify, 
+            block=block,
             remote_appID=remote_appID, 
             remote_node=remote_ip,
             remote_port=remote_port,
@@ -557,9 +570,9 @@ class CQCHandler(abc.ABC):
         """
 
         # print info
-        logging.debug("App {} pends message: 'Receive qubit'".format(self.name))
+        logging.debug("App {} puts message: 'Receive qubit'".format(self.name))
         notify = self.notify and notify
-        self.put_command(0, CQC_CMD_RECV, notify=int(notify), block=int(block))
+        self.put_command(0, CQC_CMD_RECV, read_notify=False, notify=notify, block=block)
         if not self.pend_messages:
             # Get qubit id
             q_id = self.new_qubitID(print_cqc=True)
@@ -570,6 +583,13 @@ class CQCHandler(abc.ABC):
 
             # Activate and return qubit
             q._set_active(True)
+
+            # Read the notify message
+            if notify:
+                message = self.readMessage()
+                self._assert_done_message(message)
+                self.print_CQC_msg(message)
+
             return q
 
     def flush(self, do_sequence=False):
@@ -624,11 +644,11 @@ class CQCHandler(abc.ABC):
         # Send all pending headers
         self.send_pending_headers()
 
-        # Read out any returned messages from the backend
-        res = self._handle_factory_response(num_iter, response_amount, should_notify=should_notify)
-
         # Reset _pending_headers to an empty list after all headers are sent
         self.reset_pending_headers()
+
+        # Read out any returned messages from the backend
+        res = self._handle_factory_response(num_iter, response_amount, should_notify=should_notify)
         
         # Return information that the backend returned
         return res
@@ -712,7 +732,7 @@ class CQCHandler(abc.ABC):
             if progress:
                 bar.increase()
 
-                # prepare and measure
+            # prepare and measure
             q = preparation(self)
             q.H()
             m = q.measure()
@@ -724,7 +744,7 @@ class CQCHandler(abc.ABC):
             if progress:
                 bar.increase()
 
-                # prepare and measure
+            # prepare and measure
             q = preparation(self)
             q.K()
             m = q.measure()
@@ -736,7 +756,7 @@ class CQCHandler(abc.ABC):
             if progress:
                 bar.increase()
 
-                # prepare and measure
+            # prepare and measure
             q = preparation(self)
             m = q.measure()
             accum_outcomes[2] += m
