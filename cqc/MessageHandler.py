@@ -291,7 +291,7 @@ class CQCMessageHandler(ABC):
         should_notify = None
         while cur_length < length:
             cmd = CQCCmdHeader(cmd_data[cur_length: cur_length + CQCCmdHeader.HDR_LENGTH])
-            logging.debug("CQC %s got command header %s", self.name, cmd.printable())
+            logging.debug("CQC %s got command header %s", self.name, cmd)
 
             newl = cur_length + cmd.HDR_LENGTH
             # Should we notify
@@ -306,10 +306,10 @@ class CQCMessageHandler(ABC):
 
             if xtra is not None:
                 newl += xtra.HDR_LENGTH
-                logging.debug("CQC %s: Read XTRA Header: %s", self.name, xtra.printable())
+                logging.debug("CQC %s: Read XTRA Header: %s", self.name, xtra)
 
             # Run this command
-            logging.debug("CQC %s: Executing command: %s", self.name, cmd.printable())
+            logging.debug("CQC %s: Executing command: %s", self.name, cmd)
             if cmd.instr not in self.commandHandlers:
                 logging.debug("CQC {}: Unknown command {}".format(self.name, cmd.instr))
                 msg = self.create_return_message(cqc_header.app_id, CQC_ERR_UNSUPP, cqc_version=cqc_header.version)

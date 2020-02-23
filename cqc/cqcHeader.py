@@ -115,6 +115,38 @@ CQC_OPT_NOTIFY = 0x01  # Send a notification when cmd done
 CQC_OPT_ACTION = 0x02  # On if there are actions to execute when done
 CQC_OPT_BLOCK = 0x04  # Block until command is done
 
+_CMD_TO_STRING = {
+    CQC_CMD_I: "I",
+    CQC_CMD_NEW: "NEW",
+    CQC_CMD_MEASURE: "MEASURE",
+    CQC_CMD_MEASURE_INPLACE: "MEASURE_INPLACE",
+    CQC_CMD_RESET: "RESET",
+    CQC_CMD_SEND: "SEND",
+    CQC_CMD_RECV: "RECV",
+    CQC_CMD_EPR: "EPR",
+    CQC_CMD_EPR_RECV: "EPR_RECV",
+    CQC_CMD_X: "X",
+    CQC_CMD_Z: "Z",
+    CQC_CMD_Y: "Y",
+    CQC_CMD_T: "T",
+    CQC_CMD_ROT_X: "ROT_X",
+    CQC_CMD_ROT_Y: "ROT_Y",
+    CQC_CMD_ROT_Z: "ROT_Z",
+    CQC_CMD_H: "H",
+    CQC_CMD_K: "K",
+    CQC_CMD_CNOT: "CNOT",
+    CQC_CMD_CPHASE: "CPHASE",
+    CQC_CMD_ALLOCATE: "ALLOCATE",
+    CQC_CMD_RELEASE: "RELEASE",
+}
+
+
+def command_to_string(cmd_id):
+    cmd_str = _CMD_TO_STRING.get(cmd_id)
+    if cmd_str is None:
+        raise ValueError("Unknown instruction id {}".format(cmd_id))
+    return cmd_str
+
 
 class CQCType(IntEnum):
     HELLO = 0  # Alive check
@@ -179,6 +211,9 @@ class Header(metaclass=abc.ABCMeta):
             self.is_set = False
         else:
             self.unpack(headerBytes)
+
+    def __str__(self):
+        return self.printable()
 
     def setVals(self, *args, **kwargs):
         """

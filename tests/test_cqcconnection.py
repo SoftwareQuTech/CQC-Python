@@ -1,6 +1,8 @@
 import pytest
 
+from cqc.util import parse_cqc_message
 from cqc.pythonLib import CQCConnection, qubit
+from cqc.pythonLib import CQCMixConnection
 from cqc.cqcHeader import (
     CQCCmdHeader,
     CQCHeader,
@@ -65,10 +67,8 @@ def get_expected_headers_simple_h():
     )
 
     expected_headers = [
-        hdr_tp_cmd,
-        hdr_cmd_new,
-        hdr_tp_cmd,
-        hdr_cmd_h,
+        hdr_tp_cmd + hdr_cmd_new,
+        hdr_tp_cmd + hdr_cmd_h,
         hdr_tp_cmd + hdr_cmd_release,
     ]
 
@@ -81,28 +81,39 @@ def commands_to_apply_simple_h(cqc):
     q.H()
 
 
-@pytest.mark.parametrize("commands_to_apply, get_expected_headers", [
-    (commands_to_apply_simple_h, get_expected_headers_simple_h),
-    (commands_to_apply_bit_flip_code, get_expected_headers_bit_flip_code),
-    (commands_to_apply_simple_mix, get_expected_headers_simple_mix),
-    (commands_to_apply_mix_with_factory, get_expected_headers_mix_with_factory),
-    (commands_to_apply_mix_if_else, get_expected_headers_mix_if_else),
-    (commands_to_apply_mix_nested_if_else, get_expected_headers_mix_nested_if_else),
-    (commands_to_apply_flush, get_expected_headers_flush)
+@pytest.mark.parametrize("conn_type, commands_to_apply, get_expected_headers", [
+    (CQCConnection, commands_to_apply_simple_h, get_expected_headers_simple_h),
+    (CQCConnection, commands_to_apply_flush, get_expected_headers_flush),
+    (CQCMixConnection, commands_to_apply_bit_flip_code, get_expected_headers_bit_flip_code),
+    (CQCMixConnection, commands_to_apply_simple_mix, get_expected_headers_simple_mix),
+    (CQCMixConnection, commands_to_apply_mix_with_factory, get_expected_headers_mix_with_factory),
+    (CQCMixConnection, commands_to_apply_mix_if_else, get_expected_headers_mix_if_else),
+    (CQCMixConnection, commands_to_apply_mix_nested_if_else, get_expected_headers_mix_nested_if_else),
 ])
-def test_commands(commands_to_apply, get_expected_headers, monkeypatch, mock_socket, mock_read_message):
+def test_commands(conn_type, commands_to_apply, get_expected_headers, monkeypatch, mock_socket, mock_read_message):
+    # logging.getLogger().setLevel(logging.DEBUG)
 
-    with CQCConnection("Test", socket_address=('localhost', 8000), use_classical_communication=False) as cqc:
+    with conn_type("Test", socket_address=('localhost', 8000), use_classical_communication=False) as cqc:
         commands_to_apply(cqc)
 
-    expected_headers = get_expected_headers()
+    expected_messages = get_expected_headers()
+    send_calls = list(filter(lambda call: call.name == 'send', cqc._s.calls))
+    sent_messages = [call.args[0] for call in send_calls]
 
-    commands_sent = list(filter(lambda call: call.name == 'send', cqc._s.calls))
-    assert len(expected_headers) == len(commands_sent)
-    for command, expected in zip(commands_sent, expected_headers):
-        print(command.args[0])
-        print(expected)
-        print()
+    full_msg = {}
+    # Parse and print what we expect and what we got
+    for name, messages in zip(["EXPECTED", "GOT"], [expected_messages, sent_messages]):
+        print("\n{}:".format(name))
+        for msg in messages:
+            print('[')
+            for hdr in parse_cqc_message(msg):
+                print("  {}".format(hdr))
+            print('\n]')
+        full_msg[name] = b''.join([msg for msg in messages])
+
+    # Check if full messages are equal
+    assert full_msg["EXPECTED"] == full_msg["GOT"]
+    for got, expected in zip(sent_messages, expected_messages):
         # Excluding None gives the opportunity to not specify all expected headers but still check the number of them
         if expected is not None:
-            assert command.args[0] == expected
+            assert got == expected

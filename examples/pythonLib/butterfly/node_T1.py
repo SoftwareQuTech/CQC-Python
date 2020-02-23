@@ -70,7 +70,7 @@ def main():
 
         # Measure out
         m = q5.measure()
-        to_print = "5: Measurement outcome: {}".format(m)
+        to_print = "T1: Measurement outcome: {}".format(m)
         print("|" + "-" * (len(to_print) + 2) + "|")
         print("| " + to_print + " |")
         print("|" + "-" * (len(to_print) + 2) + "|")
