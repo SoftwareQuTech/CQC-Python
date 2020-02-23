@@ -1,4 +1,5 @@
-from cqc.pythonLib import qubit, CQCMix
+from cqc.pythonLib import CQCMix
+from cqc.pythonLib import mix_qubit as qubit
 from utilities import get_header
 from cqc.cqcHeader import (
     CQCCmdHeader,
@@ -57,119 +58,119 @@ def get_expected_headers_bit_flip_code():
     )
 
     return [
-        cqc_header_tp_cmd,
-        hdr_cmd_new,
-        cqc_header_tp_cmd,
-        hdr_cmd_new,
-        cqc_header_tp_cmd,
-        hdr_cmd_new,
+        cqc_header_tp_cmd + hdr_cmd_new,
+        # BARRIER
+        cqc_header_tp_cmd + hdr_cmd_new,
+        # BARRIER
+        cqc_header_tp_cmd + hdr_cmd_new,
+        # BARRIER
         get_header(
             CQCHeader,
             version=2,
             tp=CQCType.MIX,
             app_id=0,
             length=95
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=6
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_CNOT,
             notify=True,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCXtraQubitHeader, 
             qubit_id=2
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=8
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=2,
             instr=CQC_CMD_MEASURE_INPLACE,
             notify=False,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCAssignHeader, 
             ref_id=0
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.IF,
             length=14
-        ),
-        get_header(
+        )
+        + get_header(
             CQCIfHeader,
             first_operand=0, 
             operator=CQCLogicalOperator.EQ,
             type_of_second_operand=CQCIfHeader.TYPE_VALUE, 
             second_operand=1,
             length=52
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=6
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_CNOT,
             notify=True,
             action=False,
             block=True
-        ),
-        get_header(
+        )
+        + get_header(
             CQCXtraQubitHeader, 
             qubit_id=3
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=8
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=3,
             instr=CQC_CMD_MEASURE_INPLACE,
             notify=False,
             action=False,
             block=True
-        ),
-        get_header(
+        )
+        + get_header(
             CQCAssignHeader, 
             ref_id=1
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.IF,
             length=14
-        ),
-        get_header(
+        )
+        + get_header(
             CQCIfHeader,
             first_operand=1, 
             operator=CQCLogicalOperator.EQ,
             type_of_second_operand=CQCIfHeader.TYPE_VALUE, 
             second_operand=1,
             length=9
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_X,
@@ -177,12 +178,13 @@ def get_expected_headers_bit_flip_code():
             action=False,
             block=True,
         ),
+        # BARRIER
         get_header(
             CQCHeader, 
             version=2,
             tp=CQCType.COMMAND,
             app_id=0,
-            length=CQCCmdHeader.HDR_LENGTH * 3
+            length=CQCCmdHeader.HDR_LENGTH
         )
         + get_header(
             CQCCmdHeader, 
@@ -191,6 +193,14 @@ def get_expected_headers_bit_flip_code():
             notify=True,
             action=False,
             block=True,
+        ),
+        # BARRIER
+        get_header(
+            CQCHeader, 
+            version=2,
+            tp=CQCType.COMMAND,
+            app_id=0,
+            length=CQCCmdHeader.HDR_LENGTH
         )
         + get_header(
             CQCCmdHeader, 
@@ -199,6 +209,14 @@ def get_expected_headers_bit_flip_code():
             notify=True,
             action=False,
             block=True,
+        ),
+        # BARRIER
+        get_header(
+            CQCHeader, 
+            version=2,
+            tp=CQCType.COMMAND,
+            app_id=0,
+            length=CQCCmdHeader.HDR_LENGTH
         )
         + get_header(
             CQCCmdHeader, 
@@ -228,8 +246,8 @@ def get_expected_headers_simple_mix():
             tp=CQCType.COMMAND,
             app_id=0,
             length=CQCCmdHeader.HDR_LENGTH
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=0,
             instr=CQC_CMD_NEW,
@@ -237,32 +255,33 @@ def get_expected_headers_simple_mix():
             action=False,
             block=True
         ),
+        # BARRIER
         get_header(
             CQCHeader,
             version=2,
             tp=CQCType.MIX,
             app_id=0,
             length=18
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_X,
             notify=True,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_H,
@@ -270,6 +289,7 @@ def get_expected_headers_simple_mix():
             action=False,
             block=True,
         ),
+        # BARRIER
         get_header(
             CQCHeader, 
             version=2,
@@ -308,8 +328,8 @@ def get_expected_headers_mix_with_factory():
             tp=CQCType.COMMAND,
             app_id=0,
             length=CQCCmdHeader.HDR_LENGTH
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=0,
             instr=CQC_CMD_NEW,
@@ -317,49 +337,50 @@ def get_expected_headers_mix_with_factory():
             action=False,
             block=True
         ),
+        # BARRIER
         get_header(
             CQCHeader,
             version=2,
             tp=CQCType.MIX,
             app_id=0,
             length=29
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_X,
             notify=True,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.FACTORY,
             length=6
-        ),
-        get_header(
+        )
+        + get_header(
             CQCFactoryHeader,
             num_iter=3
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_H,
             notify=True,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_Y,
@@ -367,6 +388,7 @@ def get_expected_headers_mix_with_factory():
             action=False,
             block=True,
         ),
+        # BARRIER
         get_header(
             CQCHeader, 
             version=2,
@@ -419,79 +441,79 @@ def get_expected_headers_mix_if_else():
     )
 
     return [
-        cqc_header_tp_cmd,
-        hdr_cmd_new,
-        cqc_header_tp_cmd,
-        hdr_cmd_new,
+        cqc_header_tp_cmd + hdr_cmd_new,
+        # BARRIER
+        cqc_header_tp_cmd + hdr_cmd_new,
+        # BARRIER
         get_header(
             CQCHeader,
             version=2,
             tp=CQCType.MIX,
             app_id=0,
             length=69
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=8
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_MEASURE_INPLACE,
             notify=False,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCAssignHeader, 
             ref_id=0
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.IF,
             length=14
-        ),
-        get_header(
+        )
+        + get_header(
             CQCIfHeader,
             first_operand=0, 
             operator=CQCLogicalOperator.EQ,
             type_of_second_operand=CQCIfHeader.TYPE_VALUE, 
             second_operand=1,
             length=9
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=2,
             instr=CQC_CMD_X,
             notify=True,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.IF,
             length=14
-        ),
-        get_header(
+        )
+        + get_header(
             CQCIfHeader,
             first_operand=0, 
             operator=CQCLogicalOperator.NEQ,
             type_of_second_operand=CQCIfHeader.TYPE_VALUE, 
             second_operand=1,
             length=9
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=2,
             instr=CQC_CMD_H,
@@ -499,12 +521,13 @@ def get_expected_headers_mix_if_else():
             action=False,
             block=True,
         ),
+        # BARRIER
         get_header(
             CQCHeader, 
             version=2,
             tp=CQCType.COMMAND,
             app_id=0,
-            length=CQCCmdHeader.HDR_LENGTH * 2
+            length=CQCCmdHeader.HDR_LENGTH
         )
         + get_header(
             CQCCmdHeader, 
@@ -513,6 +536,14 @@ def get_expected_headers_mix_if_else():
             notify=True,
             action=False,
             block=True,
+        ),
+        # BARRIER
+        get_header(
+            CQCHeader, 
+            version=2,
+            tp=CQCType.COMMAND,
+            app_id=0,
+            length=CQCCmdHeader.HDR_LENGTH
         )
         + get_header(
             CQCCmdHeader, 
@@ -562,137 +593,137 @@ def get_expected_headers_mix_nested_if_else():
     )
 
     return [
-        cqc_header_tp_cmd,
-        hdr_cmd_new,
-        cqc_header_tp_cmd,
-        hdr_cmd_new,
-        cqc_header_tp_cmd,
-        hdr_cmd_new,
+        cqc_header_tp_cmd + hdr_cmd_new,
+        # BARRIER
+        cqc_header_tp_cmd + hdr_cmd_new,
+        # BARRIER
+        cqc_header_tp_cmd + hdr_cmd_new,
+        # BARRIER
         get_header(
             CQCHeader,
             version=2,
             tp=CQCType.MIX,
             app_id=0,
             length=119
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_H,
             notify=True,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=8
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=1,
             instr=CQC_CMD_MEASURE_INPLACE,
             notify=False,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCAssignHeader, 
             ref_id=0
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.IF,
             length=14
-        ),
-        get_header(
+        )
+        + get_header(
             CQCIfHeader,
             first_operand=0, 
             operator=CQCLogicalOperator.EQ,
             type_of_second_operand=CQCIfHeader.TYPE_VALUE, 
             second_operand=1,
             length=50
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=2,
             instr=CQC_CMD_H,
             notify=True,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=8
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=2,
             instr=CQC_CMD_MEASURE_INPLACE,
             notify=False,
             action=False,
             block=True
-        ),
-        get_header(
+        )
+        + get_header(
             CQCAssignHeader, 
             ref_id=1
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.IF,
             length=14
-        ),
-        get_header(
+        )
+        + get_header(
             CQCIfHeader,
             first_operand=1, 
             operator=CQCLogicalOperator.EQ,
             type_of_second_operand=CQCIfHeader.TYPE_VALUE, 
             second_operand=0,
             length=9
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=3,
             instr=CQC_CMD_X,
             notify=True,
             action=False,
             block=True,
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.IF,
             length=14
-        ),
-        get_header(
+        )
+        + get_header(
             CQCIfHeader,
             first_operand=0, 
             operator=CQCLogicalOperator.NEQ,
             type_of_second_operand=CQCIfHeader.TYPE_VALUE, 
             second_operand=1,
             length=9
-        ),
-        get_header(
+        )
+        + get_header(
             CQCTypeHeader,
             tp=CQCType.COMMAND,
             length=4
-        ),
-        get_header(
+        )
+        + get_header(
             CQCCmdHeader, 
             qubit_id=2,
             instr=CQC_CMD_X,
@@ -700,12 +731,13 @@ def get_expected_headers_mix_nested_if_else():
             action=False,
             block=True,
         ),
+        # BARRIER
         get_header(
             CQCHeader, 
             version=2,
             tp=CQCType.COMMAND,
             app_id=0,
-            length=CQCCmdHeader.HDR_LENGTH * 3
+            length=CQCCmdHeader.HDR_LENGTH
         )
         + get_header(
             CQCCmdHeader, 
@@ -714,6 +746,14 @@ def get_expected_headers_mix_nested_if_else():
             notify=True,
             action=False,
             block=True,
+        ),
+        # BARRIER
+        get_header(
+            CQCHeader, 
+            version=2,
+            tp=CQCType.COMMAND,
+            app_id=0,
+            length=CQCCmdHeader.HDR_LENGTH
         )
         + get_header(
             CQCCmdHeader, 
@@ -722,6 +762,14 @@ def get_expected_headers_mix_nested_if_else():
             notify=True,
             action=False,
             block=True,
+        ),
+        # BARRIER
+        get_header(
+            CQCHeader, 
+            version=2,
+            tp=CQCType.COMMAND,
+            app_id=0,
+            length=CQCCmdHeader.HDR_LENGTH
         )
         + get_header(
             CQCCmdHeader, 

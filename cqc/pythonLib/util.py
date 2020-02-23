@@ -28,53 +28,63 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from cqc.pythonLib import CQCConnection
+import os
+import sys
 
 
-#####################################################################################################
-#
-# main
-#
-def main():
+class ProgressBar:
+    def __init__(self, maxitr):
+        self.maxitr = maxitr
+        self.itr = 0
+        try:
+            self.cols = os.get_terminal_size().columns
+        except (OSError, AttributeError):
+            self.cols = 60
+        print("")
+        self.update()
 
-    # Initialize the connection
-    with CQCConnection("T2") as T2:
+    def increase(self):
+        self.itr += 1
+        self.update()
 
-        # Make EPR-pairs with S1 and R2
-        qtmp1 = T2.recvEPR()
-        qtmp2 = T2.recvEPR()
+    def update(self):
+        cols = self.cols - 8
+        assert self.itr <= self.maxitr
+        ratio = float(self.itr) / self.maxitr
+        procent = int(ratio * 100)
+        progress = "=" * int(cols * ratio)
+        sys.stdout.write("\r")
+        sys.stdout.write("[%*s] %d%%" % (-cols, progress, procent))
+        sys.stdout.flush()
+        pass
 
-        # Check where qubit are sent from
-        if qtmp1.get_remote_entNode() == "R2":
-            q11 = qtmp1
-            q1 = qtmp2
-        else:
-            q11 = qtmp2
-            q1 = qtmp1
-
-            # Receive corrections from R2 (step 3)
-        msg = T2.recvClassical()
-        if msg[2] == 1:
-            q11.X()
-
-            # Entangle (step 4)
-        q11.cnot(q1)
-
-        # H and measure (step 5)
-        q11.H()
-        m = q11.measure()
-
-        # Send corrections to R2 (step 5)
-        msg = "T2".encode("utf-8") + bytes([m])
-        T2.sendClassical("R2", msg)
-
-        # Measure out
-        m = q1.measure()
-        to_print = "T2: Measurement outcome: {}".format(m)
-        print("|" + "-" * (len(to_print) + 2) + "|")
-        print("| " + to_print + " |")
-        print("|" + "-" * (len(to_print) + 2) + "|")
+    def close(self):
+        print("")
 
 
-##################################################################################################
-main()
+class CQCGeneralError(Exception):
+    pass
+
+
+class CQCNoQubitError(CQCGeneralError):
+    pass
+
+
+class CQCUnsuppError(CQCGeneralError):
+    pass
+
+
+class CQCTimeoutError(CQCGeneralError):
+    pass
+
+
+class CQCInuseError(CQCGeneralError):
+    pass
+
+
+class CQCUnknownError(CQCGeneralError):
+    pass
+
+
+class QubitNotActiveError(CQCGeneralError):
+    pass
