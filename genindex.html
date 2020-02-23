@@ -22,11 +22,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -156,17 +156,16 @@
 
 <div class="genindex-jumpbox">
  <a href="#_"><strong>_</strong></a>
- | <a href="#A"><strong>A</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
- | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#Q"><strong>Q</strong></a>
@@ -205,26 +204,20 @@
   </ul></td>
 </tr></table>
 
-<h2 id="A">A</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.allocate_qubits">allocate_qubits() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.qubit.check_active">check_active() (cqc.pythonLib.qubit method)</a>
 </li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.check_error">check_error() (cqc.pythonLib.CQCConnection method)</a>
-</li>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.close">close() (cqc.pythonLib.CQCConnection method)</a>
 </li>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.closeClassicalChannel">closeClassicalChannel() (cqc.pythonLib.CQCConnection method)</a>
 </li>
+      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.closeClassicalServer">closeClassicalServer() (cqc.pythonLib.CQCConnection method)</a>
+</li>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.qubit.cnot">cnot() (cqc.pythonLib.qubit method)</a>
+</li>
+      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.commit">commit() (cqc.pythonLib.CQCConnection method)</a>
 </li>
       <li><a href="modules/Protocol.html#cqc.Protocol.CQCProtocol.connectionLost">connectionLost() (cqc.Protocol.CQCProtocol method)</a>
 </li>
@@ -254,10 +247,10 @@
 </li>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection">CQCConnection (class in cqc.pythonLib)</a>
 </li>
-      <li><a href="modules/cqcHeader.html#cqc.cqcHeader.CQCEPRRequestHeader">CQCEPRRequestHeader (class in cqc.cqcHeader)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/cqcHeader.html#cqc.cqcHeader.CQCEPRRequestHeader">CQCEPRRequestHeader (class in cqc.cqcHeader)</a>
+</li>
       <li><a href="modules/cqcHeader.html#cqc.cqcHeader.CQCFactoryHeader">CQCFactoryHeader (class in cqc.cqcHeader)</a>
 </li>
       <li><a href="modules/cqcHeader.html#cqc.cqcHeader.CQCHeader">CQCHeader (class in cqc.cqcHeader)</a>
@@ -292,8 +285,6 @@
 </li>
       <li><a href="modules/MessageHandler.html#cqc.MessageHandler.CQCMessageHandler.create_extra_header">create_extra_header() (cqc.MessageHandler.CQCMessageHandler static method)</a>
 </li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.create_qubits">create_qubits() (cqc.pythonLib.CQCConnection method)</a>
-</li>
       <li><a href="modules/MessageHandler.html#cqc.MessageHandler.CQCMessageHandler.create_return_message">create_return_message() (cqc.MessageHandler.CQCMessageHandler static method)</a>
 </li>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.createEPR">createEPR() (cqc.pythonLib.CQCConnection method)</a>
@@ -323,22 +314,10 @@
   </ul></td>
 </tr></table>
 
-<h2 id="F">F</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.flush">flush() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.flush_factory">flush_factory() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.get_appID">get_appID() (cqc.pythonLib.CQCConnection method)</a>
+      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.get_remote_from_directory_or_address">get_remote_from_directory_or_address() (cqc.pythonLib.CQCConnection method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -377,10 +356,6 @@
       <li><a href="modules/pythonLib.html#cqc.pythonLib.qubit.I">I() (cqc.pythonLib.qubit method)</a>
 </li>
   </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.insert_cqc_header">insert_cqc_header() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-  </ul></td>
 </tr></table>
 
 <h2 id="K">K</h2>
@@ -411,6 +386,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.new_qubitID">new_qubitID() (cqc.pythonLib.CQCConnection method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -424,12 +407,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/cqcHeader.html#cqc.cqcHeader.Header.pack">pack() (cqc.cqcHeader.Header method)</a>
 </li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.parse_CQC_msg">parse_CQC_msg() (cqc.pythonLib.CQCConnection method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.print_CQC_msg">print_CQC_msg() (cqc.pythonLib.CQCConnection method)</a>
-</li>
       <li><a href="modules/cqcHeader.html#cqc.cqcHeader.Header.printable">printable() (cqc.cqcHeader.Header method)</a>
 </li>
   </ul></td>
@@ -448,21 +427,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.readMessage">readMessage() (cqc.pythonLib.CQCConnection method)</a>
 </li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.recvEPR">recvEPR() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.recvQubit">recvQubit() (cqc.pythonLib.CQCConnection method)</a>
+      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.recvClassical">recvClassical() (cqc.pythonLib.CQCConnection method)</a>
 </li>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.qubit.release">release() (cqc.pythonLib.qubit method)</a>
 </li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.release_all_qubits">release_all_qubits() (cqc.pythonLib.CQCConnection method)</a>
+      <li><a href="modules/pythonLib.html#cqc.pythonLib.qubit.reset">reset() (cqc.pythonLib.qubit method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.release_qubits">release_qubits() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.qubit.reset">reset() (cqc.pythonLib.qubit method)</a>
-</li>
       <li><a href="modules/MessageHandler.html#cqc.MessageHandler.CQCMessageHandler.retrieve_return_messages">retrieve_return_messages() (cqc.MessageHandler.CQCMessageHandler method)</a>
+</li>
+      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.return_meas_outcome">return_meas_outcome() (cqc.pythonLib.CQCConnection method)</a>
 </li>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.qubit.rot_X">rot_X() (cqc.pythonLib.qubit method)</a>
 </li>
@@ -476,28 +451,14 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.send_pending_headers">send_pending_headers() (cqc.pythonLib.CQCConnection method)</a>
-</li>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendClassical">sendClassical() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendCmdXtra">sendCmdXtra() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendCommand">sendCommand() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendFactory">sendFactory() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendGetTime">sendGetTime() (cqc.pythonLib.CQCConnection method)</a>
 </li>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendQubit">sendQubit() (cqc.pythonLib.CQCConnection method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.sendSimple">sendSimple() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.set_pending">set_pending() (cqc.pythonLib.CQCConnection method)</a>
-</li>
       <li><a href="modules/cqcHeader.html#cqc.cqcHeader.Header.setVals">setVals() (cqc.cqcHeader.Header method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.startClassicalServer">startClassicalServer() (cqc.pythonLib.CQCConnection method)</a>
 </li>
       <li><a href="modules/entInfoHeader.html#cqc.entInfoHeader.EntInfoCreateKeepHeader.switch_nodes">switch_nodes() (cqc.entInfoHeader.EntInfoCreateKeepHeader method)</a>
@@ -515,12 +476,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/pythonLib.html#cqc.pythonLib.qubit.T">T() (cqc.pythonLib.qubit method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.test_preparation">test_preparation() (cqc.pythonLib.CQCConnection method)</a>
-</li>
-      <li><a href="modules/pythonLib.html#cqc.pythonLib.CQCConnection.tomography">tomography() (cqc.pythonLib.CQCConnection method)</a>
 </li>
   </ul></td>
 </tr></table>

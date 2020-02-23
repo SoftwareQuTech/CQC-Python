@@ -21,11 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -168,10 +168,11 @@
 <h1>pythonLib<a class="headerlink" href="#pythonlib" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="cqc.pythonLib.CQCConnection">
-<em class="property">class </em><code class="sig-prename descclassname">cqc.pythonLib.</code><code class="sig-name descname">CQCConnection</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">socket_address=None</em>, <em class="sig-param">appID=None</em>, <em class="sig-param">pend_messages=False</em>, <em class="sig-param">retry_connection=True</em>, <em class="sig-param">conn_retry_time=0.1</em>, <em class="sig-param">log_level=None</em>, <em class="sig-param">backend=None</em>, <em class="sig-param">use_classical_communication=True</em>, <em class="sig-param">network_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<em class="property">class </em><code class="sig-prename descclassname">cqc.pythonLib.</code><code class="sig-name descname">CQCConnection</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">socket_address=None</em>, <em class="sig-param">appID=None</em>, <em class="sig-param">pend_messages=False</em>, <em class="sig-param">retry_connection=True</em>, <em class="sig-param">conn_retry_time=0.1</em>, <em class="sig-param">log_level=None</em>, <em class="sig-param">backend=None</em>, <em class="sig-param">use_classical_communication=True</em>, <em class="sig-param">network_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handler to be used when sending commands over a socket.</p>
+<dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">socket_address=None</em>, <em class="sig-param">appID=None</em>, <em class="sig-param">pend_messages=False</em>, <em class="sig-param">retry_connection=True</em>, <em class="sig-param">conn_retry_time=0.1</em>, <em class="sig-param">log_level=None</em>, <em class="sig-param">backend=None</em>, <em class="sig-param">use_classical_communication=True</em>, <em class="sig-param">network_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">socket_address=None</em>, <em class="sig-param">appID=None</em>, <em class="sig-param">pend_messages=False</em>, <em class="sig-param">retry_connection=True</em>, <em class="sig-param">conn_retry_time=0.1</em>, <em class="sig-param">log_level=None</em>, <em class="sig-param">backend=None</em>, <em class="sig-param">use_classical_communication=True</em>, <em class="sig-param">network_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize a connection to the cqc server.</p>
 <p>Since version 3.0.0: If socket_address is None or use_classical_communication is True, the CQC connection
 needs some way of finding the correct socket addresses. If backend is None or “simulaqron” the connection
@@ -226,28 +227,49 @@ Used if simulaqron is used to load socket addresses for the backend</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.get_appID">
-<code class="sig-name descname">get_appID</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.get_appID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.get_appID" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the application ID.</p>
+<dt id="cqc.pythonLib.CQCConnection.commit">
+<code class="sig-name descname">commit</code><span class="sig-paren">(</span><em class="sig-param">msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.commit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.commit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message through the socket.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.close">
-<code class="sig-name descname">close</code><span class="sig-paren">(</span><em class="sig-param">release_qubits=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.close" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">close</code><span class="sig-paren">(</span><em class="sig-param">release_qubits=True</em>, <em class="sig-param">notify=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handle closing actions.</p>
 <p>Flushes remaining headers, releases all qubits, closes the
 connections, and removes the app ID from the used app IDs.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="cqc.pythonLib.CQCConnection.new_qubitID">
+<code class="sig-name descname">new_qubitID</code><span class="sig-paren">(</span><em class="sig-param">print_cqc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.new_qubitID"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.new_qubitID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provide new qubit ID.</p>
+<p>For CQCConnection the qubit ID is given by the server. A message
+has to be read and the qubit ID extracted from it.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.startClassicalServer">
-<code class="sig-name descname">startClassicalServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.startClassicalServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.startClassicalServer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sets up a server for the application communication, if not already set up.</p>
+<code class="sig-name descname">startClassicalServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.startClassicalServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.startClassicalServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up a server for the application communication,
+if not already set up.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.pythonLib.CQCConnection.closeClassicalServer">
+<code class="sig-name descname">closeClassicalServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.closeClassicalServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.closeClassicalServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes classical server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.pythonLib.CQCConnection.recvClassical">
+<code class="sig-name descname">recvClassical</code><span class="sig-paren">(</span><em class="sig-param">timout=1</em>, <em class="sig-param">msg_size=1024</em>, <em class="sig-param">close_after=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.recvClassical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.recvClassical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive classical message.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.openClassicalChannel">
-<code class="sig-name descname">openClassicalChannel</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.openClassicalChannel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.openClassicalChannel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">openClassicalChannel</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.openClassicalChannel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.openClassicalChannel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Opens a classical connection to another host in the application network.</p>
 <ul>
 <li><p><strong>Arguments</strong></p>
@@ -267,7 +289,7 @@ connections, and removes the app ID from the used app IDs.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.closeClassicalChannel">
-<code class="sig-name descname">closeClassicalChannel</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.closeClassicalChannel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.closeClassicalChannel" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">closeClassicalChannel</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.closeClassicalChannel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.closeClassicalChannel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Closes a classical connection to another host in the application network.</p>
 <ul>
 <li><p><strong>Arguments</strong></p>
@@ -284,7 +306,7 @@ connections, and removes the app ID from the used app IDs.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.sendClassical">
-<code class="sig-name descname">sendClassical</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">msg</em>, <em class="sig-param">close_after=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.sendClassical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.sendClassical" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sendClassical</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">msg</em>, <em class="sig-param">close_after=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.sendClassical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.sendClassical" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sends a classical message to another host in the application network.</p>
 <ul>
 <li><p><strong>Arguments</strong></p>
@@ -306,265 +328,20 @@ connections, and removes the app ID from the used app IDs.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.sendSimple">
-<code class="sig-name descname">sendSimple</code><span class="sig-paren">(</span><em class="sig-param">tp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.sendSimple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.sendSimple" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends a simple message to the cqc server, for example a HELLO message if tp=CQC_TP_HELLO.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.sendCommand">
-<code class="sig-name descname">sendCommand</code><span class="sig-paren">(</span><em class="sig-param">qID</em>, <em class="sig-param">command</em>, <em class="sig-param">notify=1</em>, <em class="sig-param">block=1</em>, <em class="sig-param">action=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.sendCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.sendCommand" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends a simple message and command message to the cqc server.</p>
-<ul>
-<li><p><strong>Arguments</strong></p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">qID</dt>
-<dd class="field-odd"><p>qubit ID</p>
-</dd>
-<dt class="field-even">command</dt>
-<dd class="field-even"><p>Command to be executed, eg CQC_CMD_H</p>
-</dd>
-<dt class="field-odd">nofify</dt>
-<dd class="field-odd"><p>Do we wish to be notified when done.</p>
-</dd>
-<dt class="field-even">block</dt>
-<dd class="field-even"><p>Do we want the qubit to be blocked</p>
-</dd>
-<dt class="field-odd">action</dt>
-<dd class="field-odd"><p>Are there more commands to be executed</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.sendCmdXtra">
-<code class="sig-name descname">sendCmdXtra</code><span class="sig-paren">(</span><em class="sig-param">qID</em>, <em class="sig-param">command</em>, <em class="sig-param">notify=1</em>, <em class="sig-param">block=1</em>, <em class="sig-param">action=0</em>, <em class="sig-param">xtra_qID=0</em>, <em class="sig-param">step=0</em>, <em class="sig-param">remote_appID=0</em>, <em class="sig-param">remote_node=0</em>, <em class="sig-param">remote_port=0</em>, <em class="sig-param">ref_id=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.sendCmdXtra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.sendCmdXtra" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends a simple message, command message and xtra message to the cqc server.</p>
-<ul>
-<li><p><strong>Arguments</strong></p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">qID</dt>
-<dd class="field-odd"><p>qubit ID</p>
-</dd>
-<dt class="field-even">command</dt>
-<dd class="field-even"><p>Command to be executed, eg CQC_CMD_H</p>
-</dd>
-<dt class="field-odd">nofify</dt>
-<dd class="field-odd"><p>Do we wish to be notified when done.</p>
-</dd>
-<dt class="field-even">block</dt>
-<dd class="field-even"><p>Do we want the qubit to be blocked</p>
-</dd>
-<dt class="field-odd">action</dt>
-<dd class="field-odd"><p>Are there more commands to be executed</p>
-</dd>
-<dt class="field-even">xtra_qID</dt>
-<dd class="field-even"><p>Extra qubit ID for for example CNOT</p>
-</dd>
-<dt class="field-odd">step</dt>
-<dd class="field-odd"><p>Defines the angle of rotation.</p>
-</dd>
-<dt class="field-even">remote_appID</dt>
-<dd class="field-even"><p>Application ID of remote host</p>
-</dd>
-<dt class="field-odd">remote_node</dt>
-<dd class="field-odd"><p>ip of remote host in cqc network</p>
-</dd>
-<dt class="field-even">remote_port</dt>
-<dd class="field-even"><p>port of remote host in cqc network</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.sendGetTime">
-<code class="sig-name descname">sendGetTime</code><span class="sig-paren">(</span><em class="sig-param">qID</em>, <em class="sig-param">notify=1</em>, <em class="sig-param">block=1</em>, <em class="sig-param">action=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.sendGetTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.sendGetTime" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends get-time message</p>
-<ul>
-<li><p><strong>Arguments</strong></p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">qID</dt>
-<dd class="field-odd"><p>qubit ID</p>
-</dd>
-<dt class="field-even">command</dt>
-<dd class="field-even"><p>Command to be executed, eg CQC_CMD_H</p>
-</dd>
-<dt class="field-odd">notify</dt>
-<dd class="field-odd"><p>Do we wish to be notified when done.</p>
-</dd>
-<dt class="field-even">block</dt>
-<dd class="field-even"><p>Do we want the qubit to be blocked</p>
-</dd>
-<dt class="field-odd">action</dt>
-<dd class="field-odd"><p>Are there more commands to be executed</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.allocate_qubits">
-<code class="sig-name descname">allocate_qubits</code><span class="sig-paren">(</span><em class="sig-param">num_qubits</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.allocate_qubits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.allocate_qubits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Requests the backend to reserve some qubits
-:param num_qubits: The amount of qubits to reserve
-:return: A list of qubits
-:param notify:     Do we wish to be notified when done.
-:param block:         Do we want the qubit to be blocked</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.release_qubits">
-<code class="sig-name descname">release_qubits</code><span class="sig-paren">(</span><em class="sig-param">qubits</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em>, <em class="sig-param">action=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.release_qubits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.release_qubits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Release qubits so backend can free them up for other uses
-:param qubits: a list of qubits to be released
-:param notify:     Do we wish to be notified when done.
-:param block:         Do we want the qubit to be blocked
-:param action:     Execute the releases recursively or sequencely</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.release_all_qubits">
-<code class="sig-name descname">release_all_qubits</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.release_all_qubits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.release_all_qubits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Releases all qubits off this connection</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.sendFactory">
-<code class="sig-name descname">sendFactory</code><span class="sig-paren">(</span><em class="sig-param">qID</em>, <em class="sig-param">command</em>, <em class="sig-param">num_iter</em>, <em class="sig-param">notify=1</em>, <em class="sig-param">block=1</em>, <em class="sig-param">action=0</em>, <em class="sig-param">xtra_qID=-1</em>, <em class="sig-param">remote_appID=0</em>, <em class="sig-param">remote_node=0</em>, <em class="sig-param">remote_port=0</em>, <em class="sig-param">step_size=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.sendFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.sendFactory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends a factory message</p>
-<ul>
-<li><p><strong>Arguments</strong></p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">qID</dt>
-<dd class="field-odd"><p>qubit ID</p>
-</dd>
-<dt class="field-even">command</dt>
-<dd class="field-even"><p>Command to be executed, eg CQC_CMD_H</p>
-</dd>
-<dt class="field-odd">num_iter</dt>
-<dd class="field-odd"><p>Number of times to execute command</p>
-</dd>
-<dt class="field-even">nofify</dt>
-<dd class="field-even"><p>Do we wish to be notified when done.</p>
-</dd>
-<dt class="field-odd">block</dt>
-<dd class="field-odd"><p>Do we want the factory to be blocked</p>
-</dd>
-<dt class="field-even">action</dt>
-<dd class="field-even"><p>Are there more commands to be executed</p>
-</dd>
-<dt class="field-odd">xtra_qID</dt>
-<dd class="field-odd"><p>Extra qubit ID for for example CNOT</p>
-</dd>
-<dt class="field-even">remote_appID</dt>
-<dd class="field-even"><p>Application ID of remote host</p>
-</dd>
-<dt class="field-odd">remote_node</dt>
-<dd class="field-odd"><p>ip of remote host in cqc network</p>
-</dd>
-<dt class="field-even">remote_port</dt>
-<dd class="field-even"><p>port of remote host in cqc network</p>
-</dd>
-<dt class="field-odd">cmd_length</dt>
-<dd class="field-odd"><p>length of extra commands</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.readMessage">
-<code class="sig-name descname">readMessage</code><span class="sig-paren">(</span><em class="sig-param">maxsize=192</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.readMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.readMessage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Receive the whole message from cqc server.
-Returns (CQCHeader,None,None), (CQCHeader,CQCNotifyHeader,None) or (CQCHeader,CQCNotifyHeader,EntInfoHeader)
-depending on the type of message.
-Maxsize is the max size of message.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.print_CQC_msg">
-<code class="sig-name descname">print_CQC_msg</code><span class="sig-paren">(</span><em class="sig-param">message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.print_CQC_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.print_CQC_msg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prints messsage returned by the readMessage method of CQCConnection.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.parse_CQC_msg">
-<code class="sig-name descname">parse_CQC_msg</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">q=None</em>, <em class="sig-param">is_factory=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.parse_CQC_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.parse_CQC_msg" title="Permalink to this definition">¶</a></dt>
-<dd><p>parses the cqc message and returns the relevant value of that measure
-(qubit, measurement outcome)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>message</strong> – str
-the cqc message to be parsed</p></li>
-<li><p><strong>q</strong> – <a class="reference internal" href="#cqc.pythonLib.qubit" title="cqc.pythonLib.qubit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cqc.pythonLib.qubit</span></code></a>
-the qubit object we should save the qubit to</p></li>
-<li><p><strong>is_factory</strong> – bool
-whether the returned message came from a factory. If so, do not change the qubit, but create a new one</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the result of the message (either a qubit, or a measurement outcome. Otherwise None</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.check_error">
-<code class="sig-name descname">check_error</code><span class="sig-paren">(</span><em class="sig-param">hdr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.check_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.check_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks if there is an error returned.</p>
+<code class="sig-name descname">readMessage</code><span class="sig-paren">(</span><em class="sig-param">maxsize=192</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.readMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.readMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive the whole message from cqc server.</p>
+<p>Returns (CQCHeader,None,None), (CQCHeader,CQCNotifyHeader,None)
+or (CQCHeader,CQCNotifyHeader,EntInfoHeader) depending on the
+type of message.</p>
+<p>Maxsize is the max size of message.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.sendQubit">
-<code class="sig-name descname">sendQubit</code><span class="sig-paren">(</span><em class="sig-param">q</em>, <em class="sig-param">name</em>, <em class="sig-param">remote_appID=0</em>, <em class="sig-param">remote_socket=None</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.sendQubit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.sendQubit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends qubit to another node in the cqc network. If this node is not in the network an error is raised.</p>
-<ul>
-<li><p><strong>Arguments</strong></p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">q</dt>
-<dd class="field-odd"><p>The qubit to send.</p>
-</dd>
-<dt class="field-even">Name</dt>
-<dd class="field-even"><p>Name of the node as specified in the cqc network config file.</p>
-</dd>
-<dt class="field-odd">remote_appID</dt>
-<dd class="field-odd"><p>The app ID of the application running on the receiving node.</p>
-</dd>
-<dt class="field-even">remote_socket</dt>
-<dd class="field-even"><p>tuple (str, int) of ip and port number. Needed if no cqcFile was specified</p>
-</dd>
-<dt class="field-odd">nofify</dt>
-<dd class="field-odd"><p>Do we wish to be notified when done.</p>
-</dd>
-<dt class="field-even">block</dt>
-<dd class="field-even"><p>Do we want the qubit to be blocked</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.recvQubit">
-<code class="sig-name descname">recvQubit</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.recvQubit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.recvQubit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Receives a qubit.</p>
+<code class="sig-name descname">sendQubit</code><span class="sig-paren">(</span><em class="sig-param">q</em>, <em class="sig-param">name</em>, <em class="sig-param">remote_appID=0</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em>, <em class="sig-param">remote_socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.sendQubit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.sendQubit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends qubit to another node in the cqc network.</p>
+<p>If this node is not in the network an error is raised.</p>
 <ul>
 <li><p><strong>Arguments</strong></p>
 <blockquote>
@@ -584,6 +361,9 @@ whether the returned message came from a factory. If so, do not change the qubit
 <dt class="field-odd">block</dt>
 <dd class="field-odd"><p>Do we want the qubit to be blocked</p>
 </dd>
+<dt class="field-even">remote_socket</dt>
+<dd class="field-even"><p>tuple (str, int) of ip and port number. Needed if no cqcFile was specified</p>
+</dd>
 </dl>
 </div></blockquote>
 </li>
@@ -592,7 +372,7 @@ whether the returned message came from a factory. If so, do not change the qubit
 
 <dl class="method">
 <dt id="cqc.pythonLib.CQCConnection.createEPR">
-<code class="sig-name descname">createEPR</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">remote_appID=0</em>, <em class="sig-param">remote_socket=None</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.createEPR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.createEPR" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">createEPR</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">remote_appID=0</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em>, <em class="sig-param">remote_socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.createEPR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.createEPR" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates epr with other host in cqc network.</p>
 <ul>
 <li><p><strong>Arguments</strong></p>
@@ -604,104 +384,14 @@ whether the returned message came from a factory. If so, do not change the qubit
 <dt class="field-even">remote_appID</dt>
 <dd class="field-even"><p>The app ID of the application running on the receiving node.</p>
 </dd>
-<dt class="field-odd">remote_socket</dt>
-<dd class="field-odd"><p>tuple (str, int) of ip and port number. Needed if no cqcFile was specified</p>
-</dd>
-<dt class="field-even">nofify</dt>
-<dd class="field-even"><p>Do we wish to be notified when done.</p>
-</dd>
-<dt class="field-odd">block</dt>
-<dd class="field-odd"><p>Do we want the qubit to be blocked</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.recvEPR">
-<code class="sig-name descname">recvEPR</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.recvEPR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.recvEPR" title="Permalink to this definition">¶</a></dt>
-<dd><p>Receives a qubit from an EPR-pair generated with another node.</p>
-<ul>
-<li><p><strong>Arguments</strong></p>
-<blockquote>
-<div><dl class="field-list simple">
 <dt class="field-odd">nofify</dt>
 <dd class="field-odd"><p>Do we wish to be notified when done.</p>
 </dd>
 <dt class="field-even">block</dt>
 <dd class="field-even"><p>Do we want the qubit to be blocked</p>
 </dd>
-</dl>
-</div></blockquote>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.set_pending">
-<code class="sig-name descname">set_pending</code><span class="sig-paren">(</span><em class="sig-param">pend_messages</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.set_pending"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.set_pending" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the pend_messages flag.
-If true, flush() has to be called to send all self._pending_headers in sequence to the backend
-If false, all commands are directly send to the back_end
-:param pend_messages: Boolean to indicate if messages should pend or not</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.create_qubits">
-<code class="sig-name descname">create_qubits</code><span class="sig-paren">(</span><em class="sig-param">nb_of_qubits: int</em><span class="sig-paren">)</span> &#x2192; List[cqc.pythonLib.qubit]<a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.create_qubits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.create_qubits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates (i.e. allocates) multiple qubits, and returns a list with qubit objects.
-:nb_of_qubits: The amount of qubits to be created.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.flush">
-<code class="sig-name descname">flush</code><span class="sig-paren">(</span><em class="sig-param">do_sequence=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.flush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.flush" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flush all pending messages to the backend.
-:param do_sequence: boolean to indicate if you want to send the pending messages as a sequence
-:return: A list of things that are sent back from the server. Can be qubits, or outcomes</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.flush_factory">
-<code class="sig-name descname">flush_factory</code><span class="sig-paren">(</span><em class="sig-param">num_iter</em>, <em class="sig-param">do_sequence=False</em>, <em class="sig-param">block_factory=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.flush_factory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.flush_factory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flushes the current pending sequence in a factory. It is performed multiple times
-:param num_iter: The amount of times the current pending sequence is performed
-:return: A list of outcomes/qubits that are produced by the commands</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.send_pending_headers">
-<code class="sig-name descname">send_pending_headers</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[Any]<a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.send_pending_headers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.send_pending_headers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Sends all pending headers.
-After sending, self._pending_headers is emptied.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.insert_cqc_header">
-<code class="sig-name descname">insert_cqc_header</code><span class="sig-paren">(</span><em class="sig-param">cqc_type: cqc.cqcHeader.CQCType</em>, <em class="sig-param">version=2</em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.insert_cqc_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.insert_cqc_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inserts a CQC Header at index 0 of self._pending_headers.
-Invoke this method <em>after</em> all other headers are pended, so that the correct message length is calculated.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.tomography">
-<code class="sig-name descname">tomography</code><span class="sig-paren">(</span><em class="sig-param">preparation</em>, <em class="sig-param">iterations</em>, <em class="sig-param">progress=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.tomography"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.tomography" title="Permalink to this definition">¶</a></dt>
-<dd><p>Does a tomography on the output from the preparation specified.
-The frequencies from X, Y and Z measurements are returned as a tuple (f_X,f_Y,f_Z).</p>
-<ul>
-<li><p><strong>Arguments</strong></p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">preparation</dt>
-<dd class="field-odd"><p>A function that takes a CQCConnection as input and prepares a qubit and returns this</p>
-</dd>
-<dt class="field-even">iterations</dt>
-<dd class="field-even"><p>Number of measurements in each basis.</p>
-</dd>
-<dt class="field-odd">progress_bar</dt>
-<dd class="field-odd"><p>Displays a progress bar</p>
+<dt class="field-odd">remote_socket</dt>
+<dd class="field-odd"><p>tuple (str, int) of ip and port number. Needed if no cqcFile was specified</p>
 </dd>
 </dl>
 </div></blockquote>
@@ -710,45 +400,26 @@ The frequencies from X, Y and Z measurements are returned as a tuple (f_X,f_Y,f_
 </dd></dl>
 
 <dl class="method">
-<dt id="cqc.pythonLib.CQCConnection.test_preparation">
-<code class="sig-name descname">test_preparation</code><span class="sig-paren">(</span><em class="sig-param">preparation</em>, <em class="sig-param">exp_values</em>, <em class="sig-param">conf=2</em>, <em class="sig-param">iterations=100</em>, <em class="sig-param">progress=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCConnection.test_preparation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.test_preparation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test the preparation of a qubit.
-Returns True if the expected values are inside the confidence interval produced from the data received from
-the tomography function</p>
-<ul>
-<li><p><strong>Arguments</strong></p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">preparation</dt>
-<dd class="field-odd"><p>A function that takes a CQCConnection as input and prepares a qubit and returns this</p>
-</dd>
-<dt class="field-even">exp_values</dt>
-<dd class="field-even"><p>The expected values for measurements in the X, Y and Z basis.</p>
-</dd>
-<dt class="field-odd">conf</dt>
-<dd class="field-odd"><p>Determines the confidence region (+/- conf/sqrt(iterations) )</p>
-</dd>
-<dt class="field-even">iterations</dt>
-<dd class="field-even"><p>Number of measurements in each basis.</p>
-</dd>
-<dt class="field-odd">progress_bar</dt>
-<dd class="field-odd"><p>Displays a progress bar</p>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ul>
+<dt id="cqc.pythonLib.CQCConnection.return_meas_outcome">
+<code class="sig-name descname">return_meas_outcome</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.return_meas_outcome"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.return_meas_outcome" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return measurement outcome.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cqc.pythonLib.CQCConnection.get_remote_from_directory_or_address">
+<code class="sig-name descname">get_remote_from_directory_or_address</code><span class="sig-paren">(</span><em class="sig-param">name</em>, <em class="sig-param">remote_socket=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_connection.html#CQCConnection.get_remote_from_directory_or_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCConnection.get_remote_from_directory_or_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the remote address of a given node</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="cqc.pythonLib.qubit">
-<em class="property">class </em><code class="sig-prename descclassname">cqc.pythonLib.</code><code class="sig-name descname">qubit</code><span class="sig-paren">(</span><em class="sig-param">cqc</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em>, <em class="sig-param">createNew=True</em>, <em class="sig-param">q_id=None</em>, <em class="sig-param">entInfo=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">cqc.pythonLib.</code><code class="sig-name descname">qubit</code><span class="sig-paren">(</span><em class="sig-param">cqc</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em>, <em class="sig-param">createNew=True</em>, <em class="sig-param">q_id=None</em>, <em class="sig-param">entInfo=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit" title="Permalink to this definition">¶</a></dt>
 <dd><p>A qubit.</p>
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">cqc</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em>, <em class="sig-param">createNew=True</em>, <em class="sig-param">q_id=None</em>, <em class="sig-param">entInfo=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">cqc</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em>, <em class="sig-param">createNew=True</em>, <em class="sig-param">q_id=None</em>, <em class="sig-param">entInfo=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes the qubit. The cqc connection must be given.
 If notify, the return message is received before the method finishes.
 createNew is set to False when we receive a qubit.</p>
@@ -782,13 +453,13 @@ createNew is set to False when we receive a qubit.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.check_active">
-<code class="sig-name descname">check_active</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.check_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.check_active" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">check_active</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.check_active"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.check_active" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks if the qubit is active</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.I">
-<code class="sig-name descname">I</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.I"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.I" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">I</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.I"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.I" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs an identity gate on the qubit.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -809,7 +480,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.X">
-<code class="sig-name descname">X</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.X" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">X</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.X" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a X on the qubit.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -830,7 +501,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.Y">
-<code class="sig-name descname">Y</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.Y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.Y" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">Y</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.Y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.Y" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a Y on the qubit.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -851,7 +522,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.Z">
-<code class="sig-name descname">Z</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.Z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.Z" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">Z</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.Z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.Z" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a Z on the qubit.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -872,7 +543,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.T">
-<code class="sig-name descname">T</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.T"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.T" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">T</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.T"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.T" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a T gate on the qubit.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -893,7 +564,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.H">
-<code class="sig-name descname">H</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.H"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.H" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">H</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.H"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.H" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a Hadamard on the qubit.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -914,7 +585,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.K">
-<code class="sig-name descname">K</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.K"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.K" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">K</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.K"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.K" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs a K gate on the qubit.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -935,7 +606,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.rot_X">
-<code class="sig-name descname">rot_X</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.rot_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.rot_X" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rot_X</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.rot_X"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.rot_X" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies rotation around the x-axis with the angle of step*2*pi/256 radians.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -959,7 +630,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.rot_Y">
-<code class="sig-name descname">rot_Y</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.rot_Y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.rot_Y" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rot_Y</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.rot_Y"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.rot_Y" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies rotation around the y-axis with the angle of step*2*pi/256 radians.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -983,7 +654,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.rot_Z">
-<code class="sig-name descname">rot_Z</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.rot_Z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.rot_Z" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rot_Z</code><span class="sig-paren">(</span><em class="sig-param">step</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.rot_Z"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.rot_Z" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies rotation around the z-axis with the angle of step*2*pi/256 radians.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -1007,7 +678,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.cnot">
-<code class="sig-name descname">cnot</code><span class="sig-paren">(</span><em class="sig-param">target</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.cnot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.cnot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cnot</code><span class="sig-paren">(</span><em class="sig-param">target</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.cnot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.cnot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies a cnot onto target.
 Target should be a qubit-object with the same cqc connection.
 If notify, the return message is received before the method finishes.</p>
@@ -1032,7 +703,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.cphase">
-<code class="sig-name descname">cphase</code><span class="sig-paren">(</span><em class="sig-param">target</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.cphase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.cphase" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cphase</code><span class="sig-paren">(</span><em class="sig-param">target</em>, <em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.cphase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.cphase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Applies a cphase onto target.
 Target should be a qubit-object with the same cqc connection.
 If notify, the return message is received before the method finishes.</p>
@@ -1057,7 +728,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.measure">
-<code class="sig-name descname">measure</code><span class="sig-paren">(</span><em class="sig-param">inplace=False</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.measure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.measure" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">measure</code><span class="sig-paren">(</span><em class="sig-param">inplace=False</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.measure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.measure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Measures the qubit in the standard basis and returns the measurement outcome.
 If now MEASOUT message is received, None is returned.
 If inplace=False, the measurement is destructive and the qubit is removed from memory.
@@ -1080,7 +751,7 @@ If inplace=True, the qubit is left in the post-measurement state.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.reset">
-<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.reset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Resets the qubit.
 If notify, the return message is received before the method finishes.</p>
 <ul>
@@ -1101,7 +772,7 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.release">
-<code class="sig-name descname">release</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.release" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">release</code><span class="sig-paren">(</span><em class="sig-param">notify=True</em>, <em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.release"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.release" title="Permalink to this definition">¶</a></dt>
 <dd><p>Release the current qubit
 :param notify: Do we wish to be notified when done
 :param block: Do we want the qubit to be blocked
@@ -1110,9 +781,9 @@ If notify, the return message is received before the method finishes.</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.qubit.getTime">
-<code class="sig-name descname">getTime</code><span class="sig-paren">(</span><em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#qubit.getTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.getTime" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getTime</code><span class="sig-paren">(</span><em class="sig-param">block=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/qubit.html#qubit.getTime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.qubit.getTime" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the time information of the qubit.
-If now INF_TIME message is received, None is returned.</p>
+If no INF_TIME message is received, None is returned.</p>
 <ul>
 <li><p><strong>Arguments</strong></p>
 <blockquote>
@@ -1130,12 +801,12 @@ If now INF_TIME message is received, None is returned.</p>
 
 <dl class="class">
 <dt id="cqc.pythonLib.CQCMix">
-<em class="property">class </em><code class="sig-prename descclassname">cqc.pythonLib.</code><code class="sig-name descname">CQCMix</code><span class="sig-paren">(</span><em class="sig-param">cqc_connection: cqc.pythonLib.CQCConnection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCMix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">cqc.pythonLib.</code><code class="sig-name descname">CQCMix</code><span class="sig-paren">(</span><em class="sig-param">cqc_connection: cqc.pythonLib.cqc_mix.CQCMixConnection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_mix.html#CQCMix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix" title="Permalink to this definition">¶</a></dt>
 <dd><p>This Python Context Manager Type can be used to create CQC programs that consist of more than a single type.
 Hence the name CQC Mix. Programs of this type can consist of any number and mix of the other CQC types.</p>
 <dl class="method">
 <dt id="cqc.pythonLib.CQCMix.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">cqc_connection: cqc.pythonLib.CQCConnection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCMix.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">cqc_connection: cqc.pythonLib.cqc_mix.CQCMixConnection</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_mix.html#CQCMix.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initializes the Mix context.</p>
 <ul>
 <li><p><strong>Arguments</strong></p>
@@ -1152,7 +823,7 @@ Hence the name CQC Mix. Programs of this type can consist of any number and mix 
 
 <dl class="method">
 <dt id="cqc.pythonLib.CQCMix.cqc_if">
-<code class="sig-name descname">cqc_if</code><span class="sig-paren">(</span><em class="sig-param">logical_function: cqc.pythonLib._LogicalFunction</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCMix.cqc_if"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix.cqc_if" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cqc_if</code><span class="sig-paren">(</span><em class="sig-param">logical_function: cqc.pythonLib.cqc_mix._LogicalFunction</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_mix.html#CQCMix.cqc_if"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix.cqc_if" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open a Python Context Manager Type to start an if-statement block.</p>
 <ul>
 <li><p><strong>Arguments</strong></p>
@@ -1173,14 +844,14 @@ The value can be any integer (though only 1 and 0 make sense).</p>
 
 <dl class="method">
 <dt id="cqc.pythonLib.CQCMix.cqc_else">
-<code class="sig-name descname">cqc_else</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCMix.cqc_else"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix.cqc_else" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">cqc_else</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_mix.html#CQCMix.cqc_else"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix.cqc_else" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open a Python Context Manager Type to start an else-statement block.
 This will be  an else-block of the last closed cqc_if-block.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="cqc.pythonLib.CQCMix.loop">
-<code class="sig-name descname">loop</code><span class="sig-paren">(</span><em class="sig-param">times: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib.html#CQCMix.loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix.loop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">loop</code><span class="sig-paren">(</span><em class="sig-param">times: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cqc/pythonLib/cqc_mix.html#CQCMix.loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cqc.pythonLib.CQCMix.loop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open a Python Context Manager Type to start a factory (i.e. repeated sequence of commands).</p>
 <ul>
 <li><p><strong>Arguments</strong></p>

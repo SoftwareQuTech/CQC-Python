@@ -21,11 +21,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -268,6 +268,38 @@
 <span class="n">CQC_OPT_ACTION</span> <span class="o">=</span> <span class="mh">0x02</span>  <span class="c1"># On if there are actions to execute when done</span>
 <span class="n">CQC_OPT_BLOCK</span> <span class="o">=</span> <span class="mh">0x04</span>  <span class="c1"># Block until command is done</span>
 
+<span class="n">_CMD_TO_STRING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">CQC_CMD_I</span><span class="p">:</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_NEW</span><span class="p">:</span> <span class="s2">&quot;NEW&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_MEASURE</span><span class="p">:</span> <span class="s2">&quot;MEASURE&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_MEASURE_INPLACE</span><span class="p">:</span> <span class="s2">&quot;MEASURE_INPLACE&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_RESET</span><span class="p">:</span> <span class="s2">&quot;RESET&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_SEND</span><span class="p">:</span> <span class="s2">&quot;SEND&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_RECV</span><span class="p">:</span> <span class="s2">&quot;RECV&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_EPR</span><span class="p">:</span> <span class="s2">&quot;EPR&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_EPR_RECV</span><span class="p">:</span> <span class="s2">&quot;EPR_RECV&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_X</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_Z</span><span class="p">:</span> <span class="s2">&quot;Z&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_Y</span><span class="p">:</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_T</span><span class="p">:</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_ROT_X</span><span class="p">:</span> <span class="s2">&quot;ROT_X&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_ROT_Y</span><span class="p">:</span> <span class="s2">&quot;ROT_Y&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_ROT_Z</span><span class="p">:</span> <span class="s2">&quot;ROT_Z&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_H</span><span class="p">:</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_K</span><span class="p">:</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_CNOT</span><span class="p">:</span> <span class="s2">&quot;CNOT&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_CPHASE</span><span class="p">:</span> <span class="s2">&quot;CPHASE&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_ALLOCATE</span><span class="p">:</span> <span class="s2">&quot;ALLOCATE&quot;</span><span class="p">,</span>
+    <span class="n">CQC_CMD_RELEASE</span><span class="p">:</span> <span class="s2">&quot;RELEASE&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">command_to_string</span><span class="p">(</span><span class="n">cmd_id</span><span class="p">):</span>
+    <span class="n">cmd_str</span> <span class="o">=</span> <span class="n">_CMD_TO_STRING</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cmd_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cmd_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown instruction id </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd_id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">cmd_str</span>
+
 
 <div class="viewcode-block" id="CQCType"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.CQCType">[docs]</a><span class="k">class</span> <span class="nc">CQCType</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
     <span class="n">HELLO</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Alive check</span>
@@ -332,6 +364,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">is_set</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">headerBytes</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">printable</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Header.setVals"><a class="viewcode-back" href="../../modules/cqcHeader.html#cqc.cqcHeader.Header.setVals">[docs]</a>    <span class="k">def</span> <span class="nf">setVals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

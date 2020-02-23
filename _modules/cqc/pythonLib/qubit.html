@@ -1,0 +1,716 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cqc.pythonLib.qubit &mdash; cqc 3.1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> cqc
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../classical_communication.html">Classical Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../useful_commands.html">Useful commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../interface.html">CQC Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples using the python library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cqc</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cqc.pythonLib.qubit</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cqc.pythonLib.qubit</h1><div class="highlight"><pre>
+<span></span><span class="c1">#</span>
+<span class="c1"># Copyright (c) 2017, Stephanie Wehner and Axel Dahlberg</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted provided that the following conditions are met:</span>
+<span class="c1"># 1. Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1"># 2. Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#    documentation and/or other materials provided with the distribution.</span>
+<span class="c1"># 3. All advertising materials mentioning features or use of this software</span>
+<span class="c1">#    must display the following acknowledgement:</span>
+<span class="c1">#    This product includes software developed by Stephanie Wehner, QuTech.</span>
+<span class="c1"># 4. Neither the name of the QuTech organization nor the</span>
+<span class="c1">#    names of its contributors may be used to endorse or promote products</span>
+<span class="c1">#    derived from this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER &#39;&#39;AS IS&#39;&#39; AND ANY</span>
+<span class="c1"># EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1"># WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</span>
+<span class="c1"># DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY</span>
+<span class="c1"># DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES</span>
+<span class="c1"># (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<span class="c1"># LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND</span>
+<span class="c1"># ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1"># (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS</span>
+<span class="c1"># SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">cqc.cqcHeader</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CQC_CMD_NEW</span><span class="p">,</span>
+    <span class="n">CQC_CMD_I</span><span class="p">,</span>
+    <span class="n">CQC_CMD_X</span><span class="p">,</span>
+    <span class="n">CQC_CMD_Y</span><span class="p">,</span>
+    <span class="n">CQC_CMD_Z</span><span class="p">,</span>
+    <span class="n">CQC_CMD_T</span><span class="p">,</span>
+    <span class="n">CQC_CMD_H</span><span class="p">,</span>
+    <span class="n">CQC_CMD_K</span><span class="p">,</span>
+    <span class="n">CQC_CMD_ROT_X</span><span class="p">,</span>
+    <span class="n">CQC_CMD_ROT_Y</span><span class="p">,</span>
+    <span class="n">CQC_CMD_ROT_Z</span><span class="p">,</span>
+    <span class="n">CQC_CMD_CNOT</span><span class="p">,</span>
+    <span class="n">CQC_CMD_CPHASE</span><span class="p">,</span>
+    <span class="n">CQC_CMD_MEASURE</span><span class="p">,</span>
+    <span class="n">CQC_CMD_MEASURE_INPLACE</span><span class="p">,</span>
+    <span class="n">CQC_CMD_RESET</span><span class="p">,</span>
+    <span class="n">CQC_CMD_RELEASE</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CQCGeneralError</span><span class="p">,</span>
+    <span class="n">CQCUnsuppError</span><span class="p">,</span>
+    <span class="n">QubitNotActiveError</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="qubit"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit">[docs]</a><span class="k">class</span> <span class="nc">qubit</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A qubit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="qubit.__init__"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cqc</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">createNew</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">q_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">entInfo</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the qubit. The cqc connection must be given.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+<span class="sd">        createNew is set to False when we receive a qubit.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :cqc:         The CQCconnection used</span>
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">            :createNew:     If NEW-message should be sent, used internally</span>
+<span class="sd">            :q_id:         Qubit id, used internally if createNew</span>
+<span class="sd">            :entInfo:     Entanglement information, if qubit is part of EPR-pair</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Cqc connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span> <span class="o">=</span> <span class="n">cqc</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">notify</span> <span class="o">=</span> <span class="n">cqc</span><span class="o">.</span><span class="n">notify</span>
+
+        <span class="c1"># Check if the cqc connection was openened using a &#39;with&#39; statement</span>
+        <span class="c1"># If not, raise a deprecation warning</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">_opened_with_with</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;You should open CQCConnection in a context, i.e. using &#39;with CQCConnection(...) as cqc:&#39;. &quot;</span>
+                <span class="s2">&quot;Then qubits will be automatically released by the end of the program, independently of what happens. &quot;</span>
+                <span class="s2">&quot;For more information, see https://softwarequtech.github.io/SimulaQron/html/PythonLib.html&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Whether the qubit is active. Will be set in the first run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">createNew</span><span class="p">:</span>
+            <span class="c1"># print info</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;App </span><span class="si">{}</span><span class="s2"> tells CQC: &#39;Create qubit&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+
+            <span class="c1"># Create new qubit at the cqc server</span>
+            <span class="c1"># TODO how to handle pending headers</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">commit_command</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">CQC_CMD_NEW</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">)</span>
+            
+            <span class="c1"># Get qubit id</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_qID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">new_qubitID</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CQCGeneralError</span><span class="p">(</span><span class="s2">&quot;Didn&#39;t receive the qubit id&quot;</span><span class="p">)</span>
+            
+            <span class="c1"># Activate qubit</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_active</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">notify</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">notify</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">readMessage</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">print_CQC_msg</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qID</span> <span class="o">=</span> <span class="n">q_id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_active</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># Why?</span>
+
+        <span class="c1"># Entanglement information</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_entanglement_info</span><span class="p">(</span><span class="n">entInfo</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Qubit at the node </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Not active qubit&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">entanglement_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entInfo</span>
+
+    <span class="k">def</span> <span class="nf">_set_entanglement_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ent_info</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_entInfo</span> <span class="o">=</span> <span class="n">ent_info</span>
+
+        <span class="c1"># Lookup remote entangled node</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_remote_entNode</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entInfo</span><span class="p">:</span>
+            <span class="n">ip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entInfo</span><span class="o">.</span><span class="n">node_B</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entInfo</span><span class="o">.</span><span class="n">port_B</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">_cqcNet</span><span class="o">.</span><span class="n">hostDict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">ip</span> <span class="o">==</span> <span class="n">ip</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">port</span> <span class="o">==</span> <span class="n">port</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_remote_entNode</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span>
+                        <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_remote_entNode</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">remote_entangled_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remote_entNode</span>
+
+    <span class="k">def</span> <span class="nf">get_entInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;get_entInfo is deprecated, use the property entanglement_info instead&quot;</span><span class="p">,</span>
+                      <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entInfo</span>
+
+    <span class="k">def</span> <span class="nf">print_entInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;print_entInfo is deprecated&quot;</span><span class="p">,</span>
+                      <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entanglement_info</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entanglement_info</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No entanglement information&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_entInfo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entInfo</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;set_entInfo is deprecated, use _set_entanglement_info instead&quot;</span><span class="p">,</span>
+                      <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_entanglement_info</span><span class="p">(</span><span class="n">entInfo</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_entangled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entInfo</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">get_remote_entNode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;get_remote_entNode is deprecated, use the propery remote_entangled_node instead&quot;</span><span class="p">,</span>
+                      <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_entangled_node</span>
+
+<div class="viewcode-block" id="qubit.check_active"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.check_active">[docs]</a>    <span class="k">def</span> <span class="nf">check_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the qubit is active</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">QubitNotActiveError</span><span class="p">(</span><span class="s2">&quot;Qubit is not active&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_set_active</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">be_active</span><span class="p">):</span>
+
+        <span class="c1"># Check if not already new state</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">==</span> <span class="n">be_active</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">be_active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">active_qubits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">active_qubits</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">active_qubits</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="n">be_active</span>
+
+    <span class="k">def</span> <span class="nf">_single_qubit_gate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a single qubit gate specified by the command, called in I(), X(), Y() etc</span>
+<span class="sd">        :param command: the identifier of the command, as specified in cqcHeader.py</span>
+<span class="sd">        :param notify: Do we wish to be notified when done</span>
+<span class="sd">        :param block: Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if qubit is active</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_active</span><span class="p">()</span>
+
+        <span class="n">notify</span> <span class="o">=</span> <span class="n">notify</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">notify</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">put_command</span><span class="p">(</span>
+            <span class="n">qID</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_qID</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
+            <span class="n">notify</span><span class="o">=</span><span class="n">notify</span><span class="p">,</span>
+            <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="qubit.I"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.I">[docs]</a>    <span class="k">def</span> <span class="nf">I</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs an identity gate on the qubit.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_qubit_gate</span><span class="p">(</span><span class="n">CQC_CMD_I</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.X"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.X">[docs]</a>    <span class="k">def</span> <span class="nf">X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a X on the qubit.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_qubit_gate</span><span class="p">(</span><span class="n">CQC_CMD_X</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.Y"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.Y">[docs]</a>    <span class="k">def</span> <span class="nf">Y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a Y on the qubit.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_qubit_gate</span><span class="p">(</span><span class="n">CQC_CMD_Y</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.Z"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.Z">[docs]</a>    <span class="k">def</span> <span class="nf">Z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a Z on the qubit.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_qubit_gate</span><span class="p">(</span><span class="n">CQC_CMD_Z</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.T"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.T">[docs]</a>    <span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a T gate on the qubit.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_qubit_gate</span><span class="p">(</span><span class="n">CQC_CMD_T</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.H"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.H">[docs]</a>    <span class="k">def</span> <span class="nf">H</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a Hadamard on the qubit.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_qubit_gate</span><span class="p">(</span><span class="n">CQC_CMD_H</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.K"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.K">[docs]</a>    <span class="k">def</span> <span class="nf">K</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a K gate on the qubit.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_qubit_gate</span><span class="p">(</span><span class="n">CQC_CMD_K</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_single_gate_rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a rotation on a qubit</span>
+<span class="sd">        :param command: the rotation qubit command as specified in cqcHeader.py</span>
+<span class="sd">        :param step: Determines the rotation angle in steps of 2*pi/256</span>
+<span class="sd">        :param notify: Do we wish to be notified when done</span>
+<span class="sd">        :param block: Do we want the qubit to be blocked</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if qubit is active</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_active</span><span class="p">()</span>
+
+        <span class="n">notify</span> <span class="o">=</span> <span class="n">notify</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">notify</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">put_command</span><span class="p">(</span>
+            <span class="n">qID</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_qID</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span>
+            <span class="n">notify</span><span class="o">=</span><span class="n">notify</span><span class="p">,</span>
+            <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="qubit.rot_X"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.rot_X">[docs]</a>    <span class="k">def</span> <span class="nf">rot_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies rotation around the x-axis with the angle of step*2*pi/256 radians.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :step:         Determines the rotation angle in steps of 2*pi/256</span>
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_gate_rotation</span><span class="p">(</span><span class="n">CQC_CMD_ROT_X</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.rot_Y"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.rot_Y">[docs]</a>    <span class="k">def</span> <span class="nf">rot_Y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies rotation around the y-axis with the angle of step*2*pi/256 radians.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :step:         Determines the rotation angle in steps of 2*pi/256</span>
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_gate_rotation</span><span class="p">(</span><span class="n">CQC_CMD_ROT_Y</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.rot_Z"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.rot_Z">[docs]</a>    <span class="k">def</span> <span class="nf">rot_Z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies rotation around the z-axis with the angle of step*2*pi/256 radians.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :step:         Determines the rotation angle in steps of 2*pi/256</span>
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_single_gate_rotation</span><span class="p">(</span><span class="n">CQC_CMD_ROT_Z</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_two_qubit_gate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform a two qubit gate on the qubit</span>
+<span class="sd">        :param command: the two qubit gate command as specified in cqcHeader.py</span>
+<span class="sd">        :param target: The target qubit</span>
+<span class="sd">        :param notify: Do we wish to be notified when done</span>
+<span class="sd">        :param block: Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if qubit is active</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_active</span><span class="p">()</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">check_active</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span> <span class="o">!=</span> <span class="n">target</span><span class="o">.</span><span class="n">_cqc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CQCUnsuppError</span><span class="p">(</span><span class="s2">&quot;Multi qubit operations can only operate on qubits in the same process&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">target</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CQCUnsuppError</span><span class="p">(</span><span class="s2">&quot;Cannot perform multi qubit operation where control and target are the same&quot;</span><span class="p">)</span>
+
+        <span class="n">notify</span> <span class="o">=</span> <span class="n">notify</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">notify</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">put_command</span><span class="p">(</span>
+            <span class="n">qID</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_qID</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
+            <span class="n">notify</span><span class="o">=</span><span class="n">notify</span><span class="p">,</span>
+            <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
+            <span class="n">xtra_qID</span><span class="o">=</span><span class="n">target</span><span class="o">.</span><span class="n">_qID</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="qubit.cnot"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.cnot">[docs]</a>    <span class="k">def</span> <span class="nf">cnot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies a cnot onto target.</span>
+<span class="sd">        Target should be a qubit-object with the same cqc connection.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :target:     The target qubit</span>
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_two_qubit_gate</span><span class="p">(</span><span class="n">CQC_CMD_CNOT</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.cphase"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.cphase">[docs]</a>    <span class="k">def</span> <span class="nf">cphase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies a cphase onto target.</span>
+<span class="sd">        Target should be a qubit-object with the same cqc connection.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :target:     The target qubit</span>
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_two_qubit_gate</span><span class="p">(</span><span class="n">CQC_CMD_CPHASE</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">notify</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.measure"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.measure">[docs]</a>    <span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Measures the qubit in the standard basis and returns the measurement outcome.</span>
+<span class="sd">        If now MEASOUT message is received, None is returned.</span>
+<span class="sd">        If inplace=False, the measurement is destructive and the qubit is removed from memory.</span>
+<span class="sd">        If inplace=True, the qubit is left in the post-measurement state.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :inplace:     If false, measure destructively.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if qubit is active</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_active</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="n">CQC_CMD_MEASURE_INPLACE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="n">CQC_CMD_MEASURE</span>
+            <span class="c1"># Set qubit to non active so the user can receive helpful errors during compile time </span>
+            <span class="c1"># if this qubit is used after this measurement</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_active</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">put_command</span><span class="p">(</span>
+            <span class="n">qID</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_qID</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="n">command</span><span class="p">,</span>
+            <span class="n">notify</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">pend_messages</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">return_meas_outcome</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="qubit.reset"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the qubit.</span>
+<span class="sd">        If notify, the return message is received before the method finishes.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :nofify:     Do we wish to be notified when done.</span>
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if qubit is active</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_active</span><span class="p">()</span>
+
+        <span class="n">notify</span> <span class="o">=</span> <span class="n">notify</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">notify</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">put_command</span><span class="p">(</span>
+            <span class="n">qID</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_qID</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="n">CQC_CMD_RESET</span><span class="p">,</span>
+            <span class="n">notify</span><span class="o">=</span><span class="n">notify</span><span class="p">,</span>
+            <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.release"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.release">[docs]</a>    <span class="k">def</span> <span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Release the current qubit</span>
+<span class="sd">        :param notify: Do we wish to be notified when done</span>
+<span class="sd">        :param block: Do we want the qubit to be blocked</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">notify</span> <span class="o">=</span> <span class="n">notify</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">notify</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">put_command</span><span class="p">(</span>
+            <span class="n">qID</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_qID</span><span class="p">,</span>
+            <span class="n">command</span><span class="o">=</span><span class="n">CQC_CMD_RELEASE</span><span class="p">,</span>
+            <span class="n">notify</span><span class="o">=</span><span class="n">notify</span><span class="p">,</span>
+            <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="qubit.getTime"><a class="viewcode-back" href="../../../modules/pythonLib.html#cqc.pythonLib.qubit.getTime">[docs]</a>    <span class="k">def</span> <span class="nf">getTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the time information of the qubit.</span>
+<span class="sd">        If no INF_TIME message is received, None is returned.</span>
+
+<span class="sd">        - **Arguments**</span>
+
+<span class="sd">            :block:         Do we want the qubit to be blocked</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if qubit is active</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_active</span><span class="p">()</span>
+
+        <span class="c1"># print info</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;App </span><span class="si">{}</span><span class="s2"> tells CQC: &#39;Return time-info of qubit with ID </span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qID</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">sendGetTime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_qID</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">block</span><span class="p">))</span>
+
+        <span class="c1"># Return time-stamp</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">readMessage</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">otherHdr</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">otherHdr</span><span class="o">.</span><span class="n">datetime</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Stephanie Wehner and Axel Dahlberg
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
