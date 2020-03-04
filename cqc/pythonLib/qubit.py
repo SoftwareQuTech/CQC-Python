@@ -488,6 +488,8 @@ class qubit:
 
         notify = notify and self.notify
 
+        self._set_active(False)
+
         self._cqc.put_command(
             qID=self._qID,
             command=CQC_CMD_RELEASE,
