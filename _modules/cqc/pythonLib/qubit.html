@@ -641,6 +641,8 @@
 
         <span class="n">notify</span> <span class="o">=</span> <span class="n">notify</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">notify</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_active</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_cqc</span><span class="o">.</span><span class="n">put_command</span><span class="p">(</span>
             <span class="n">qID</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_qID</span><span class="p">,</span>
             <span class="n">command</span><span class="o">=</span><span class="n">CQC_CMD_RELEASE</span><span class="p">,</span>
