@@ -6,6 +6,9 @@
 Welcome to cqc's documentation!
 ============================================
 
+This Python library provides a way to program a protocol on a network where the nodes listen to instructions through the classical-quantum combiner (CQC) interface.
+For more information on how to use this library with SimulaQron, see https://softwarequtech.github.io/SimulaQron/html/GettingStarted.html.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

@@ -6,6 +6,14 @@ For more details refer to the [documentation](https://softwarequtech.github.io/S
 Upcoming
 --------
 
+2020-04-01 (v3.2.2)
+-------------------
+- Security patch: require twisted 20.3 or higher
+
+2020-03-04 (v3.2.1)
+-------------------
+- Fixed bug when releasing qubits.
+
 2020-02-23 (v3.2.0)
 -------------------
 - Major refactoring of `cqc.pythonLib` which splits the code into multiple files and improved extendability by the use of abstract classes etc.

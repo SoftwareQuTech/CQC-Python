@@ -394,7 +394,7 @@ class CQCHandler(abc.ABC):
         """Handle exiting of context."""
 
         if release_qubits:
-            for q in self.active_qubits:
+            for q in list(self.active_qubits):
                 q.release()
 
         # Flush all remaining commands and the releases
