@@ -60,8 +60,8 @@ def init(name, cqcFile=None):
     if name in cqcNet.hostDict:
         myHost = cqcNet.hostDict[name]
     else:
-        logging.error("The name '%s' is not in the cqc network.", name)
-        raise LookupError("The name '%s' is not in the cqc network.".format(name))
+        logging.error("The name '{}' is not in the cqc network.".format(name))
+        raise LookupError("The name '{}' is not in the cqc network.".format(name))
 
     addr = myHost.addr
 
