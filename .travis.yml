@@ -1,41 +1,41 @@
 language: python
 only:
-  - master
-  - Develop
+- master
+- Develop
 matrix:
   include:
-    - name: Python 3.5 on Linux
-      python: 3.5
-    - name: Python 3.6 on Linux
-      python: 3.6
-      env:
-      - BUILD=True
-    - name: Python 3.7 on Xenial Linux
-      python: 3.7
-      dist: xenial
-    - name: Python 3.7 on macOS
-      os: osx
-      osx_image: xcode10.2
-      language: shell
-      env:
-      - PIPFLAG="--user"
+  - name: Python 3.5 on Linux
+    python: 3.5
+  - name: Python 3.6 on Linux
+    python: 3.6
+    env:
+    - BUILD=True
+  - name: Python 3.7 on Xenial Linux
+    python: 3.7
+    dist: xenial
+  - name: Python 3.7 on macOS
+    os: osx
+    osx_image: xcode10.2
+    language: shell
+    env:
+    - PIPFLAG="--user"
 before_install:
-  - make build
+- make build
 install:
-  - pip3 install -r test_requirements.txt $PIPFLAG
-  - pip3 install dist/*.whl $PIPFLAG
+- pip3 install -r test_requirements.txt $PIPFLAG
+- pip3 install dist/*.whl $PIPFLAG
 script:
-  - make lint
-  - make tests
+- make lint
+- make tests
 before_deploy:
-  - cd docs
-  - make build
-  - cd ..
+- cd docs
+- make build
+- cd ..
 deploy:
   - provider: pypi
-    user: adahlberg
+    user: __token__
     password:
-      secure: cQUlOGHX5ksULLBM2kOE9s2hdaJn4WK8rhD4LUuWndUG7rLeqtVfEMVrqWuMmzWcHXKOti143vgthSgp+akixfnQD7jWupVVSRiz5SFgq+1DRezGlkvYcZz2833on28lNFRiTjuPHkY3WoK0sS1iESxwTBvvi4y+q+AGtFzKE8hr+Pej+HnqFMMeXfqE7d/ZhoOrcBiRRcOrV/2JjpET5CMqimCYR4rz25yzpvVWlakC24vCqGs0Py+JL+VlZszjQz25NAQuuVwOAKnH/bapCV/JFmpvrFF5gKqAly9d1/+ZVgQVT9swMPjwmQs3zQ9E7IlL+4BPhdDly1H/GchyTRvf3uFt6Lok8ySvDyIkZUM2HlIoJIJCAESRCoEK7K7t1ySovBKjXI1Jc8O3QhAvdVMFWPpVxq5ZKwvUAEKtt7vRzN2KVmSi1nJxEzL89iuZkUtihws6DD8Y/6VgcemCFEZlP8ubxxRqR6gSaAhxSHppTdlNK2xUKq5AOwuS8A/3ur7SsMGasmMXTgQ/ElkrlHSZDvub4A89EMxfCMKrutIDPXSdpgYkmAvMFBsop+il/HJwWLc14xiNRsod4XVV5143M3pGg1wNKCifl2tTjbgoho9kFyso6RFkK28Qy3oSqZ+Sdw346M6jD6r2JVm7xsQZI7a5iR2Uq3PESkjkTP0=
+      secure: WmIUXiriro1toBRRkSwrsk+EEjyuWvdSxlp/9iDm/+CVXt8u46uiCIwKBjwG7vONN/FEu9fhZwwps6MphWtAE6GzmssGRujSn+2od9RSxDNfNErBoA92ew3UQVHfPpkX3cGKP0jo236hlCpkCaFZ4Im9fs1RrjP2eh4Oe4giM078k5Mqjhpg+enD6b55NPOCssro0BnB/tSQUc6+TFHFWTdnc5JUqGhhxc7ni4u/B1JSXJd6Mhj9FHy4qhiFsJsm75P90nbAegI3qyn0IlJvFDDj4F85CzIpC/tza8CvtmsPyNwARlEeQtQJnEOenVVZO8N0uKCXdUIX/P1RZ2eJM3xNRf9qyeATXIBhQBeUjXlrEikGlL47nPZdNw+zQQzLakfNmStbhuohoXzwD2j2uegPfP5qvgSi+QsqhlJAVdPHS6ZuIORKSTPwTrtZU0yZEmE6MBYpcv2Iy+ErMEjpRrieLcBZMgH4BqxCwuEtGeIGt2RaRpvfJ6qiWuWU7+e2T7lPBPDDhyMi3K2CXRN8Fc3MdqDCUfii5zQQqvdzrUWdD+N5mV/fG/aoNwj9iD6R961zqSshI+Y6E6vYXKYLWFixdz80VvMKeBCfGl6ndu6xqfWHgNhenP31nf2EqJ7dylc1fUkWy00c2+HfVyYTty37gwcUY/zpwDIgFE3AvJY=
     distributions: sdist bdist_wheel
     skip_existing: true
     on:
