@@ -107,8 +107,6 @@ class CQCHandler(abc.ABC):
         # Set an app ID
         self._appID = self._get_new_app_id(app_id)
 
-        self.active_qubits = []
-
         # This is a sort of global notify
         self.notify = notify
 
